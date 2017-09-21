@@ -17,19 +17,54 @@ public class PlayerControl02 : MonoBehaviour
 
 	public Transform opponentChan;
 
+	private PhotonView PhotonView;
+	public bool UseTransformView = true;
+	private Quaternion TargetRotation;
+	private Vector3 TargetPosition;
 	void Awake()
 	{
 		rb = GetComponent<Rigidbody>();
 		animation = GetComponent<Animator>();
+		PhotonView = GetComponent<PhotonView>();
+		opponentChan = FindObjectOfType<CrazyRotate> ().transform;
 	}
+	private void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+	{
+		if (UseTransformView)
+			return;
 
+		if (stream.isWriting)
+		{
+			stream.SendNext(transform.position);
+			stream.SendNext(transform.rotation);
+		}
+		else
+		{
+			TargetPosition = (Vector3)stream.ReceiveNext();
+			TargetRotation = (Quaternion)stream.ReceiveNext();
+		}
+	}
 	void Update()
 	{
+		if (PhotonView.isMine)
+			CheckInput();
+		else
+			SmoothMove();
+	}
+	private void SmoothMove()
+	{
+		if (UseTransformView)
+			return;
+
+		transform.position = Vector3.Lerp(transform.position, TargetPosition, 0.25f);
+		transform.rotation = Quaternion.RotateTowards(transform.rotation, TargetRotation, 500 * Time.deltaTime);
+	}
+	private void CheckInput(){
 		float x = Input.GetAxisRaw("Horizontal");
 		float z = Input.GetAxisRaw("Vertical");
 
 		movement = new Vector3(x, 0, z);
-		
+
 		Movement(x, z);
 	}
 
@@ -49,34 +84,68 @@ public class PlayerControl02 : MonoBehaviour
 		{
 			z = dashing;
 			transform.Translate (movement + (Vector3.forward * z));
-			animation.SetTrigger("Dash/Tumble(Shift)"); // Stamina / Charges
+			PhotonView.RPC("RPC_PerformDash", PhotonTargets.All);
 		}
 
 		if (Input.GetKeyDown(KeyCode.J))
 		{
-			animation.SetTrigger("Attack(LeftClick)");
+			PhotonView.RPC("RPC_PerformAttack", PhotonTargets.All);
 			transform.LookAt(opponentChan);
 		}
 		else if (Input.GetKeyDown(KeyCode.L))
 		{
-			animation.SetTrigger("PretendGuard(RightClick)");
+			PhotonView.RPC("RPC_PerformGuard", PhotonTargets.All);
 			transform.LookAt(opponentChan);
 		}
 		else if (Input.GetKeyDown(KeyCode.U)) // && cooldown done
 		{
-			animation.SetTrigger("Skill(SWW)");
+			PhotonView.RPC("RPC_PerformSkill01", PhotonTargets.All);
 			transform.LookAt(opponentChan);
 		}
 		else if (Input.GetKeyDown(KeyCode.I))
 		{
-			animation.SetTrigger("Skill(ASD)");
+			PhotonView.RPC("RPC_PerformSkill02", PhotonTargets.All);
 			transform.LookAt(opponentChan);
 		}
 		else if (Input.GetKeyDown(KeyCode.Space))
 		{
-			animation.SetTrigger("Skill(ASDASD)");
+			PhotonView.RPC("RPC_PerformSkill03", PhotonTargets.All);
 			transform.LookAt(opponentChan);
 		}
+	}
+
+	[PunRPC]
+	private void RPC_PerformDash()
+	{
+		animation.SetTrigger("Dash/Tumble(Shift)"); // Stamina / Charges
+	}
+
+	[PunRPC]
+	private void RPC_PerformAttack()
+	{
+		animation.SetTrigger("Attack(LeftClick)"); // Stamina / Charges
+	}
+
+	[PunRPC]
+	private void RPC_PerformGuard()
+	{
+		animation.SetTrigger("PretendGuard(RightClick)"); // Stamina / Charges
+	}
+
+	[PunRPC]
+	private void RPC_PerformSkill01()
+	{
+		animation.SetTrigger("Skill(SWW)"); // Stamina / Charges
+	}
+	[PunRPC]
+	private void RPC_PerformSkill02()
+	{
+		animation.SetTrigger("Skill(ASD)"); // Stamina / Charges
+	}
+	[PunRPC]
+	private void RPC_PerformSkill03()
+	{
+		animation.SetTrigger("Skill(ASDASD)"); // Stamina / Charges
 	}
 
 	//converts control input vectors into camera facing vectors

@@ -1,9 +1,17 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_FYP Prototype\Scripts\CameraControl.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_FYP Prototype\Scripts\Network\Lobby\CreateRoom.cs">
     <Files>
-      <File FileName="Assets\_FYP Prototype\Scripts\PlayerControl02.cs" Line="17" Column="2" />
-      <File FileName="Assets\_FYP Prototype\Scripts\CameraControl.cs" Line="76" Column="32" />
+      <File FileName="Assets\_FYP Prototype\Scripts\Network\Room\PlayerLayout.cs" Line="1" Column="1" />
+      <File FileName="Assets\_FYP Prototype\Scripts\Network\Lobby\MainCanvesManager.cs" Line="1" Column="1" />
+      <File FileName="Assets\_FYP Prototype\Scripts\Network\Room\CurrentRoomCanvas.cs" Line="1" Column="1" />
+      <File FileName="Assets\_FYP Prototype\Scripts\Network\PlayerNetwork.cs" Line="89" Column="125" />
+      <File FileName="Assets\_FYP Prototype\Scripts\Network\Lobby\RoomListing.cs" Line="1" Column="1" />
+      <File FileName="Assets\_FYP Prototype\Scripts\Network\Room\PlayerListing.cs" Line="1" Column="1" />
+      <File FileName="Assets\_FYP Prototype\Scripts\Network\Lobby\LobbyCanvas.cs" Line="1" Column="1" />
+      <File FileName="Assets\_FYP Prototype\Scripts\Network\Lobby\LobbyNetwork.cs" Line="21" Column="47" />
+      <File FileName="Assets\_FYP Prototype\Scripts\PlayerControl02.cs" Line="112" Column="38" />
+      <File FileName="Assets\_FYP Prototype\Scripts\Network\Lobby\CreateRoom.cs" Line="13" Column="97" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

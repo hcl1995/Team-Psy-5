@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/_FYP Prototype/_Scenes/Main.unity
+- path: Assets/_FYP Prototype/_Scenes/MM.unity
   isLoaded: 1
   isActive: 1
