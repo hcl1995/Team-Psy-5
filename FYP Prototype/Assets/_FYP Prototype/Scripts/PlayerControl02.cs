@@ -1,9 +1,26 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerControl02 : MonoBehaviour
 {
+	private static PlayerControl02 _instance;
+	public static PlayerControl02 Instance
+	{
+		get 
+		{
+			if(_instance == null)
+			{
+				GameObject go = GameObject.Find("unitychan");
+
+				_instance = go.GetComponent<PlayerControl02>();
+				_instance.Start();
+			}
+			return _instance;
+		}
+	}
+
 	float rotationSpeed = 30;
 
 	Vector3 movement;
@@ -17,10 +34,31 @@ public class PlayerControl02 : MonoBehaviour
 
 	public Transform opponentChan;
 
+	public GameObject projectile;
+	public Transform spawnPoint;
+
+	public GameObject chargeBar;
+	public Image fillCharge;
+	public float chargeRate;
+
+	public bool maxCharge;
+
+	public GameObject wallSkill;
+	public Transform wallSpawnPoint;
+	public GameObject wallSkill02;
+	public Transform wallSpawnPoint02;
+	public GameObject wallSkill03;
+	public Transform wallSpawnPoint03;
+
 	void Awake()
 	{
 		rb = GetComponent<Rigidbody>();
 		animation = GetComponent<Animator>();
+	}
+
+	void Start()
+	{
+		
 	}
 
 	void Update()
@@ -64,18 +102,46 @@ public class PlayerControl02 : MonoBehaviour
 		}
 		else if (Input.GetKeyDown(KeyCode.U)) // && cooldown done
 		{
-			animation.SetTrigger("Skill(SWW)");
+			//animation.SetTrigger("Skill(SWW)");
+			//transform.LookAt(opponentChan);
+
+
+			maxCharge = false;
+			chargeBar.SetActive(true);
+		}
+		else if (Input.GetKeyUp(KeyCode.U))
+		{
 			transform.LookAt(opponentChan);
+			Instantiate(projectile, spawnPoint.position, spawnPoint.rotation);
+			chargeBar.SetActive(false);
 		}
 		else if (Input.GetKeyDown(KeyCode.I))
 		{
-			animation.SetTrigger("Skill(ASD)");
-			transform.LookAt(opponentChan);
+			//animation.SetTrigger("Skill(ASD)");
+			//transform.LookAt(opponentChan);
+
+			Instantiate(wallSkill, wallSpawnPoint.position, wallSpawnPoint.rotation);
+			Instantiate(wallSkill02, wallSpawnPoint02.position, wallSpawnPoint02.rotation);
+			Instantiate(wallSkill03, wallSpawnPoint03.position, wallSpawnPoint03.rotation);
 		}
 		else if (Input.GetKeyDown(KeyCode.Space))
 		{
 			animation.SetTrigger("Skill(ASDASD)");
 			transform.LookAt(opponentChan);
+		}
+
+		if (chargeBar.activeInHierarchy)
+		{
+			fillCharge.fillAmount += Time.deltaTime * chargeRate;
+
+			if (fillCharge.fillAmount >= 1)
+			{
+				maxCharge = true;
+			}
+		}
+		else
+		{
+			fillCharge.fillAmount = 0;
 		}
 	}
 
