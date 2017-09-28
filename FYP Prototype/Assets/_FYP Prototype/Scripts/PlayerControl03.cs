@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PlayerControl02 : MonoBehaviour
+public class PlayerControl03 : MonoBehaviour
 {
-	private static PlayerControl02 _instance;
-	public static PlayerControl02 Instance
+	private static PlayerControl03 _instance;
+	public static PlayerControl03 Instance
 	{
 		get 
 		{
@@ -14,7 +14,7 @@ public class PlayerControl02 : MonoBehaviour
 			{
 				GameObject go = GameObject.Find("unitychan");
 
-				_instance = go.GetComponent<PlayerControl02>();
+				_instance = go.GetComponent<PlayerControl03>();
 				_instance.Start();
 			}
 			return _instance;
@@ -58,7 +58,7 @@ public class PlayerControl02 : MonoBehaviour
 
 	void Start()
 	{
-		
+
 	}
 
 	void Update()
@@ -67,7 +67,7 @@ public class PlayerControl02 : MonoBehaviour
 		float z = Input.GetAxisRaw("Vertical");
 
 		movement = new Vector3(x, 0, z);
-		
+
 		Movement(x, z);
 	}
 
@@ -83,49 +83,43 @@ public class PlayerControl02 : MonoBehaviour
 		GetCameraRelativeMovement();
 		RotateTowardMovementDirection();
 
-		if (Input.GetKeyDown(KeyCode.LeftShift) || Input.GetKeyDown(KeyCode.K))
+		if (Input.GetKeyDown(KeyCode.LeftShift))
 		{
 			z = dashing;
 			transform.Translate (movement + (Vector3.forward * z));
 			animation.SetTrigger("Dash/Tumble(Shift)"); // Stamina / Charges
 		}
 
-		if (Input.GetKeyDown(KeyCode.J))
+		if (Input.GetMouseButtonDown(0))
 		{
-			transform.LookAt(opponentChan);
+			RotateTowardOpponentDuringAction();
 			animation.SetTrigger("Attack(LeftClick)");
 		}
-		else if (Input.GetKeyDown(KeyCode.L))
+		else if (Input.GetMouseButtonDown(1))
 		{
-			transform.LookAt(opponentChan);
+			RotateTowardOpponentDuringAction();
 			animation.SetTrigger("PretendGuard(RightClick)");
 		}
-		else if (Input.GetKeyDown(KeyCode.U)) // && cooldown done
+		else if (Input.GetKeyDown(KeyCode.Q)) // && cooldown done
 		{
-			//transform.LookAt(opponentChan);
-			//animation.SetTrigger("Skill(SWW)");
-
 			maxCharge = false;
 			chargeBar.SetActive(true);
 		}
-		else if (Input.GetKeyUp(KeyCode.U))
+		else if (Input.GetKeyUp(KeyCode.Q))
 		{
-			transform.LookAt(opponentChan);
+			RotateTowardOpponentDuringAction();
 			Instantiate(projectile, spawnPoint.position, spawnPoint.rotation);
 			chargeBar.SetActive(false);
 		}
-		else if (Input.GetKeyDown(KeyCode.I))
+		else if (Input.GetKeyDown(KeyCode.E))
 		{
-			//transform.LookAt(opponentChan);
-			//animation.SetTrigger("Skill(ASD)");
-
 			Instantiate(wallSkill, wallSpawnPoint.position, wallSpawnPoint.rotation);
 			Instantiate(wallSkill02, wallSpawnPoint02.position, wallSpawnPoint02.rotation);
 			Instantiate(wallSkill03, wallSpawnPoint03.position, wallSpawnPoint03.rotation);
 		}
 		else if (Input.GetKeyDown(KeyCode.Space))
 		{
-			transform.LookAt(opponentChan);
+			RotateTowardOpponentDuringAction();
 			animation.SetTrigger("Skill(ASDASD)");
 		}
 
@@ -165,7 +159,7 @@ public class PlayerControl02 : MonoBehaviour
 		// Target direction relative to the camera
 		targetDirection = x * right + z * forward;
 	}
-		
+
 	void RotateTowardMovementDirection()  
 	{
 		if (movement != Vector3.zero)
@@ -174,19 +168,14 @@ public class PlayerControl02 : MonoBehaviour
 		}
 	}
 
-//	void RotateTowardOpponentDuringAction()
-//	{
-//		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-//		RaycastHit hit;
-//
-//		if (Physics.Raycast (ray, out hit, 100f))
-//		{
-//			Vector3 playerToMouse = hit.point - transform.position;
-//			playerToMouse.y = 0f;
-//
-//			// transform.LookAt(hit.point);
-//			Quaternion rotation = Quaternion.LookRotation(playerToMouse);
-//			transform.rotation = rotation;
-//		}
-//	}
+	void RotateTowardOpponentDuringAction()
+	{
+		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+		RaycastHit hit;
+
+		if (Physics.Raycast (ray, out hit, 100f, LayerMask.GetMask("Ground")))
+		{
+			transform.LookAt(hit.point);
+		}
+	}
 }

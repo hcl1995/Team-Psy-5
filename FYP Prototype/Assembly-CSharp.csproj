@@ -46,19 +46,22 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-     <Compile Include="Assets\CamControl.cs" />
+     <Compile Include="Assets\CameraControlFix.cs" />
      <Compile Include="Assets\FightingUnityChan_FreeAsset\FightingUnityChan_FreeAsset\Scripts\CameraController.cs" />
      <Compile Include="Assets\FightingUnityChan_FreeAsset\FightingUnityChan_FreeAsset\Scripts\IdleChanger.cs" />
+     <Compile Include="Assets\TankCameraControl.cs" />
      <Compile Include="Assets\Warrior Pack Bundle 1 FREE\Code\IKHands.cs" />
      <Compile Include="Assets\Warrior Pack Bundle 1 FREE\Code\SmoothFollow.cs" />
      <Compile Include="Assets\Warrior Pack Bundle 1 FREE\Code\WarriorAnimationDemoFREE.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\CameraControl.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\ControlToggle.cs" />
+     <Compile Include="Assets\_FYP Prototype\Scripts\DestructableWall.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\Dump\CrazyRotate.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\Dump\StressTestLag.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\KeyCombo.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\PlayerControl.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\PlayerControl02.cs" />
+     <Compile Include="Assets\_FYP Prototype\Scripts\PlayerControl03.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\Projectile.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\WallSkill.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\WallSkill02.cs" />

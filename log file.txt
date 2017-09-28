@@ -33,3 +33,10 @@ Commit 07 (Sep 28, 2017)
 ------------------------
 -Bullet skill (Physic Movement)
 -Wall Skill (Work In Progress)
+
+
+Commit 07 (Sep 28, 2017)
+------------------------
+-Ver.3 character control scheme
+-Not destructable & destructable props added
+-Wall Skill (Got Pattern, No Effect, Invisible)

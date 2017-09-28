@@ -1,14 +1,9 @@
 ﻿<Properties StartupItem="Assembly-CSharp.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\_FYP Prototype\Scripts\WallSkill03.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets\CameraControlFix.cs">
     <Files>
-      <File FileName="Assets\_FYP Prototype\Scripts\CameraControl.cs" Line="1" Column="1" />
-      <File FileName="Assets\CamControl.cs" Line="1" Column="1" />
-      <File FileName="Assets\_FYP Prototype\Scripts\Projectile.cs" Line="48" Column="52" />
-      <File FileName="Assets\_FYP Prototype\Scripts\PlayerControl02.cs" Line="125" Column="27" />
-      <File FileName="Assets\_FYP Prototype\Scripts\WallSkill.cs" Line="29" Column="4" />
-      <File FileName="Assets\_FYP Prototype\Scripts\WallSkill02.cs" Line="27" Column="4" />
-      <File FileName="Assets\_FYP Prototype\Scripts\WallSkill03.cs" Line="18" Column="33" />
+      <File FileName="Assets\_FYP Prototype\Scripts\CameraControl.cs" Line="28" Column="3" />
+      <File FileName="Assets\CameraControlFix.cs" Line="20" Column="4" />
     </Files>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>

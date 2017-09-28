@@ -59,7 +59,7 @@ public class Projectile : MonoBehaviour
 		{
 			other.gameObject.GetComponent<Animator>().SetTrigger("DamageDown");
 
-			if (PlayerControl02.Instance.maxCharge)
+			if (PlayerControl02.Instance.maxCharge || PlayerControl03.Instance.maxCharge)
 			{
 				other.gameObject.transform.Translate (dir);
 			}
