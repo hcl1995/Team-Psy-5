@@ -35,8 +35,14 @@ Commit 07 (Sep 28, 2017)
 -Wall Skill (Work In Progress)
 
 
-Commit 07 (Sep 28, 2017)
+Commit 08 (Sep 28, 2017)
 ------------------------
 -Ver.3 character control scheme
 -Not destructable & destructable props added
 -Wall Skill (Got Pattern, No Effect, Invisible)
+
+
+Commit 09 (Oct 06, 2017)
+------------------------
+-Skill completed (Main scene)
+-Attack Animation Testing (Work in progress - Animation scene)

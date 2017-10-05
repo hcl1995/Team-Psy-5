@@ -9,7 +9,7 @@ public class WallSkill : MonoBehaviour
 
 	bool lerping;
 
-	float completionTime = 0.188f;
+	float completionTime;
 	public float speed;
 
 	void Start()
@@ -17,8 +17,7 @@ public class WallSkill : MonoBehaviour
 		lerping = true;
 
 		startPos = transform.position;
-		//endPos = transform.position -= new Vector3(0, 0, 2);
-		endPos = PlayerControl02.Instance.transform.position;
+		endPos = OpponentChan.Instance.transform.position;
 	}
 
 	void Update()
@@ -26,18 +25,15 @@ public class WallSkill : MonoBehaviour
 		if (lerping)
 		{
 			transform.position = Vector3.Lerp(startPos, endPos, completionTime += (Time.deltaTime * speed));
-			//transform.position -= (new Vector3(0, 0, 4 * Time.deltaTime));
+		}
+		else
+		{
+			Destroy(gameObject, 0.5f);
 		}
 
-		if (completionTime >= 1.0)
+		if (completionTime >= 0.5)
 		{
 			lerping = false;
-			speed = 0;
-		}
-
-		if (!lerping)
-		{
-			Destroy(gameObject, 1.0f);
 		}
 
 		endPos.y = startPos.y;

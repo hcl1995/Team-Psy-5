@@ -32,7 +32,7 @@ public class PlayerControl03 : MonoBehaviour
 	public float speed;
 	public float dashing;
 
-	public Transform opponentChan;
+	//public Transform opponentChan;
 
 	public GameObject projectile;
 	public Transform spawnPoint;
@@ -44,11 +44,13 @@ public class PlayerControl03 : MonoBehaviour
 	public bool maxCharge;
 
 	public GameObject wallSkill;
-	public Transform wallSpawnPoint;
 	public GameObject wallSkill02;
+	public Transform wallSpawnPoint;
 	public Transform wallSpawnPoint02;
-	public GameObject wallSkill03;
 	public Transform wallSpawnPoint03;
+	public Transform wallSpawnPoint04;
+
+	public Transform recordEndPos;
 
 	void Awake()
 	{
@@ -113,9 +115,12 @@ public class PlayerControl03 : MonoBehaviour
 		}
 		else if (Input.GetKeyDown(KeyCode.E))
 		{
+			recordEndPos = OpponentChan.Instance.transform;
+
 			Instantiate(wallSkill, wallSpawnPoint.position, wallSpawnPoint.rotation);
-			Instantiate(wallSkill02, wallSpawnPoint02.position, wallSpawnPoint02.rotation);
-			Instantiate(wallSkill03, wallSpawnPoint03.position, wallSpawnPoint03.rotation);
+			Instantiate(wallSkill, wallSpawnPoint02.position, wallSpawnPoint02.rotation);
+			Instantiate(wallSkill, wallSpawnPoint03.position, wallSpawnPoint03.rotation);
+			Instantiate(wallSkill02, wallSpawnPoint04.position, wallSpawnPoint04.rotation);
 		}
 		else if (Input.GetKeyDown(KeyCode.Space))
 		{
@@ -178,4 +183,33 @@ public class PlayerControl03 : MonoBehaviour
 			transform.LookAt(hit.point);
 		}
 	}
+
+	//	void Attack()
+	//	{
+	//		int attack = 0 ;
+	//		float attackInterval = 0;
+	//
+	//		if (Input.GetKeyDown(KeyCode.S))
+	//		{
+	//			attack += 1;
+	//			animation.SetTrigger("Skill(SWW)"); // Attack01
+	//		}
+	//
+	//		if (attack == 1 && attackInterval < 0.5)
+	//		{
+	//			attackInterval += Time.deltaTime;
+	//		}
+	//		if (attack == 1 && attackInterval > 0.5)
+	//		{
+	//			attack = 0;
+	//			attackInterval = 0;
+	//		}
+	//
+	//		if (attack == 2 && attackInterval < 0.5)
+	//		{
+	//			attack = 0;
+	//			attackInterval = 0;
+	//			animation.SetTrigger("Skill(SWW)"); // Attack02
+	//		}
+	//	}
 }

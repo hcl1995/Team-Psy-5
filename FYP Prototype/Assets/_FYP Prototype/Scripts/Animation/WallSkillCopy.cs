@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WallSkill02 : MonoBehaviour
+public class WallSkillCopy : MonoBehaviour
 {
 	Vector3 startPos;
 	Vector3 endPos;
@@ -17,8 +17,7 @@ public class WallSkill02 : MonoBehaviour
 		lerping = true;
 
 		startPos = transform.position;
-		//endPos = transform.position += new Vector3(1.65f, 0, 1.65f);
-		endPos = PlayerControl02.Instance.transform.position;
+		endPos = OnHitChan.Instance.transform.position;
 	}
 
 	void Update()
@@ -26,18 +25,15 @@ public class WallSkill02 : MonoBehaviour
 		if (lerping)
 		{
 			transform.position = Vector3.Lerp(startPos, endPos, completionTime += (Time.deltaTime * speed));
-			//transform.position += (new Vector3(1.65f * Time.deltaTime, 0, 1.65f * Time.deltaTime));
+		}
+		else
+		{
+			Destroy(gameObject, 0.5f);
 		}
 
-		if (completionTime >= 0.812)
+		if (completionTime >= 0.5)
 		{
 			lerping = false;
-			speed = 0;
-		}
-
-		if (!lerping)
-		{
-			Destroy(gameObject, 1.0f);
 		}
 
 		endPos.y = startPos.y;
