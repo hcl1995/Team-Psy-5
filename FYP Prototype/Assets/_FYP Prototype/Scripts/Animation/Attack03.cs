@@ -5,13 +5,26 @@ using UnityEngine;
 public class Attack03 : MonoBehaviour
 {
 	public Transform player;
+	public GameObject impact;
+
+	GameObject impactGO;
+
+	bool hitOnce;
 
 	void OnTriggerEnter(Collider other)
 	{
+
+		Vector3 dir = other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position) - transform.position;
+		dir = -dir.normalized;
+
 		if (other.gameObject.CompareTag("Enemy"))
 		{
 			//other.transform.LookAt(player);
+//			Quaternion rotation = Quaternion.LookRotation(dir);
+//			other.transform.rotation = rotation;
 			other.gameObject.GetComponent<Animator>().SetTrigger("OnHit03");
+			impactGO = (GameObject) Instantiate(impact, other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position), Quaternion.identity);
+			Destroy(impactGO, 0.5f);
 		}
 	}
 }

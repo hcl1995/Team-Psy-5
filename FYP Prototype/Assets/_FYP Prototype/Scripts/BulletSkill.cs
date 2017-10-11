@@ -6,7 +6,6 @@ public class BulletSkill : MonoBehaviour
 {
 	Vector3 initialVelocity;
 
-	[SerializeField]
 	float minVelocity = 10f;
 
 	Vector3 lastFrameVelocity;
@@ -20,6 +19,7 @@ public class BulletSkill : MonoBehaviour
 
 	public float projectileSpeed;
 	public float travelingThreshold;
+	public float distance;
 
 	void OnEnable()
 	{
@@ -53,6 +53,7 @@ public class BulletSkill : MonoBehaviour
 	{
 		bounceLimit++;
 
+		// OnCollision way to look.
 		Vector3 dir = other.contacts[0].point - transform.position;
 		dir = -dir.normalized;
 
@@ -60,12 +61,17 @@ public class BulletSkill : MonoBehaviour
 		{
 			Quaternion rotation = Quaternion.LookRotation(dir);
 			other.transform.rotation = rotation;
+
 			other.gameObject.GetComponent<Animator>().SetTrigger("DamageDown");
 
-			if (PlayerControl02.Instance.maxCharge || PlayerControl03.Instance.maxCharge)
+			if (PlayerControl03.Instance.maxCharge)
 			{
-				other.gameObject.transform.Translate (dir);
+				//other.gameObject.transform.position += (dir);
+				//other.gameObject.transform.Translate (dir);
+				other.gameObject.transform.position += (transform.forward * distance);
 			}
+
+			Destroy(gameObject);
 		}
 
 		Bounce(other.contacts[0].normal);

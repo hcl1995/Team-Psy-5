@@ -32,6 +32,13 @@ public class AttackChanController : MonoBehaviour
 	public float speed;
 	public float dashing;
 
+	Vector3 startPos;
+	Vector3 endPos;
+
+	bool dash = false;
+	float completeTime;
+	float lerpSpeed = 10;
+
 	//public Transform opponentChan;
 
 //	public GameObject projectile;
@@ -50,33 +57,15 @@ public class AttackChanController : MonoBehaviour
 //	public Transform wallSpawnPoint03;
 //	public Transform wallSpawnPoint04;
 
+	[HideInInspector]
 	public Transform recordEndPos;
 
-	public int attack;
-	public float attackInterval;
+	int attack;
+	float attackInterval;
 	public float attackIntervalLimit;
 
-	bool attack1;
-	bool attack2;
-	bool attack3;
-
-	public Collider[] attackHitboxes;
-
-	public Transform enemyChan;
-
-	void LaunchAttack(Collider col)
-	{
-		Collider[] cols = Physics.OverlapSphere(col.bounds.center, 0.02f, LayerMask.GetMask("Hitbox"));
-
-		foreach (Collider c in cols)
-		{
-			Debug.Log(c.name);
-			if (c.transform.root == transform)
-			{
-				continue;
-			}
-		}
-	}
+	[HideInInspector]
+	public GameObject trailRendererObject;
 
 	void Awake()
 	{
@@ -97,6 +86,7 @@ public class AttackChanController : MonoBehaviour
 		movement = new Vector3(x, 0, z);
 
 		Movement(x, z);
+		Attack();
 	}
 
 	void Movement(float x, float z)
@@ -114,11 +104,27 @@ public class AttackChanController : MonoBehaviour
 		if (Input.GetKeyDown(KeyCode.LeftShift))
 		{
 			z = dashing;
-			transform.Translate (movement + (Vector3.forward * z));
+
+			startPos = transform.position;
+			endPos = transform.position += (transform.forward * z);
+
+			dash = true;
+			trailRendererObject.transform.position = gameObject.transform.position;
+			//transform.position += transform.forward * z;
 			//animation.SetTrigger("Dash/Tumble(Shift)"); // Stamina / Charges
 		}
 
-		Attack();
+		if (dash)
+		{
+			completeTime += (Time.deltaTime * lerpSpeed);
+			transform.position = Vector3.Lerp (startPos, endPos, completeTime);
+		}
+
+		if (completeTime >= 1)
+		{
+			dash = false;
+			completeTime = 0;
+		}
 
 //		if (Input.GetMouseButtonDown(0))
 //		{
@@ -227,82 +233,66 @@ public class AttackChanController : MonoBehaviour
 			attack = 0;
 			attackInterval = 0;
 		}
-		else if (attack == 0)
-		{
-			attack1 = false;
-			attack2 = false;
-			attack3 = false;
-		}
-
-		if (attack1 || attack2 || attack3)
+		else if (attack >= 1 && attackInterval < attackIntervalLimit)
 		{
 			attackInterval += Time.deltaTime;
 		}
 
 		if (Input.GetMouseButtonDown(0) && attack == 1 && attackInterval < attackIntervalLimit)
 		{
-			attack1 = true;
-
-			if (attack1 == true)
-			{
-				transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).
-				GetChild(5).gameObject.SetActive(true);
-
-				attack2 = false;
-				attack3 = false;
-				RotateTowardMouseDuringAction();
-				animation.SetTrigger("Attack01");
-				LaunchAttack(attackHitboxes[0]);
-			}
+			RotateTowardMouseDuringAction();
+			animation.SetTrigger("Attack01");
 		}
 		else if (Input.GetMouseButtonDown(0) && attack == 2 && attackInterval < attackIntervalLimit)
 		{
-			attack2 = true;
-
-			if (attack2 == true)
-			{
-				transform.GetChild(0).GetChild(1).GetChild(0).GetChild(1).GetChild(0).GetChild(1).gameObject.SetActive(true);
-
-				attack1 = false;
-				attack3 = false;
-				RotateTowardMouseDuringAction();
-				animation.SetTrigger("Attack02");
-				LaunchAttack(attackHitboxes[1]);
-			}
+			RotateTowardMouseDuringAction();
+			animation.SetTrigger("Attack02");
 		}
 		else if (Input.GetMouseButtonDown(0) && attack >= 3 && attackInterval < attackIntervalLimit)
 		{
 			attack = 0;
 			attackInterval = 0;
 
-			attack3 = true;
-
-			if (attack3 == true)
-			{
-				transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(0).GetChild(0).
-				GetChild(5).gameObject.SetActive(true);
-
-				attack1= false;
-				attack2 = false;
-				RotateTowardMouseDuringAction();
-				animation.SetTrigger("Attack03");
-				LaunchAttack(attackHitboxes[2]);
-			}
+			RotateTowardMouseDuringAction();
+			animation.SetTrigger("Attack03");
 		}
-			
-		if (attack1 == false)
+
+		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack_1"))
+		{
+			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).
+			GetChild(5).gameObject.SetActive(true);
+			animation.ResetTrigger("Attack01");
+		}
+		else
 		{
 			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).
 			GetChild(5).gameObject.SetActive(false);
 		}
-		if (attack2 == false)
+
+		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack_2"))
+		{
+			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(1).GetChild(0).GetChild(1).gameObject.SetActive(true);
+			animation.ResetTrigger("Attack02");
+		}
+		else
 		{
 			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(1).GetChild(0).GetChild(1).gameObject.SetActive(false);
 		}
-		if (attack3 == false)
+
+		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack_3"))
+		{
+			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(0).GetChild(0).
+			GetChild(5).gameObject.SetActive(true);
+			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).
+			GetChild(6).gameObject.SetActive(true);
+			animation.ResetTrigger("Attack03");
+		}
+		else
 		{
 			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(0).GetChild(0).
 			GetChild(5).gameObject.SetActive(false);
+			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).
+			GetChild(6).gameObject.SetActive(false);
 		}
 	}
 }

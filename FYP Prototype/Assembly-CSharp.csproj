@@ -73,6 +73,7 @@
      <Compile Include="Assets\_FYP Prototype\Scripts\OpponentChan.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\PlayerControl03.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\SpawnEmpty.cs" />
+     <Compile Include="Assets\_FYP Prototype\Scripts\UltimateSkill.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\WallSkill.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\WallSkill1.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\WallSkillEffect.cs" />

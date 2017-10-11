@@ -31,6 +31,7 @@ public class PlayerControl03 : MonoBehaviour
 
 	public float speed;
 	public float dashing;
+	float completeTime;
 
 	//public Transform opponentChan;
 
@@ -41,6 +42,10 @@ public class PlayerControl03 : MonoBehaviour
 	public Image fillCharge;
 	public float chargeRate;
 
+	//float bulletCooldown;
+	public float bulletCooldownDuration;
+
+	[HideInInspector]
 	public bool maxCharge;
 
 	public GameObject wallSkill;
@@ -50,7 +55,31 @@ public class PlayerControl03 : MonoBehaviour
 	public Transform wallSpawnPoint03;
 	public Transform wallSpawnPoint04;
 
+	//float wallCooldown;
+	public float wallCooldownDuration;
+
+	public GameObject ultimate;
+	public Transform ultimateSpawnPoint;
+
+	//float ultimateCooldown;
+	public float ultimateCooldownDuration;
+
+	[Header("Cooldown Timer")]
+	public float bulletCooldown;
+	public float wallCooldown;
+	public float ultimateCooldown;
+
+	[HideInInspector]
 	public Transform recordEndPos;
+
+	Vector3 startPos;
+	Vector3 endPos;
+
+	bool dash = false;
+	float lerpSpeed = 10;
+
+	[HideInInspector]
+	public GameObject trailRendererObject;
 
 	void Awake()
 	{
@@ -70,7 +99,9 @@ public class PlayerControl03 : MonoBehaviour
 
 		movement = new Vector3(x, 0, z);
 
+		Cooldowns();
 		Movement(x, z);
+		ActionsInputKey();
 	}
 
 	void Movement(float x, float z)
@@ -88,58 +119,26 @@ public class PlayerControl03 : MonoBehaviour
 		if (Input.GetKeyDown(KeyCode.LeftShift))
 		{
 			z = dashing;
-			transform.Translate (movement + (Vector3.forward * z));
+			startPos = transform.position;
+			endPos = transform.position += (transform.forward * z);
+
+			dash = true;
+			trailRendererObject.transform.position = gameObject.transform.position;
+
 			animation.SetTrigger("Dash/Tumble(Shift)"); // Stamina / Charges
+			// Animation Problem: Re-dash Instead Go Back To Idle
 		}
 
-		if (Input.GetMouseButtonDown(0))
+		if (dash)
 		{
-			RotateTowardOpponentDuringAction();
-			animation.SetTrigger("Attack(LeftClick)");
-		}
-		else if (Input.GetMouseButtonDown(1))
-		{
-			RotateTowardOpponentDuringAction();
-			animation.SetTrigger("PretendGuard(RightClick)");
-		}
-		else if (Input.GetKeyDown(KeyCode.Q)) // && cooldown done
-		{
-			maxCharge = false;
-			chargeBar.SetActive(true);
-		}
-		else if (Input.GetKeyUp(KeyCode.Q))
-		{
-			RotateTowardOpponentDuringAction();
-			Instantiate(projectile, spawnPoint.position, spawnPoint.rotation);
-			chargeBar.SetActive(false);
-		}
-		else if (Input.GetKeyDown(KeyCode.E))
-		{
-			recordEndPos = OpponentChan.Instance.transform;
-
-			Instantiate(wallSkill, wallSpawnPoint.position, wallSpawnPoint.rotation);
-			Instantiate(wallSkill, wallSpawnPoint02.position, wallSpawnPoint02.rotation);
-			Instantiate(wallSkill, wallSpawnPoint03.position, wallSpawnPoint03.rotation);
-			Instantiate(wallSkill02, wallSpawnPoint04.position, wallSpawnPoint04.rotation);
-		}
-		else if (Input.GetKeyDown(KeyCode.Space))
-		{
-			RotateTowardOpponentDuringAction();
-			animation.SetTrigger("Skill(ASDASD)");
+			completeTime += (Time.deltaTime * lerpSpeed);
+			transform.position = Vector3.Lerp (startPos, endPos, completeTime);
 		}
 
-		if (chargeBar.activeInHierarchy)
+		if (completeTime >= 1)
 		{
-			fillCharge.fillAmount += Time.deltaTime * chargeRate;
-
-			if (fillCharge.fillAmount >= 1)
-			{
-				maxCharge = true;
-			}
-		}
-		else
-		{
-			fillCharge.fillAmount = 0;
+			dash = false;
+			completeTime = 0;
 		}
 	}
 
@@ -184,32 +183,105 @@ public class PlayerControl03 : MonoBehaviour
 		}
 	}
 
-	//	void Attack()
-	//	{
-	//		int attack = 0 ;
-	//		float attackInterval = 0;
-	//
-	//		if (Input.GetKeyDown(KeyCode.S))
-	//		{
-	//			attack += 1;
-	//			animation.SetTrigger("Skill(SWW)"); // Attack01
-	//		}
-	//
-	//		if (attack == 1 && attackInterval < 0.5)
-	//		{
-	//			attackInterval += Time.deltaTime;
-	//		}
-	//		if (attack == 1 && attackInterval > 0.5)
-	//		{
-	//			attack = 0;
-	//			attackInterval = 0;
-	//		}
-	//
-	//		if (attack == 2 && attackInterval < 0.5)
-	//		{
-	//			attack = 0;
-	//			attackInterval = 0;
-	//			animation.SetTrigger("Skill(SWW)"); // Attack02
-	//		}
-	//	}
+	void ActionsInputKey()
+	{
+		if (Input.GetMouseButtonDown(0))
+		{
+			RotateTowardOpponentDuringAction();
+			animation.SetTrigger("Attack(LeftClick)");
+		}
+		else if (Input.GetMouseButtonDown(1))
+		{
+			RotateTowardOpponentDuringAction();
+			animation.SetTrigger("PretendGuard(RightClick)");
+		}
+		else if (Input.GetKeyDown(KeyCode.Q)) // && cooldown done
+		{
+			if (bulletCooldown <= 0)
+			{
+				maxCharge = false;
+				chargeBar.SetActive(true);
+			}
+		}
+		else if (Input.GetKeyUp(KeyCode.Q))
+		{
+			if (bulletCooldown <= 0)
+			{
+				RotateTowardOpponentDuringAction();
+				Instantiate(projectile, spawnPoint.position, spawnPoint.rotation);
+				chargeBar.SetActive(false);
+
+				bulletCooldown = bulletCooldownDuration;
+			}
+		}
+		else if (Input.GetKeyDown(KeyCode.E))
+		{
+			if (wallCooldown <= 0)
+			{
+				recordEndPos = OpponentChan.Instance.transform;
+
+				Instantiate(wallSkill, wallSpawnPoint.position, wallSpawnPoint.rotation);
+				Instantiate(wallSkill, wallSpawnPoint02.position, wallSpawnPoint02.rotation);
+				Instantiate(wallSkill, wallSpawnPoint03.position, wallSpawnPoint03.rotation);
+				Instantiate(wallSkill02, wallSpawnPoint04.position, wallSpawnPoint04.rotation);
+
+				wallCooldown = wallCooldownDuration;
+			}
+		}
+		else if (Input.GetKeyDown(KeyCode.Space))
+		{
+			if (ultimateCooldown <= 0)
+			{
+				RotateTowardOpponentDuringAction();
+				animation.SetTrigger("Skill(ASDASD)");
+				Instantiate(ultimate, ultimateSpawnPoint.position, ultimateSpawnPoint.rotation);
+
+				ultimateCooldown = ultimateCooldownDuration;
+			}
+		}
+
+		if (chargeBar.activeInHierarchy)
+		{
+			fillCharge.fillAmount += Time.deltaTime * chargeRate;
+
+			if (fillCharge.fillAmount >= 1)
+			{
+				maxCharge = true;
+			}
+		}
+		else
+		{
+			fillCharge.fillAmount = 0;
+		}
+	}
+
+	void Cooldowns()
+	{
+		if (bulletCooldown > 0)
+		{
+			bulletCooldown -= Time.deltaTime;
+		}
+		else
+		{
+			bulletCooldown = 0;
+		}
+
+		if (wallCooldown > 0)
+		{
+			wallCooldown -= Time.deltaTime;
+		}
+		else
+		{
+			wallCooldown = 0;
+		}
+
+		if (ultimateCooldown > 0)
+		{
+			ultimateCooldown -= Time.deltaTime;
+		}
+		else
+		{
+			ultimateCooldown = 0;
+		}
+	}
 }

@@ -46,3 +46,8 @@ Commit 09 (Oct 06, 2017)
 ------------------------
 -Skill completed (Main scene)
 -Attack Animation Testing (Work in progress - Animation scene)
+
+
+Commit 10 (Oct 12, 2017)
+------------------------
+-Hit Sparks VFX
