@@ -283,16 +283,12 @@ public class AttackChanController : MonoBehaviour
 		{
 			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(0).GetChild(0).
 			GetChild(5).gameObject.SetActive(true);
-			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).
-			GetChild(6).gameObject.SetActive(true);
 			animation.ResetTrigger("Attack03");
 		}
 		else
 		{
 			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(0).GetChild(0).
 			GetChild(5).gameObject.SetActive(false);
-			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).
-			GetChild(6).gameObject.SetActive(false);
 		}
 	}
 }

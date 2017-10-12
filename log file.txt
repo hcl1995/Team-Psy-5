@@ -51,3 +51,9 @@ Commit 09 (Oct 06, 2017)
 Commit 10 (Oct 12, 2017)
 ------------------------
 -Hit Sparks VFX
+
+
+Commit 11 (Oct 12, 2017)
+------------------------
+-Added Dash Charges
+-Easier Header for Khai Lun

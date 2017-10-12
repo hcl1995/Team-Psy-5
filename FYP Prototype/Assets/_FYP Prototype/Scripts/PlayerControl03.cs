@@ -29,57 +29,57 @@ public class PlayerControl03 : MonoBehaviour
 	Rigidbody rb;
 	Animator animation;
 
+	[Header("Movement")]
 	public float speed;
 	public float dashing;
+	public float dashChargeCooldownDuration;
+	public int maxDashCharge;
+
+	Vector3 startPos;
+	Vector3 endPos;
+
+	int count;
+	bool dash = false;
 	float completeTime;
+	float lerpSpeed = 10;
 
 	//public Transform opponentChan;
 
-	public GameObject projectile;
-	public Transform spawnPoint;
-
-	public GameObject chargeBar;
-	public Image fillCharge;
+	[Header("Bullet")]
 	public float chargeRate;
-
-	//float bulletCooldown;
 	public float bulletCooldownDuration;
 
-	[HideInInspector]
-	public bool maxCharge;
+	[Header("EarthWallJutsu")]
+	public float wallCooldownDuration;
 
+	[Header("Ultimate")]
+	public float ultimateCooldownDuration;
+
+	[Header("Drag & Drop")]
+	public GameObject projectile;
+	public Transform spawnPoint;
+	public GameObject chargeBar;
+	public Image fillCharge;
 	public GameObject wallSkill;
 	public GameObject wallSkill02;
 	public Transform wallSpawnPoint;
 	public Transform wallSpawnPoint02;
 	public Transform wallSpawnPoint03;
 	public Transform wallSpawnPoint04;
-
-	//float wallCooldown;
-	public float wallCooldownDuration;
-
 	public GameObject ultimate;
 	public Transform ultimateSpawnPoint;
+	public GameObject trailRendererObject;
 
-	//float ultimateCooldown;
-	public float ultimateCooldownDuration;
-
-	[Header("Cooldown Timer")]
-	public float bulletCooldown;
+	[Header("Observer Ward")]
+	public bool maxCharge;
+	public int dashCharge;
 	public float wallCooldown;
+	public float bulletCooldown;
 	public float ultimateCooldown;
+	public float dashChargeCooldown;
 
 	[HideInInspector]
 	public Transform recordEndPos;
-
-	Vector3 startPos;
-	Vector3 endPos;
-
-	bool dash = false;
-	float lerpSpeed = 10;
-
-	[HideInInspector]
-	public GameObject trailRendererObject;
 
 	void Awake()
 	{
@@ -89,7 +89,7 @@ public class PlayerControl03 : MonoBehaviour
 
 	void Start()
 	{
-
+		dashCharge = maxDashCharge;
 	}
 
 	void Update()
@@ -99,7 +99,6 @@ public class PlayerControl03 : MonoBehaviour
 
 		movement = new Vector3(x, 0, z);
 
-		Cooldowns();
 		Movement(x, z);
 		ActionsInputKey();
 	}
@@ -118,15 +117,21 @@ public class PlayerControl03 : MonoBehaviour
 
 		if (Input.GetKeyDown(KeyCode.LeftShift))
 		{
-			z = dashing;
-			startPos = transform.position;
-			endPos = transform.position += (transform.forward * z);
+			if (dashCharge > 0)
+			{
+				z = dashing;
+				startPos = transform.position;
+				endPos = transform.position += (transform.forward * z);
 
-			dash = true;
-			trailRendererObject.transform.position = gameObject.transform.position;
+				dash = true;
+				trailRendererObject.transform.position = gameObject.transform.position;
 
-			animation.SetTrigger("Dash/Tumble(Shift)"); // Stamina / Charges
-			// Animation Problem: Re-dash Instead Go Back To Idle
+				animation.SetTrigger("Dash/Tumble(Shift)");
+
+				count++;
+				dashCharge--;
+				dashChargeCooldown += dashChargeCooldownDuration;
+			}
 		}
 
 		if (dash)
@@ -140,6 +145,36 @@ public class PlayerControl03 : MonoBehaviour
 			dash = false;
 			completeTime = 0;
 		}
+			
+		if (dashChargeCooldown > 0)
+		{
+			dashChargeCooldown -= Time.deltaTime;
+		}
+		else
+		{
+			dashChargeCooldown = 0;
+		}
+
+		// GG gives me cancer
+		if (maxDashCharge - dashCharge == count && dashChargeCooldown <= ((dashChargeCooldownDuration * count) - dashChargeCooldownDuration))
+		{
+			count--;
+			dashCharge++;
+		}
+
+		// hardcoded..
+//		if (maxDashCharge - dashCharge == 1 && dashChargeCooldown <= 0)
+//		{
+//			dashCharge++;
+//		}
+//		else if (maxDashCharge - dashCharge == 2 && dashChargeCooldown <= 5)
+//		{
+//			dashCharge++;
+//		}
+//		else if (maxDashCharge - dashCharge == 3 && dashChargeCooldown <= 10)
+//		{
+//			dashCharge++;
+//		}
 	}
 
 	//converts control input vectors into camera facing vectors
@@ -240,6 +275,15 @@ public class PlayerControl03 : MonoBehaviour
 			}
 		}
 
+		if (bulletCooldown > 0)
+		{
+			bulletCooldown -= Time.deltaTime;
+		}
+		else
+		{
+			bulletCooldown = 0;
+		}
+
 		if (chargeBar.activeInHierarchy)
 		{
 			fillCharge.fillAmount += Time.deltaTime * chargeRate;
@@ -252,18 +296,6 @@ public class PlayerControl03 : MonoBehaviour
 		else
 		{
 			fillCharge.fillAmount = 0;
-		}
-	}
-
-	void Cooldowns()
-	{
-		if (bulletCooldown > 0)
-		{
-			bulletCooldown -= Time.deltaTime;
-		}
-		else
-		{
-			bulletCooldown = 0;
 		}
 
 		if (wallCooldown > 0)

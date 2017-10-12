@@ -1,6 +1,6 @@
 Open Scene - Under Project --> FYP Prototype --> _Scenes --> Main
 
-*Just see the variable with numbers.
+*Just see the variable with numbers based on the headers.
 *Damage / Stun is Fishman implement.
 
 
@@ -20,4 +20,4 @@ FYP Prototype --> Prefabs --> UltimateCollider (Push Distance) need walk sibeh c
 
 Hierarchy
 ---------
-unitychan (Movement Speed, Dash Distance, Bullet Charge Rate, All Skills Cooldown Time) NOTE* NOT TIMER
+unitychan (Movement Speed, Dash Distance / Max Charge / Dash CD, Bullet Charge Rate, Skills CD)
