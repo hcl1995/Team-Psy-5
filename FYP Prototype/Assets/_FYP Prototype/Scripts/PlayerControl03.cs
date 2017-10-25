@@ -12,7 +12,7 @@ public class PlayerControl03 : MonoBehaviour
 		{
 			if(_instance == null)
 			{
-				GameObject go = GameObject.Find("unitychan");
+				GameObject go = GameObject.Find("Player");
 
 				_instance = go.GetComponent<PlayerControl03>();
 				_instance.Start();
@@ -81,6 +81,10 @@ public class PlayerControl03 : MonoBehaviour
 	[HideInInspector]
 	public Transform recordEndPos;
 
+	int attack;
+	float attackInterval;
+	public float attackIntervalLimit;
+
 	void Awake()
 	{
 		rb = GetComponent<Rigidbody>();
@@ -99,6 +103,7 @@ public class PlayerControl03 : MonoBehaviour
 
 		movement = new Vector3(x, 0, z);
 
+		Attack();
 		Movement(x, z);
 		ActionsInputKey();
 	}
@@ -124,9 +129,7 @@ public class PlayerControl03 : MonoBehaviour
 				endPos = transform.position += (transform.forward * z);
 
 				dash = true;
-				trailRendererObject.transform.position = gameObject.transform.position;
-
-				animation.SetTrigger("Dash/Tumble(Shift)");
+				animation.SetTrigger("Dash");
 
 				count++;
 				dashCharge--;
@@ -138,6 +141,7 @@ public class PlayerControl03 : MonoBehaviour
 		{
 			completeTime += (Time.deltaTime * lerpSpeed);
 			transform.position = Vector3.Lerp (startPos, endPos, completeTime);
+			trailRendererObject.transform.position = gameObject.transform.position;
 		}
 
 		if (completeTime >= 1)
@@ -207,7 +211,7 @@ public class PlayerControl03 : MonoBehaviour
 		}
 	}
 
-	void RotateTowardOpponentDuringAction()
+	void RotateTowardMouseDuringAction()
 	{
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
@@ -215,20 +219,22 @@ public class PlayerControl03 : MonoBehaviour
 		if (Physics.Raycast (ray, out hit, 100f, LayerMask.GetMask("Ground")))
 		{
 			transform.LookAt(hit.point);
+//			Quaternion rotation = Quaternion.LookRotation(hit.point);
+//			transform.rotation = rotation;
 		}
 	}
 
 	void ActionsInputKey()
 	{
-		if (Input.GetMouseButtonDown(0))
+//		if (Input.GetMouseButtonDown(0))
+//		{
+//			RotateTowardMouseDuringAction();
+//			animation.SetTrigger("Attack");
+//		}
+		if (Input.GetMouseButtonDown(1))
 		{
-			RotateTowardOpponentDuringAction();
-			animation.SetTrigger("Attack(LeftClick)");
-		}
-		else if (Input.GetMouseButtonDown(1))
-		{
-			RotateTowardOpponentDuringAction();
-			animation.SetTrigger("PretendGuard(RightClick)");
+			RotateTowardMouseDuringAction();
+			animation.SetTrigger("Guard");
 		}
 		else if (Input.GetKeyDown(KeyCode.Q)) // && cooldown done
 		{
@@ -236,13 +242,14 @@ public class PlayerControl03 : MonoBehaviour
 			{
 				maxCharge = false;
 				chargeBar.SetActive(true);
+				animation.SetTrigger("Bullet");
 			}
 		}
 		else if (Input.GetKeyUp(KeyCode.Q))
 		{
 			if (bulletCooldown <= 0)
 			{
-				RotateTowardOpponentDuringAction();
+				RotateTowardMouseDuringAction();
 				Instantiate(projectile, spawnPoint.position, spawnPoint.rotation);
 				chargeBar.SetActive(false);
 
@@ -267,8 +274,8 @@ public class PlayerControl03 : MonoBehaviour
 		{
 			if (ultimateCooldown <= 0)
 			{
-				RotateTowardOpponentDuringAction();
-				animation.SetTrigger("Skill(ASDASD)");
+				RotateTowardMouseDuringAction();
+				//animation.SetTrigger("Ultimate");
 				Instantiate(ultimate, ultimateSpawnPoint.position, ultimateSpawnPoint.rotation);
 
 				ultimateCooldown = ultimateCooldownDuration;
@@ -314,6 +321,79 @@ public class PlayerControl03 : MonoBehaviour
 		else
 		{
 			ultimateCooldown = 0;
+		}
+	}
+
+	void Attack()
+	{
+		if (Input.GetMouseButtonDown(0))
+		{
+			attack++;
+			attackInterval = 0;
+			//Debug.Log(attack);
+		}
+
+		if (attack >= 1 && attackInterval > attackIntervalLimit)
+		{
+			attack = 0;
+			attackInterval = 0;
+		}
+		else if (attack >= 1 && attackInterval < attackIntervalLimit)
+		{
+			attackInterval += Time.deltaTime;
+		}
+
+		if (Input.GetMouseButtonDown(0) && attack == 1 && attackInterval < attackIntervalLimit)
+		{
+			RotateTowardMouseDuringAction();
+			animation.SetTrigger("Attack");
+		}
+		else if (Input.GetMouseButtonDown(0) && attack == 2 && attackInterval < attackIntervalLimit)
+		{
+			RotateTowardMouseDuringAction();
+			animation.SetTrigger("Attack02");
+		}
+		else if (Input.GetMouseButtonDown(0) && attack >= 3 && attackInterval < attackIntervalLimit)
+		{
+			attack = 0;
+			attackInterval = 0;
+
+			RotateTowardMouseDuringAction();
+			animation.SetTrigger("Attack03");
+		}
+
+		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
+		{
+			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).
+			GetChild(5).gameObject.SetActive(true);
+			animation.ResetTrigger("Attack");
+		}
+		else
+		{
+			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).
+			GetChild(5).gameObject.SetActive(false);
+		}
+
+		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack02"))
+		{
+			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(1).GetChild(0).GetChild(1).gameObject.SetActive(true);
+			animation.ResetTrigger("Attack02");
+		}
+		else
+		{
+			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(1).GetChild(0).GetChild(1).gameObject.SetActive(false);
+		}
+
+		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack03"))
+		{
+			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(0).GetChild(0).
+			GetChild(5).gameObject.SetActive(true);
+			animation.ResetTrigger("Attack03");
+		}
+		else
+		{
+			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(0).GetChild(0).
+			GetChild(5).gameObject.SetActive(false);
 		}
 	}
 }

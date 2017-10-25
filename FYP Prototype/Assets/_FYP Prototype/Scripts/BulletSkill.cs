@@ -55,12 +55,13 @@ public class BulletSkill : MonoBehaviour
 
 		// OnCollision way to look.
 		Vector3 dir = other.contacts[0].point - transform.position;
-		dir = -dir.normalized;
+		dir = dir.normalized;
+		//dir = -dir.normalized;
 
 		if (other.gameObject.CompareTag("Enemy"))
 		{
-			Quaternion rotation = Quaternion.LookRotation(dir);
-			other.transform.rotation = rotation;
+//			Quaternion rotation = Quaternion.LookRotation(dir);
+//			other.transform.rotation = rotation;
 
 			other.gameObject.GetComponent<Animator>().SetTrigger("DamageDown");
 
@@ -70,10 +71,15 @@ public class BulletSkill : MonoBehaviour
 				//other.gameObject.transform.Translate (dir);
 				other.gameObject.transform.position += (transform.forward * distance);
 			}
+			Destroy(gameObject);
+		}
+		// DELETE, JUST FOR TESTING.
+		else if (other.gameObject.CompareTag("Player"))
+		{
+			other.gameObject.GetComponent<Animator>().SetTrigger("Death");
 
 			Destroy(gameObject);
 		}
-
 		Bounce(other.contacts[0].normal);
 	}
 

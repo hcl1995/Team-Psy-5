@@ -57,3 +57,11 @@ Commit 11 (Oct 12, 2017)
 ------------------------
 -Added Dash Charges
 -Easier Header for Khai Lun
+
+
+Commit 12 (Oct 25, 2017)
+------------------------
+-Cinemachine Camera
+-Inserted all animation done by artist.
+-Animation have some transform problem.
+-*Red biped test death and wake up / black bidep test on hit only

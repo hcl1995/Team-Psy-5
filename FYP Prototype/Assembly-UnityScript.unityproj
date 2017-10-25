@@ -54,6 +54,7 @@
      <Compile Include="Assets\FightingUnityChan_FreeAsset\Standard Assets\Scripts\Camera Scripts\MouseOrbit.js" />
      <None Include="Assets\FightingUnityChan_FreeAsset\FightingUnityChan_FreeAsset\Models\UnityChanShader\Shader\Unitychan_chara_eye.shader" />
      <None Include="Assets\FightingUnityChan_FreeAsset\FightingUnityChan_FreeAsset\Models\UnityChanShader\Shader\Unitychan_chara_fuku.shader" />
+     <None Include="Assets\Cinemachine\license.txt" />
      <None Include="Assets\FightingUnityChan_FreeAsset\FightingUnityChan_FreeAsset\Models\UnityChanShader\Shader\Unitychan_chara_fuku_ds.shader" />
      <None Include="Assets\FightingUnityChan_FreeAsset\FightingUnityChan_FreeAsset\Models\UnityChanShader\Shader\Unitychan_chara_eye_blend.shader" />
      <None Include="Assets\FightingUnityChan_FreeAsset\FightingUnityChan_FreeAsset\Models\UnityChanShader\Shader\Unitychan_chara_hair_ds.shader" />
