@@ -1,0 +1,42 @@
+Commit 01 (Sep 17, 2017)
+------------------------
+-Ver.1 character control scheme
+
+
+Commit 02 (Sep 17, 2017)
+------------------------
+-Canvas description for control
+
+
+Commit 03 (Sep 19, 2017)
+------------------------
+-Ver.2 character control scheme
+
+
+Commit 04 (Sep 19, 2017)
+------------------------
+-Add more info @ canvas description for control
+
+
+Commit 05 (Sep 21, 2017)
+------------------------
+-Animation testing scene & lag test scene
+
+
+Commit 06 (Sep 21, 2017)
+------------------------
+-Rework movement speed, dash distance & camera
+-Camera not fully working
+
+
+Commit 07 (Sep 28, 2017)
+------------------------
+-Bullet skill (Physic Movement)
+-Wall Skill (Work In Progress)
+
+
+Commit 07 (Sep 28, 2017)
+------------------------
+-Ver.3 character control scheme
+-Not destructable & destructable props added
+-Wall Skill (Got Pattern, No Effect, Invisible)
