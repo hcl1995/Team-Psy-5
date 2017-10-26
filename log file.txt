@@ -65,3 +65,8 @@ Commit 12 (Oct 25, 2017)
 -Inserted all animation done by artist.
 -Animation have some transform problem.
 -*Red biped test death and wake up / black bidep test on hit only
+
+Commit 13 (Oct 27, 2017)
+------------------------
+-Implement Basic Match UI
+-UI function not working properly (Networking Issues)
