@@ -1,3 +1,7 @@
+Commit 14 (Oct 31, 2017)
+------------------------
+-Lobby UI basic function complete (Have to rework)
+
 Commit 01 (Sep 17, 2017)
 ------------------------
 -Ver.1 character control scheme
