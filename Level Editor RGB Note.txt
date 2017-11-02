@@ -1,0 +1,17 @@
+Ground Layer
+------------
+Black
+
+Red = RGB (255, 0, 0)
+Blue = RGB (0, 0, 255)
+Gray = RGB (100, 100, 100)
+
+
+Props Layer
+-----------
+Green = RGB (0, 255, 0)
+Yellow = RGB (255, 255, 0)
+
+
+
+*Note - When u add a colour please note down here the RGB. :)

@@ -43,8 +43,6 @@ public class PlayerControl03 : MonoBehaviour
 	float completeTime;
 	float lerpSpeed = 10;
 
-	//public Transform opponentChan;
-
 	[Header("Bullet")]
 	public float chargeRate;
 	public float bulletCooldownDuration;
@@ -216,9 +214,12 @@ public class PlayerControl03 : MonoBehaviour
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
 
-		if (Physics.Raycast (ray, out hit, 100f, LayerMask.GetMask("Ground")))
+		if (Physics.Raycast (ray, out hit))
 		{
 			transform.LookAt(hit.point);
+
+			// bloody cheat
+			transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
 //			Quaternion rotation = Quaternion.LookRotation(hit.point);
 //			transform.rotation = rotation;
 		}
@@ -236,7 +237,7 @@ public class PlayerControl03 : MonoBehaviour
 			RotateTowardMouseDuringAction();
 			animation.SetTrigger("Guard");
 		}
-		else if (Input.GetKeyDown(KeyCode.Q)) // && cooldown done
+		else if (Input.GetKeyDown(KeyCode.Q))
 		{
 			if (bulletCooldown <= 0)
 			{
@@ -262,6 +263,7 @@ public class PlayerControl03 : MonoBehaviour
 			{
 				recordEndPos = OpponentChan.Instance.transform;
 
+				animation.SetTrigger("Wall");
 				Instantiate(wallSkill, wallSpawnPoint.position, wallSpawnPoint.rotation);
 				Instantiate(wallSkill, wallSpawnPoint02.position, wallSpawnPoint02.rotation);
 				Instantiate(wallSkill, wallSpawnPoint03.position, wallSpawnPoint03.rotation);
@@ -361,38 +363,38 @@ public class PlayerControl03 : MonoBehaviour
 			RotateTowardMouseDuringAction();
 			animation.SetTrigger("Attack03");
 		}
-
+			
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
 		{
-			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).
+			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).
 			GetChild(5).gameObject.SetActive(true);
 			animation.ResetTrigger("Attack");
 		}
 		else
 		{
-			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).
+			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).
 			GetChild(5).gameObject.SetActive(false);
 		}
 
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack02"))
 		{
-			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(1).GetChild(0).GetChild(1).gameObject.SetActive(true);
+			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(1).GetChild(0).GetChild(1).gameObject.SetActive(true);
 			animation.ResetTrigger("Attack02");
 		}
 		else
 		{
-			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(1).GetChild(0).GetChild(1).gameObject.SetActive(false);
+			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(1).GetChild(0).GetChild(1).gameObject.SetActive(false);
 		}
 
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack03"))
 		{
-			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(0).GetChild(0).
+			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(0).GetChild(0).
 			GetChild(5).gameObject.SetActive(true);
 			animation.ResetTrigger("Attack03");
 		}
 		else
 		{
-			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(0).GetChild(0).
+			transform.GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(0).GetChild(0).
 			GetChild(5).gameObject.SetActive(false);
 		}
 	}

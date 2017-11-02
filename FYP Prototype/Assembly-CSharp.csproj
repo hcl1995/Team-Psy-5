@@ -56,6 +56,7 @@
      <Compile Include="Assets\_FYP Prototype\Scripts\Attack03.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\BulletSkill.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\CameraBlending.cs" />
+     <Compile Include="Assets\_FYP Prototype\Scripts\ColorToPrefab.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\DestructableWall.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\Dump\CameraControl.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\Dump\CameraControlFix.cs" />
@@ -67,6 +68,7 @@
      <Compile Include="Assets\_FYP Prototype\Scripts\Dump\PlayerControl02.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\Dump\Projectile.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\Dump\StressTestLag.cs" />
+     <Compile Include="Assets\_FYP Prototype\Scripts\LevelGenerator.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\OpponentChan.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\PlayerControl03.cs" />
      <Compile Include="Assets\_FYP Prototype\Scripts\SpawnEmpty.cs" />
@@ -123,6 +125,7 @@
      <None Include="Assets\FightingUnityChan_FreeAsset\FightingUnityChan_FreeAsset\Models\UnityChanShader\Shader\Unitychan_chara_eye_blend.shader" />
      <None Include="Assets\FightingUnityChan_FreeAsset\FightingUnityChan_FreeAsset\Models\UnityChanShader\Shader\Unitychan_chara_hair_ds.shader" />
      <None Include="Assets\FightingUnityChan_FreeAsset\FightingUnityChan_FreeAsset\Models\UnityChanShader\Shader\Unitychan_chara_akarami_blend.shader" />
+     <None Include="Assets\_FYP Prototype\Document\Level Editor RGB Note.txt" />
      <None Include="Assets\FightingUnityChan_FreeAsset\FightingUnityChan_FreeAsset\Models\UnityChanShader\Shader\Unitychan_chara_hair.shader" />
      <None Include="Assets\FightingUnityChan_FreeAsset\FightingUnityChan_FreeAsset\Models\UnityChanShader\Shader\Unitychan_chara_eyelash_blend.shader" />
      <None Include="Assets\FightingUnityChan_FreeAsset\FightingUnityChan_FreeAsset\Models\UnityChanShader\Shader\Unitychan_chara_hada.shader" />

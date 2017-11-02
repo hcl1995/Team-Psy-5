@@ -13,7 +13,7 @@ public class WallSkillEffect : MonoBehaviour
 	{
 		if (other.gameObject.CompareTag("Enemy"))
 		{
-			other.gameObject.GetComponent<Animator>().SetTrigger("DamageDown");
+			other.gameObject.GetComponentInParent<Animator>().SetTrigger("DamageDown");
 			// disable opponent movements, player control scripts.
 		}
 	}
