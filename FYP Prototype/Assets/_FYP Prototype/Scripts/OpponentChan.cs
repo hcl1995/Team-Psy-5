@@ -12,7 +12,7 @@ public class OpponentChan : MonoBehaviour
 		{
 			if(_instance == null)
 			{
-				GameObject go = GameObject.Find("Opponent");
+				GameObject go = GameObject.Find("Dummy");
 
 				_instance = go.GetComponent<OpponentChan>();
 				_instance.Start();

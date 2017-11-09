@@ -43,8 +43,6 @@ public class PlayerControl03 : MonoBehaviour
 	float completeTime;
 	float lerpSpeed = 10;
 
-	//public Transform opponentChan;
-
 	[Header("Bullet")]
 	public float chargeRate;
 	public float bulletCooldownDuration;
@@ -85,6 +83,21 @@ public class PlayerControl03 : MonoBehaviour
 	float attackInterval;
 	public float attackIntervalLimit;
 
+	public GameObject attack01;
+	public GameObject attack02;
+	public GameObject attack03;
+
+	public enum playerState
+	{
+		Normal,
+		Guarding, // def++?
+		Attacking,
+		SkillCharging,
+		OnAnimation
+	}
+
+	public playerState state = playerState.Normal;
+
 	void Awake()
 	{
 		rb = GetComponent<Rigidbody>();
@@ -98,13 +111,24 @@ public class PlayerControl03 : MonoBehaviour
 
 	void Update()
 	{
+		RestrictInput();
+
 		float x = Input.GetAxisRaw("Horizontal");
 		float z = Input.GetAxisRaw("Vertical");
 
 		movement = new Vector3(x, 0, z);
 
+		if (state == playerState.Normal)
+		{
+			Movement(x, z);
+		}
+		else
+		{
+			Movement(0, 0);
+		}
+
 		Attack();
-		Movement(x, z);
+		//Movement(x, z);
 		ActionsInputKey();
 	}
 
@@ -120,20 +144,23 @@ public class PlayerControl03 : MonoBehaviour
 		GetCameraRelativeMovement();
 		RotateTowardMovementDirection();
 
-		if (Input.GetKeyDown(KeyCode.LeftShift))
+		if (state == playerState.Normal)
 		{
-			if (dashCharge > 0)
+			if (Input.GetKeyDown(KeyCode.LeftShift))
 			{
-				z = dashing;
-				startPos = transform.position;
-				endPos = transform.position += (transform.forward * z);
+				if (dashCharge > 0)
+				{
+					z = dashing;
+					startPos = transform.position;
+					endPos = transform.position += (transform.forward * z);
 
-				dash = true;
-				animation.SetTrigger("Dash");
+					dash = true;
+					animation.SetTrigger("Dash");
 
-				count++;
-				dashCharge--;
-				dashChargeCooldown += dashChargeCooldownDuration;
+					count++;
+					dashCharge--;
+					dashChargeCooldown += dashChargeCooldownDuration;
+				}
 			}
 		}
 
@@ -216,9 +243,12 @@ public class PlayerControl03 : MonoBehaviour
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
 
-		if (Physics.Raycast (ray, out hit, 100f, LayerMask.GetMask("Ground")))
+		if (Physics.Raycast (ray, out hit))
 		{
 			transform.LookAt(hit.point);
+
+			// bloody cheat
+			transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
 //			Quaternion rotation = Quaternion.LookRotation(hit.point);
 //			transform.rotation = rotation;
 		}
@@ -231,54 +261,72 @@ public class PlayerControl03 : MonoBehaviour
 //			RotateTowardMouseDuringAction();
 //			animation.SetTrigger("Attack");
 //		}
-		if (Input.GetMouseButtonDown(1))
+		if (state == playerState.SkillCharging)
 		{
-			RotateTowardMouseDuringAction();
-			animation.SetTrigger("Guard");
-		}
-		else if (Input.GetKeyDown(KeyCode.Q)) // && cooldown done
-		{
-			if (bulletCooldown <= 0)
+			if (Input.GetKeyUp(KeyCode.Q))
 			{
-				maxCharge = false;
-				chargeBar.SetActive(true);
-				animation.SetTrigger("Bullet");
+				if (bulletCooldown <= 0)
+				{
+					animation.SetBool("ReleaseShot", true);
+
+					RotateTowardMouseDuringAction();
+					Instantiate(projectile, spawnPoint.position, spawnPoint.rotation);
+					chargeBar.SetActive(false);
+
+					bulletCooldown = bulletCooldownDuration;
+				}
 			}
 		}
-		else if (Input.GetKeyUp(KeyCode.Q))
+		else if (state == playerState.Normal)
 		{
-			if (bulletCooldown <= 0)
+			if (Input.GetMouseButtonDown(1))
 			{
 				RotateTowardMouseDuringAction();
-				Instantiate(projectile, spawnPoint.position, spawnPoint.rotation);
-				chargeBar.SetActive(false);
+				animation.SetTrigger("Guard");
+				animation.SetBool("Guarding", true);
+			}
+			else if (Input.GetKeyDown(KeyCode.Q))
+			{
+				if (bulletCooldown <= 0)
+				{
+					maxCharge = false;
+					chargeBar.SetActive(true);
+					animation.SetTrigger("Bullet");
+					animation.SetBool("ReleaseShot", false);
+				}
+			}
+			else if (Input.GetKeyDown(KeyCode.E))
+			{
+				if (wallCooldown <= 0)
+				{
+					recordEndPos = OpponentChan.Instance.transform;
 
-				bulletCooldown = bulletCooldownDuration;
+					animation.SetTrigger("Wall");
+					Instantiate(wallSkill, wallSpawnPoint.position, wallSpawnPoint.rotation);
+					Instantiate(wallSkill, wallSpawnPoint02.position, wallSpawnPoint02.rotation);
+					Instantiate(wallSkill, wallSpawnPoint03.position, wallSpawnPoint03.rotation);
+					Instantiate(wallSkill02, wallSpawnPoint04.position, wallSpawnPoint04.rotation);
+
+					wallCooldown = wallCooldownDuration;
+				}
+			}
+			else if (Input.GetKeyDown(KeyCode.Space))
+			{
+				if (ultimateCooldown <= 0)
+				{
+					RotateTowardMouseDuringAction();
+					//animation.SetTrigger("Ultimate");
+					Instantiate(ultimate, ultimateSpawnPoint.position, ultimateSpawnPoint.rotation);
+
+					ultimateCooldown = ultimateCooldownDuration;
+				}
 			}
 		}
-		else if (Input.GetKeyDown(KeyCode.E))
+		else if (state == playerState.Guarding)
 		{
-			if (wallCooldown <= 0)
+			if (Input.GetMouseButtonUp(1))
 			{
-				recordEndPos = OpponentChan.Instance.transform;
-
-				Instantiate(wallSkill, wallSpawnPoint.position, wallSpawnPoint.rotation);
-				Instantiate(wallSkill, wallSpawnPoint02.position, wallSpawnPoint02.rotation);
-				Instantiate(wallSkill, wallSpawnPoint03.position, wallSpawnPoint03.rotation);
-				Instantiate(wallSkill02, wallSpawnPoint04.position, wallSpawnPoint04.rotation);
-
-				wallCooldown = wallCooldownDuration;
-			}
-		}
-		else if (Input.GetKeyDown(KeyCode.Space))
-		{
-			if (ultimateCooldown <= 0)
-			{
-				RotateTowardMouseDuringAction();
-				//animation.SetTrigger("Ultimate");
-				Instantiate(ultimate, ultimateSpawnPoint.position, ultimateSpawnPoint.rotation);
-
-				ultimateCooldown = ultimateCooldownDuration;
+				animation.SetBool("Guarding", false);
 			}
 		}
 
@@ -326,13 +374,6 @@ public class PlayerControl03 : MonoBehaviour
 
 	void Attack()
 	{
-		if (Input.GetMouseButtonDown(0))
-		{
-			attack++;
-			attackInterval = 0;
-			//Debug.Log(attack);
-		}
-
 		if (attack >= 1 && attackInterval > attackIntervalLimit)
 		{
 			attack = 0;
@@ -343,57 +384,95 @@ public class PlayerControl03 : MonoBehaviour
 			attackInterval += Time.deltaTime;
 		}
 
-		if (Input.GetMouseButtonDown(0) && attack == 1 && attackInterval < attackIntervalLimit)
+		if (Input.GetMouseButtonDown(0))
 		{
-			RotateTowardMouseDuringAction();
-			animation.SetTrigger("Attack");
-		}
-		else if (Input.GetMouseButtonDown(0) && attack == 2 && attackInterval < attackIntervalLimit)
-		{
-			RotateTowardMouseDuringAction();
-			animation.SetTrigger("Attack02");
-		}
-		else if (Input.GetMouseButtonDown(0) && attack >= 3 && attackInterval < attackIntervalLimit)
-		{
-			attack = 0;
+			attack++;
 			attackInterval = 0;
-
-			RotateTowardMouseDuringAction();
-			animation.SetTrigger("Attack03");
+			//Debug.Log(attack);
 		}
 
+		if (state == playerState.Normal)
+		{
+			if (attack == 1 && attackInterval < attackIntervalLimit)
+			{
+				RotateTowardMouseDuringAction();
+				animation.SetTrigger("Attack");
+			}
+		}
+		else if (state == playerState.Attacking)
+		{
+			if (attack == 2 && attackInterval < attackIntervalLimit)
+			{
+				RotateTowardMouseDuringAction();
+				animation.SetTrigger("Attack02");
+			}
+			else if (attack >= 3 && attackInterval < attackIntervalLimit)
+			{
+				attack = 0;
+				attackInterval = 0;
+
+				RotateTowardMouseDuringAction();
+				animation.SetTrigger("Attack03");
+			}
+		}
+			
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
 		{
-			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).
-			GetChild(5).gameObject.SetActive(true);
+			attack01.SetActive(true);
 			animation.ResetTrigger("Attack");
 		}
 		else
 		{
-			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(0).
-			GetChild(5).gameObject.SetActive(false);
+			attack01.SetActive(false);
 		}
 
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack02"))
 		{
-			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(1).GetChild(0).GetChild(1).gameObject.SetActive(true);
+			attack02.SetActive(true);
 			animation.ResetTrigger("Attack02");
 		}
 		else
 		{
-			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(1).GetChild(0).GetChild(1).gameObject.SetActive(false);
+			attack02.SetActive(false);
 		}
 
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack03"))
 		{
-			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(0).GetChild(0).
-			GetChild(5).gameObject.SetActive(true);
+			attack03.SetActive(true);
 			animation.ResetTrigger("Attack03");
 		}
 		else
 		{
-			transform.GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(2).GetChild(0).GetChild(0).GetChild(1).GetChild(0).GetChild(0).GetChild(0).
-			GetChild(5).gameObject.SetActive(false);
+			attack03.SetActive(false);
+		}
+	}
+
+	void RestrictInput()
+	{
+		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Idle") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Run") ||
+			this.animation.GetCurrentAnimatorStateInfo(0).IsName("Dash"))
+		{
+			state = playerState.Normal;
+		}
+		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack02") ||
+				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack03"))
+		{
+			state = playerState.Attacking;
+		}
+		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Guard"))
+		{
+			state = playerState.Guarding;
+		}
+		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting01"))
+		{
+			state = playerState.SkillCharging;
+		}
+		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting02") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Wall") ||
+				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Ultimate") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown") ||
+				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown02") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown03") ||
+				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Recover") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Death"))
+		{
+			state = playerState.OnAnimation;
 		}
 	}
 }

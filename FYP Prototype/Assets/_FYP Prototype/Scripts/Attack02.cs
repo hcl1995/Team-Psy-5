@@ -12,16 +12,15 @@ public class Attack02 : MonoBehaviour
 	{
 		if (other.gameObject.CompareTag("Enemy"))
 		{
-			//other.gameObject.GetComponent<Animator>().SetTrigger("DamageDown02");
 			other.gameObject.GetComponentInParent<Animator>().SetTrigger("DamageDown02");
 			impactGO = (GameObject) Instantiate(impact, other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position), Quaternion.identity);
 			Destroy(impactGO, 0.5f);
 
-//			other.transform.LookAt(transform.position);
-//
-//			Vector3 eulerFucker = other.transform.rotation.eulerAngles;
-//			eulerFucker = new Vector3(0, eulerFucker.y, 0);
-//			other.transform.rotation = Quaternion.Euler(eulerFucker);
+			other.transform.root.LookAt(transform.position);
+
+			Vector3 eulerFucker = other.transform.rotation.eulerAngles;
+			eulerFucker = new Vector3(0, eulerFucker.y - 180f, 0);
+			other.transform.root.rotation = Quaternion.Euler(eulerFucker);
 		}
 	}
 }

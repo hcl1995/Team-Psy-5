@@ -1,6 +1,14 @@
+Commit 15 (Nov 09, 2017)
+------------------------
+-Restrict Input (Buggy)
+-Inserted All The Animation From Animator
+-Animation Transition State (Should Be No Problem)
+
+
 Commit 14 (Oct 31, 2017)
 ------------------------
 -Lobby UI basic function complete (Have to rework)
+
 
 Commit 01 (Sep 17, 2017)
 ------------------------

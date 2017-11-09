@@ -15,15 +15,22 @@ public class UltimateSkill : MonoBehaviour
 	{
 		if (other.gameObject.CompareTag("Enemy"))
 		{
-			other.gameObject.GetComponent<Animator>().SetTrigger("DamageDown");
-			other.gameObject.transform.position += (transform.forward * distance);
+			//other.gameObject.GetComponent<Animator>().SetTrigger("DamageDown");
+			other.gameObject.GetComponentInParent<Animator>().SetTrigger("DamageDown");
+			other.gameObject.transform.root.position += (transform.forward * distance);
 
-			other.transform.LookAt(transform.position);
+//			other.transform.LookAt(transform.position);
+//
+//			// OnTrigger way to look. Works for OnCollision as well.
+//			Vector3 eulerFucker = other.transform.rotation.eulerAngles;
+//			eulerFucker = new Vector3(0, eulerFucker.y, 0);
+//			other.transform.rotation = Quaternion.Euler(eulerFucker);
 
-			// OnTrigger way to look. Works for OnCollision as well.
+			other.transform.root.LookAt(transform.position);
+
 			Vector3 eulerFucker = other.transform.rotation.eulerAngles;
-			eulerFucker = new Vector3(0, eulerFucker.y, 0);
-			other.transform.rotation = Quaternion.Euler(eulerFucker);
+			eulerFucker = new Vector3(0, eulerFucker.y - 180f, 0);
+			other.transform.root.rotation = Quaternion.Euler(eulerFucker);
 		}
 	}
 }
