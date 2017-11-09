@@ -76,13 +76,14 @@ public class PlayerControl03 : MonoBehaviour
 	public float ultimateCooldown;
 	public float dashChargeCooldown;
 
+	public int attack;
+	public float attackInterval;
+	public float attackIntervalLimit;
+
 	[HideInInspector]
 	public Transform recordEndPos;
 
-	int attack;
-	float attackInterval;
-	public float attackIntervalLimit;
-
+	[Header("Hitboxes")]
 	public GameObject attack01;
 	public GameObject attack02;
 	public GameObject attack03;
@@ -374,7 +375,7 @@ public class PlayerControl03 : MonoBehaviour
 
 	void Attack()
 	{
-		if (attack >= 1 && attackInterval > attackIntervalLimit)
+		if (attack >= 3 || attackInterval > attackIntervalLimit)
 		{
 			attack = 0;
 			attackInterval = 0;
@@ -383,7 +384,7 @@ public class PlayerControl03 : MonoBehaviour
 		{
 			attackInterval += Time.deltaTime;
 		}
-
+			
 		if (Input.GetMouseButtonDown(0))
 		{
 			attack++;
@@ -419,7 +420,6 @@ public class PlayerControl03 : MonoBehaviour
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
 		{
 			attack01.SetActive(true);
-			animation.ResetTrigger("Attack");
 		}
 		else
 		{
@@ -429,7 +429,6 @@ public class PlayerControl03 : MonoBehaviour
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack02"))
 		{
 			attack02.SetActive(true);
-			animation.ResetTrigger("Attack02");
 		}
 		else
 		{
@@ -439,7 +438,6 @@ public class PlayerControl03 : MonoBehaviour
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack03"))
 		{
 			attack03.SetActive(true);
-			animation.ResetTrigger("Attack03");
 		}
 		else
 		{
@@ -453,6 +451,9 @@ public class PlayerControl03 : MonoBehaviour
 			this.animation.GetCurrentAnimatorStateInfo(0).IsName("Dash"))
 		{
 			state = playerState.Normal;
+			animation.ResetTrigger("Attack");
+			animation.ResetTrigger("Attack02");
+			animation.ResetTrigger("Attack03");
 		}
 		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack02") ||
 				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack03"))
@@ -473,6 +474,20 @@ public class PlayerControl03 : MonoBehaviour
 				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Recover") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Death"))
 		{
 			state = playerState.OnAnimation;
+		}
+	}
+
+	void OnTriggerEnter(Collider other)
+	{
+		if (other.gameObject.CompareTag("OutofBound"))
+		{
+			rb.drag = 1;
+			rb.constraints = RigidbodyConstraints.None;
+		}
+		else
+		{
+			rb.drag = Mathf.Infinity;
+			rb.constraints = RigidbodyConstraints.FreezePositionY |	RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
 		}
 	}
 }

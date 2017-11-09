@@ -1,3 +1,9 @@
+Commit 16 (Nov 10, 2017)
+------------------------
+-Lesser Bug Version
+-Out of Bound (Unfreeze Position Y & Drag When Outside)
+
+
 Commit 15 (Nov 09, 2017)
 ------------------------
 -Restrict Input (Buggy)
