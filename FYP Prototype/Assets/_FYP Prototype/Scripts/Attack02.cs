@@ -5,8 +5,12 @@ using UnityEngine;
 public class Attack02 : MonoBehaviour
 {
 	public GameObject impact;
-
 	GameObject impactGO;
+
+	void Start()
+	{
+		Destroy(gameObject, 0.3f);
+	}
 
 	void OnTriggerEnter(Collider other)
 	{
@@ -21,6 +25,8 @@ public class Attack02 : MonoBehaviour
 			Vector3 eulerFucker = other.transform.rotation.eulerAngles;
 			eulerFucker = new Vector3(0, eulerFucker.y - 180f, 0);
 			other.transform.root.rotation = Quaternion.Euler(eulerFucker);
+
+			Destroy(gameObject);
 		}
 	}
 }

@@ -5,10 +5,9 @@ using UnityEngine;
 public class Attack03 : MonoBehaviour
 {
 	public GameObject impact;
+	GameObject impactGO;
 
 	public float distance;
-
-	GameObject impactGO;
 
 //	Vector3 startPos;
 //	Vector3 endPos;
@@ -32,12 +31,16 @@ public class Attack03 : MonoBehaviour
 //		}
 //	}
 
+	void Start()
+	{
+		Destroy(gameObject, 0.3f);
+	}
+
 	void OnTriggerEnter(Collider other)
 	{
 		if (other.gameObject.CompareTag("Enemy"))
 		{
 			other.gameObject.GetComponentInParent<Animator>().SetTrigger("DamageDown03");
-			other.gameObject.transform.root.position += (gameObject.transform.root.forward * distance);
 
 			impactGO = (GameObject) Instantiate(impact, other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position), Quaternion.identity);
 			Destroy(impactGO, 0.5f);
@@ -47,6 +50,10 @@ public class Attack03 : MonoBehaviour
 			Vector3 eulerFucker = other.transform.rotation.eulerAngles;
 			eulerFucker = new Vector3(0, eulerFucker.y - 180f, 0);
 			other.transform.root.rotation = Quaternion.Euler(eulerFucker);
+
+			other.gameObject.transform.root.position += (gameObject.transform.root.forward * distance);
+
+			Destroy(gameObject);
 		}
 	}
 }

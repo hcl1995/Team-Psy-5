@@ -76,8 +76,8 @@ public class PlayerControl03 : MonoBehaviour
 	public float ultimateCooldown;
 	public float dashChargeCooldown;
 
-	public int attack;
-	public float attackInterval;
+	int attack;
+	float attackInterval;
 	public float attackIntervalLimit;
 
 	[HideInInspector]
@@ -87,6 +87,14 @@ public class PlayerControl03 : MonoBehaviour
 	public GameObject attack01;
 	public GameObject attack02;
 	public GameObject attack03;
+
+	public Transform attackSpawnPoint;
+	public Transform attackSpawnPoint02;
+	public Transform attackSpawnPoint03;
+
+	bool atk01Once;
+	bool atk02Once;
+	bool atk03Once;
 
 	public enum playerState
 	{
@@ -262,23 +270,7 @@ public class PlayerControl03 : MonoBehaviour
 //			RotateTowardMouseDuringAction();
 //			animation.SetTrigger("Attack");
 //		}
-		if (state == playerState.SkillCharging)
-		{
-			if (Input.GetKeyUp(KeyCode.Q))
-			{
-				if (bulletCooldown <= 0)
-				{
-					animation.SetBool("ReleaseShot", true);
-
-					RotateTowardMouseDuringAction();
-					Instantiate(projectile, spawnPoint.position, spawnPoint.rotation);
-					chargeBar.SetActive(false);
-
-					bulletCooldown = bulletCooldownDuration;
-				}
-			}
-		}
-		else if (state == playerState.Normal)
+		if (state == playerState.Normal)
 		{
 			if (Input.GetMouseButtonDown(1))
 			{
@@ -328,6 +320,22 @@ public class PlayerControl03 : MonoBehaviour
 			if (Input.GetMouseButtonUp(1))
 			{
 				animation.SetBool("Guarding", false);
+			}
+		}
+		else if (state == playerState.SkillCharging)
+		{
+			if (Input.GetKeyUp(KeyCode.Q))
+			{
+				if (bulletCooldown <= 0)
+				{
+					animation.SetBool("ReleaseShot", true);
+
+					RotateTowardMouseDuringAction();
+					Instantiate(projectile, spawnPoint.position, spawnPoint.rotation);
+					chargeBar.SetActive(false);
+
+					bulletCooldown = bulletCooldownDuration;
+				}
 			}
 		}
 
@@ -419,36 +427,58 @@ public class PlayerControl03 : MonoBehaviour
 			
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
 		{
-			attack01.SetActive(true);
+			if (!atk01Once)
+			{
+				Instantiate(attack01, attackSpawnPoint.transform.position, Quaternion.identity, attackSpawnPoint);
+				atk01Once = true;
+			}
+			//attack01.SetActive(true);
 		}
 		else
 		{
-			attack01.SetActive(false);
+			atk01Once = false;
+			//attack01.SetActive(false);
 		}
 
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack02"))
 		{
-			attack02.SetActive(true);
+			if (!atk02Once)
+			{
+				Instantiate(attack02, attackSpawnPoint02.transform.position, Quaternion.identity, attackSpawnPoint02);
+				atk02Once = true;
+			}
+			//attack02.SetActive(true);
 		}
 		else
 		{
-			attack02.SetActive(false);
+			atk02Once = false;
+			//attack02.SetActive(false);
 		}
 
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack03"))
 		{
-			attack03.SetActive(true);
+			if (!atk03Once)
+			{
+				Instantiate(attack03, attackSpawnPoint03.transform.position, Quaternion.identity, attackSpawnPoint03);
+				atk03Once = true;
+			}
+			//attack03.SetActive(true);
 		}
 		else
 		{
-			attack03.SetActive(false);
+			atk03Once = false;
+			//attack03.SetActive(false);
 		}
 	}
 
 	void RestrictInput()
 	{
-		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Idle") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Run") ||
-			this.animation.GetCurrentAnimatorStateInfo(0).IsName("Dash"))
+		if (chargeBar.activeInHierarchy)
+		{
+			state = playerState.SkillCharging;
+		}
+		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Idle") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Run") ||
+			this.animation.GetCurrentAnimatorStateInfo(0).IsName("Dash") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting02"))
 		{
 			state = playerState.Normal;
 			animation.ResetTrigger("Attack");
@@ -464,11 +494,7 @@ public class PlayerControl03 : MonoBehaviour
 		{
 			state = playerState.Guarding;
 		}
-		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting01"))
-		{
-			state = playerState.SkillCharging;
-		}
-		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting02") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Wall") ||
+		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Wall") || //this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting02")
 				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Ultimate") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown") ||
 				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown02") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown03") ||
 				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Recover") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Death"))
@@ -483,11 +509,13 @@ public class PlayerControl03 : MonoBehaviour
 		{
 			rb.drag = 1;
 			rb.constraints = RigidbodyConstraints.None;
+			animation.SetBool("OnGround", false);
 		}
-		else
-		{
-			rb.drag = Mathf.Infinity;
-			rb.constraints = RigidbodyConstraints.FreezePositionY |	RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-		}
+//		else
+//		{
+//			rb.drag = Mathf.Infinity;
+//			rb.constraints = RigidbodyConstraints.FreezePositionY |	RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+//			animation.SetBool("OnGround", true);
+//		}
 	}
 }

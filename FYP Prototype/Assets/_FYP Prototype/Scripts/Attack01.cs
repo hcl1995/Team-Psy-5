@@ -5,12 +5,13 @@ using UnityEngine;
 public class Attack01 : MonoBehaviour
 {
 	public GameObject impact;
-
 	GameObject impactGO;
 
-	// ONTRIGGER NOT WORKING, BULLET WORKS WELL...? DEFUQ
+	void Start()
+	{
+		Destroy(gameObject, 0.3f); // noob way.. 0.3f just nice the punch go out
+	}
 
-	// HOW THE FUCK AM I NOT HITTING TWICE?
 	void OnTriggerEnter(Collider other)
 	{
 //		Vector3 dir = other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position) - transform.position;
@@ -28,6 +29,7 @@ public class Attack01 : MonoBehaviour
 			eulerFucker = new Vector3(0, eulerFucker.y - 180f, 0);
 			other.transform.root.rotation = Quaternion.Euler(eulerFucker);
 
+			Destroy(gameObject);
 			// Some Multiple Punches
 			//Physics.IgnoreCollision(GetComponent<Collider>(), other.GetComponent<Collider>(), true);
 		}
