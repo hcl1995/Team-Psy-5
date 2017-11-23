@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Networking;
 
-public class PlayerControl03 : MonoBehaviour
+public class PlayerControl03 : NetworkBehaviour
 {
 	private static PlayerControl03 _instance;
 	public static PlayerControl03 Instance
@@ -27,7 +28,7 @@ public class PlayerControl03 : MonoBehaviour
 	Vector3 targetDirection;
 
 	Rigidbody rb;
-	Animator animation;
+	public Animator animation;
 
 	[Header("Movement")]
 	public float speed;
@@ -76,30 +77,23 @@ public class PlayerControl03 : MonoBehaviour
 	public float ultimateCooldown;
 	public float dashChargeCooldown;
 
+	[HideInInspector]
+	public Transform recordEndPos;
+
 	int attack;
 	float attackInterval;
 	public float attackIntervalLimit;
 
-	[HideInInspector]
-	public Transform recordEndPos;
-
-	[Header("Hitboxes")]
 	public GameObject attack01;
 	public GameObject attack02;
 	public GameObject attack03;
 
-	public Transform attackSpawnPoint;
-	public Transform attackSpawnPoint02;
-	public Transform attackSpawnPoint03;
-
-	bool atk01Once;
-	bool atk02Once;
-	bool atk03Once;
+	bool toggleGuard = false;
 
 	public enum playerState
 	{
 		Normal,
-		Guarding, // def++?
+		Guarding,
 		Attacking,
 		SkillCharging,
 		OnAnimation
@@ -107,19 +101,25 @@ public class PlayerControl03 : MonoBehaviour
 
 	public playerState state = playerState.Normal;
 
-	void Awake()
+	protected void Awake()
 	{
 		rb = GetComponent<Rigidbody>();
 		animation = GetComponent<Animator>();
 	}
 
-	void Start()
+	protected void Start()
 	{
 		dashCharge = maxDashCharge;
 	}
 
-	void Update()
+	protected void Update()
 	{
+		if (!isLocalPlayer)
+			return;
+		CheckInput();
+	}
+
+	void CheckInput(){
 		RestrictInput();
 
 		float x = Input.GetAxisRaw("Horizontal");
@@ -139,6 +139,20 @@ public class PlayerControl03 : MonoBehaviour
 		Attack();
 		//Movement(x, z);
 		ActionsInputKey();
+
+//		if (Input.GetKeyDown (KeyCode.K)) {
+//			if (toggleGuard) {
+//				animation.SetBool ("Guarding", false);
+//				CmdSetPlayerState (playerState.Normal);
+//				toggleGuard = false;
+//			} else if (!toggleGuard) {
+//				animation.SetTrigger("Guard");
+//				animation.SetBool("Guarding", true);
+//				CmdSetPlayerState (playerState.Guarding);
+//				toggleGuard = true;
+//			}
+//		}
+
 	}
 
 	void Movement(float x, float z)
@@ -194,27 +208,12 @@ public class PlayerControl03 : MonoBehaviour
 		{
 			dashChargeCooldown = 0;
 		}
-
-		// GG gives me cancer
+			
 		if (maxDashCharge - dashCharge == count && dashChargeCooldown <= ((dashChargeCooldownDuration * count) - dashChargeCooldownDuration))
 		{
 			count--;
 			dashCharge++;
 		}
-
-		// hardcoded..
-//		if (maxDashCharge - dashCharge == 1 && dashChargeCooldown <= 0)
-//		{
-//			dashCharge++;
-//		}
-//		else if (maxDashCharge - dashCharge == 2 && dashChargeCooldown <= 5)
-//		{
-//			dashCharge++;
-//		}
-//		else if (maxDashCharge - dashCharge == 3 && dashChargeCooldown <= 10)
-//		{
-//			dashCharge++;
-//		}
 	}
 
 	//converts control input vectors into camera facing vectors
@@ -247,7 +246,7 @@ public class PlayerControl03 : MonoBehaviour
 		}
 	}
 
-	void RotateTowardMouseDuringAction()
+	public void RotateTowardMouseDuringAction()
 	{
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
@@ -263,13 +262,8 @@ public class PlayerControl03 : MonoBehaviour
 		}
 	}
 
-	void ActionsInputKey()
+	protected virtual void ActionsInputKey()
 	{
-//		if (Input.GetMouseButtonDown(0))
-//		{
-//			RotateTowardMouseDuringAction();
-//			animation.SetTrigger("Attack");
-//		}
 		if (state == playerState.Normal)
 		{
 			if (Input.GetMouseButtonDown(1))
@@ -277,6 +271,7 @@ public class PlayerControl03 : MonoBehaviour
 				RotateTowardMouseDuringAction();
 				animation.SetTrigger("Guard");
 				animation.SetBool("Guarding", true);
+				CmdSetPlayerState (playerState.Guarding);
 			}
 			else if (Input.GetKeyDown(KeyCode.Q))
 			{
@@ -320,6 +315,7 @@ public class PlayerControl03 : MonoBehaviour
 			if (Input.GetMouseButtonUp(1))
 			{
 				animation.SetBool("Guarding", false);
+				CmdSetPlayerState (playerState.Normal);
 			}
 		}
 		else if (state == playerState.SkillCharging)
@@ -331,7 +327,7 @@ public class PlayerControl03 : MonoBehaviour
 					animation.SetBool("ReleaseShot", true);
 
 					RotateTowardMouseDuringAction();
-					Instantiate(projectile, spawnPoint.position, spawnPoint.rotation);
+					CmdFire (spawnPoint.position,spawnPoint.rotation);
 					chargeBar.SetActive(false);
 
 					bulletCooldown = bulletCooldownDuration;
@@ -383,7 +379,7 @@ public class PlayerControl03 : MonoBehaviour
 
 	void Attack()
 	{
-		if (attack >= 3 || attackInterval > attackIntervalLimit)
+		if (attack >= 3 && attackInterval > attackIntervalLimit)
 		{
 			attack = 0;
 			attackInterval = 0;
@@ -392,12 +388,11 @@ public class PlayerControl03 : MonoBehaviour
 		{
 			attackInterval += Time.deltaTime;
 		}
-			
+
 		if (Input.GetMouseButtonDown(0))
 		{
 			attack++;
 			attackInterval = 0;
-			//Debug.Log(attack);
 		}
 
 		if (state == playerState.Normal)
@@ -405,7 +400,7 @@ public class PlayerControl03 : MonoBehaviour
 			if (attack == 1 && attackInterval < attackIntervalLimit)
 			{
 				RotateTowardMouseDuringAction();
-				animation.SetTrigger("Attack");
+				CmdAnimation("Attack");
 			}
 		}
 		else if (state == playerState.Attacking)
@@ -413,7 +408,7 @@ public class PlayerControl03 : MonoBehaviour
 			if (attack == 2 && attackInterval < attackIntervalLimit)
 			{
 				RotateTowardMouseDuringAction();
-				animation.SetTrigger("Attack02");
+				CmdAnimation("Attack02");
 			}
 			else if (attack >= 3 && attackInterval < attackIntervalLimit)
 			{
@@ -421,53 +416,8 @@ public class PlayerControl03 : MonoBehaviour
 				attackInterval = 0;
 
 				RotateTowardMouseDuringAction();
-				animation.SetTrigger("Attack03");
+				CmdAnimation("Attack03");
 			}
-		}
-			
-		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
-		{
-			if (!atk01Once)
-			{
-				Instantiate(attack01, attackSpawnPoint.transform.position, Quaternion.identity, attackSpawnPoint);
-				atk01Once = true;
-			}
-			//attack01.SetActive(true);
-		}
-		else
-		{
-			atk01Once = false;
-			//attack01.SetActive(false);
-		}
-
-		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack02"))
-		{
-			if (!atk02Once)
-			{
-				Instantiate(attack02, attackSpawnPoint02.transform.position, Quaternion.identity, attackSpawnPoint02);
-				atk02Once = true;
-			}
-			//attack02.SetActive(true);
-		}
-		else
-		{
-			atk02Once = false;
-			//attack02.SetActive(false);
-		}
-
-		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack03"))
-		{
-			if (!atk03Once)
-			{
-				Instantiate(attack03, attackSpawnPoint03.transform.position, Quaternion.identity, attackSpawnPoint03);
-				atk03Once = true;
-			}
-			//attack03.SetActive(true);
-		}
-		else
-		{
-			atk03Once = false;
-			//attack03.SetActive(false);
 		}
 	}
 
@@ -481,9 +431,9 @@ public class PlayerControl03 : MonoBehaviour
 			this.animation.GetCurrentAnimatorStateInfo(0).IsName("Dash") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting02"))
 		{
 			state = playerState.Normal;
-			animation.ResetTrigger("Attack");
-			animation.ResetTrigger("Attack02");
-			animation.ResetTrigger("Attack03");
+//			animation.ResetTrigger("Attack");
+//			animation.ResetTrigger("Attack02");
+//			animation.ResetTrigger("Attack03");
 		}
 		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack02") ||
 				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack03"))
@@ -494,7 +444,11 @@ public class PlayerControl03 : MonoBehaviour
 		{
 			state = playerState.Guarding;
 		}
-		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Wall") || //this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting02")
+		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting01"))
+		{
+			state = playerState.SkillCharging;
+		}
+		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Wall") ||
 				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Ultimate") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown") ||
 				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown02") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown03") ||
 				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Recover") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Death"))
@@ -503,19 +457,70 @@ public class PlayerControl03 : MonoBehaviour
 		}
 	}
 
+	[Command]
+	public void CmdFire(Vector3 position, Quaternion rotation){
+		var bullet = Instantiate(projectile, position, rotation);
+		NetworkServer.Spawn (bullet);
+	}
+
+	[ClientRpc]
+	void RpcSetAnimation(string anim){
+		animation.SetTrigger(anim);
+		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
+		{
+			attack01.SetActive(true);
+			animation.ResetTrigger("Attack");
+		}
+		else
+		{
+			attack01.SetActive(false);
+		}
+
+		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack02"))
+		{
+			attack02.SetActive(true);
+			animation.ResetTrigger("Attack02");
+		}
+		else
+		{
+			attack02.SetActive(false);
+		}
+
+		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack03"))
+		{
+			attack03.SetActive(true);
+			animation.ResetTrigger("Attack03");
+		}
+		else
+		{
+			attack03.SetActive(false);
+		}
+	}
+
+	[Command]
+	void CmdAnimation(string anim){
+		RpcSetAnimation (anim);
+	}
+
+	[Command]
+	public void CmdSetPlayerState(playerState playerState){
+		state = playerState;
+	}
+
 	void OnTriggerEnter(Collider other)
 	{
 		if (other.gameObject.CompareTag("OutofBound"))
 		{
+			Debug.Log("FUCK");
 			rb.drag = 1;
 			rb.constraints = RigidbodyConstraints.None;
 			animation.SetBool("OnGround", false);
 		}
-//		else
-//		{
-//			rb.drag = Mathf.Infinity;
-//			rb.constraints = RigidbodyConstraints.FreezePositionY |	RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-//			animation.SetBool("OnGround", true);
-//		}
+		//		else
+		//		{
+		//			rb.drag = Mathf.Infinity;
+		//			rb.constraints = RigidbodyConstraints.FreezePositionY |	RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
+		//			animation.SetBool("OnGround", true);
+		//		}
 	}
 }

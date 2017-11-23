@@ -6,7 +6,7 @@ using Cinemachine;
 public class CameraBlending : MonoBehaviour
 {
 	public CinemachineVirtualCamera vcam;
-	//float minFOV;
+	float minFOV;
 
 	void Start()
 	{

@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class BulletSkill : MonoBehaviour
+public class BulletSkill : NetworkBehaviour
 {
 	Vector3 initialVelocity;
 
@@ -20,6 +21,9 @@ public class BulletSkill : MonoBehaviour
 	public float projectileSpeed;
 	public float travelingThreshold;
 	public float distance;
+	public float damage = 10;
+
+	public GameObject impact;
 
 	void OnEnable()
 	{
@@ -55,21 +59,32 @@ public class BulletSkill : MonoBehaviour
 
 		// OnCollision way to look.
 		Vector3 dir = other.contacts[0].point - transform.position;
-		dir = -dir.normalized;
+		dir = dir.normalized;
+		//dir = -dir.normalized;
 
 		if (other.gameObject.CompareTag("Enemy"))
 		{
-			Quaternion rotation = Quaternion.LookRotation(dir);
-			other.transform.rotation = rotation;
+//			Quaternion rotation = Quaternion.LookRotation(dir);
+//			other.transform.rotation = rotation;
 
 			other.gameObject.GetComponent<Animator>().SetTrigger("DamageDown");
 
+			NetworkServer.Destroy (gameObject);
+			Destroy(gameObject);
+
+		}
+		// DELETE, JUST FOR TESTING.
+		else if (other.gameObject.CompareTag("Player"))
+		{
+			//other.gameObject.GetComponent<Animator>().SetTrigger("Death");
+			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (10.0f,"DamageDown");
+
 			if (PlayerControl03.Instance.maxCharge)
 			{
-				//other.gameObject.transform.position += (dir);
-				//other.gameObject.transform.Translate (dir);
-				other.gameObject.transform.position += (transform.forward * distance);
+				other.gameObject.transform.root.position += (gameObject.transform.root.forward * distance);
 			}
+
+			NetworkServer.Destroy (gameObject);
 			Destroy(gameObject);
 		}
 		Bounce(other.contacts[0].normal);

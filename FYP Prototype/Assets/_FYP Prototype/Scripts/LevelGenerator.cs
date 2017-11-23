@@ -4,88 +4,67 @@ using UnityEngine;
 
 public class LevelGenerator : MonoBehaviour
 {
-	public Texture2D map;
-	public Texture2D props;
-
+	public Texture2D[] texture;
 	public ColorToPrefab[] colorMappings;
 
 	void Start ()
 	{
-		GeneratePropsLayer();
-		GenerateGroundLayer();
-	}
-
-	void GenerateGroundLayer()
-	{
-		for (int x = 0; x < map.width; x++)
-		{
-			for (int z = 0; z < map.height; z++)
-			{
-				GenerateGround(x, z);
-			}
-		}
-	}
-
-	void GenerateGround(int x, int z)
-	{
-		Color pixelColor = map.GetPixel(x, z);
-
-		if (pixelColor.a == 0)
-		{
-			return;
-		}
-
-//		foreach (ColorToPrefab colorMapping in colorMappings)
-//		{
-//			if (colorMapping.color.Equals(pixelColor))
-//			{
-//				Vector3 position = new Vector3(x, 0, z);
-//				Instantiate(colorMapping.prefab, position, Quaternion.identity, transform);
-//			}
-//		}
+		GenerateLevel();
 
 		foreach (ColorToPrefab colorMapping in colorMappings)
 		{
-//			if (pixelColor == Color.black)
-//			{
-//				Vector3 position = new Vector3(x, 0, z);
-//				Instantiate(colorMapping.prefab, position, Quaternion.identity, transform);
-//			}
+			colorMapping.prefab.GetComponent<Renderer>().sharedMaterial.color = colorMapping.color;
+		}
+	}
 
-			if (colorMapping.color.Equals(pixelColor))
+	void GenerateLevel()
+	{
+		for (int x = 0; x < texture[0].width; x++)
+		{
+			for (int z = 0; z < texture[0].height; z++)
 			{
-				Vector3 position = new Vector3(x, 0.0f, z);
-				Instantiate(colorMapping.prefab, position, Quaternion.identity, transform);
+				GenerateLevel(x, z);
 			}
 		}
 	}
 
-	void GeneratePropsLayer()
+	void GenerateLevel(int x, int z)
 	{
-		for (int x = 0; x < props.width; x++)
+		for (int i = 0; i < texture.Length; i++)
 		{
-			for (int z = 0; z < props.height; z++)
+			float oriScale = 1;
+			float oriYPosition = 1;
+			Color pixelColor = texture[i].GetPixel(x, z);
+
+			if (pixelColor.a == 0)
 			{
-				GenerateProps(x, z);
+				return;
 			}
-		}
-	}
 
-	void GenerateProps(int x, int z)
-	{
-		Color pixelColor02 = props.GetPixel(x, z);
-
-		if (pixelColor02.a == 0)
-		{
-			return;
-		}
-
-		foreach (ColorToPrefab colorMapping in colorMappings)
-		{
-			if (colorMapping.color.Equals(pixelColor02))
+			// IF Designer Arrange In Wrong Layer Order = GG.
+			if (i < 1)
 			{
-				Vector3 position = new Vector3(x, 1, z);
-				Instantiate(colorMapping.prefab, position, Quaternion.identity, transform);
+				oriYPosition = 0;
+			}
+			else if (i > 1)
+			{
+				oriYPosition = 1;
+			}
+
+			foreach (ColorToPrefab colorMapping in colorMappings)
+			{
+				if (colorMapping.color.Equals(pixelColor))
+				{
+					// Preset Scale | Normally It's Always 1 For What Artist Made.
+
+					// magic number. Means Scale + 1 = Y + 0.5. | Original Scale & Y-Position = 1.
+					float scale = colorMapping.prefab.transform.localScale.y - oriScale; 
+					float yPosition = oriYPosition + (scale * 0.5f);
+
+					Vector3 position = new Vector3(x, yPosition, z);
+					Instantiate(colorMapping.prefab, position, Quaternion.identity, transform);
+					// Required Grouping The Shapes Into Game Object & Modify. FUCK THIS SHIT, BLOCKS CMI.
+				}
 			}
 		}
 	}
