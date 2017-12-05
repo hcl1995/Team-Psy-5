@@ -21,6 +21,8 @@ public class PlayerHealth : NetworkBehaviour {
 
 	public RectTransform healthBar;
 
+	bool isDead = false;
+
 	void Start(){
 		anim = GetComponent<Animator>();
 	}
@@ -30,16 +32,19 @@ public class PlayerHealth : NetworkBehaviour {
 			return;
 
 		currentHealth -= amount;
-		if (currentHealth <= 0)
-		{
-			currentHealth = 0;
-			Debug.Log("Dead!");
-		}
+		checkDeath();
 	}
 
 	void Update(){
 		if (!isLocalPlayer)
 			return;
+
+		if (gameObject.transform.position.y <= -5)
+		{
+			currentHealth -= maxHealth;
+			checkDeath();
+		}
+
 		if (currentHealth < previousHealth) {
 			hitIndicator.OnHit ();
 			previousHealth = currentHealth;
@@ -57,7 +62,13 @@ public class PlayerHealth : NetworkBehaviour {
 			return;
 		if (playerControl.state == PlayerControl03.playerState.Guarding) {
 			currentHealth -= 1.0f;
-		} else {
+		}
+//		else if (playerControl.skill02Buffed)
+//		{
+//			currentHealth -= damage * 1.5f;
+//			CmdAnimation (animation);
+//		}
+		else {
 			currentHealth -= damage;
 			CmdAnimation (animation);
 		}
@@ -71,32 +82,33 @@ public class PlayerHealth : NetworkBehaviour {
 		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
 		transform.root.rotation = Quaternion.Euler (eulerFucker);
 
-		if (currentHealth <= 0)
-		{
-			currentHealth = 0;
-			Debug.Log("Dead!");
-			CmdLose ();
-		}
+		checkDeath();
 	}
 
 	public void takeDamageBullet(float damage, string animation){
 		if (!isServer)
 			return;
 
-		if (playerControl.state == PlayerControl03.playerState.Guarding) {
-			currentHealth -= 1.0f;
-		} else {
+		if (playerControl.skill02Buffed)
+		{
+			currentHealth -= damage * 1.5f;
+			CmdAnimation (animation);
+		}
+		else
+		{
 			currentHealth -= damage;
 			CmdAnimation (animation);
 		}
+
+//		if (playerControl.state == PlayerControl03.playerState.Guarding) {
+//			currentHealth -= 1.0f;
+//		} else {
+//			currentHealth -= damage;
+//			CmdAnimation (animation);
+//		}
 		//CmdHit ();
 
-		if (currentHealth <= 0)
-		{
-			currentHealth = 0;
-			Debug.Log("Dead!");
-			CmdLose ();
-		}
+		checkDeath();
 	}
 
 	public void takeSkill02(float damage, string animation){
@@ -106,24 +118,8 @@ public class PlayerHealth : NetworkBehaviour {
 		currentHealth -= damage;
 		CmdAnimation (animation);
 
-		if (currentHealth <= 0)
-		{
-			currentHealth = 0;
-			Debug.Log("Dead!");
-			CmdLose ();
-		}
+		checkDeath();
 	}
-
-//	public void sei9jor()
-//	{
-//		if (currentHealth <= 0)
-//		{
-//			currentHealth = 0;
-//			CmdAnimation ("Death");
-//			Debug.Log("Dead!");
-//			CmdLose ();
-//		}
-//	}
 
 	public void takeDamageHazard(float damage){
 		if (!isServer)
@@ -131,11 +127,19 @@ public class PlayerHealth : NetworkBehaviour {
 
 		currentHealth -= damage;
 		//CmdHit ();
+		checkDeath();
+	}
 
+	public void checkDeath()
+	{
 		if (currentHealth <= 0)
 		{
+			if (isDead)
+				return;
 			currentHealth = 0;
-			Debug.Log("Dead!");
+			isDead = true;
+			CmdAnimation("Death");
+			//Debug.Log("Dead!");
 			CmdLose ();
 		}
 	}

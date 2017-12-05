@@ -35,7 +35,14 @@ public class Attack02 : MonoBehaviour
 		{
 			if (other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> () != selfHealth) {
 				//other.gameObject.GetComponentInParent<Animator>().SetTrigger("DamageDown02");
-				other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> ().takeDamage (damage,"DamageDown02",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position));
+				if (selfControl.skill02Buffed == false)
+				{
+					other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> ().takeDamage (damage,"DamageDown02",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position));
+				}
+				else if (selfControl.skill02Buffed == true)
+				{
+					other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> ().takeDamage (damage * 1.5f,"DamageDown02",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position));
+				}
 				isHit = true;
 //				impactGO = (GameObject) Instantiate(impact, other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position), Quaternion.identity);
 //				Destroy(impactGO, 0.5f);

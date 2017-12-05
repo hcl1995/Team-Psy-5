@@ -6,7 +6,7 @@ using Cinemachine;
 public class CameraBlending : MonoBehaviour
 {
 	public CinemachineVirtualCamera vcam;
-	float minFOV;
+	//float minFOV;
 
 	void Start()
 	{
@@ -17,13 +17,13 @@ public class CameraBlending : MonoBehaviour
 
 	void Update()
 	{
-		if (Camera.main.fieldOfView > 10.5)
+		if (Camera.main.fieldOfView > 15.5)
 		{
-			vcam.enabled = true;
+			vcam.enabled = false;
 		}
 		else
 		{
-			vcam.enabled = false;
+			vcam.enabled = true;
 		}
 	}
 }

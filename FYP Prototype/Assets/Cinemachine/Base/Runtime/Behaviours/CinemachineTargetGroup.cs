@@ -59,6 +59,18 @@ namespace Cinemachine
         /// contribute to the group's average position, orientation, and size</summary>
         [Tooltip("The target objects, together with their weights and radii, that will contribute to the group's average position, orientation, and size.")]
         public Target[] m_Targets = new Target[0];
+		public GameObject[] m_Players;
+
+		// TEMPORARY SOLUTION
+		public void Start()
+		{
+			m_Players = GameObject.FindGameObjectsWithTag("Neck");
+
+			for (int i = 0; i < m_Players.Length; i++)
+			{
+				m_Targets[i].target = m_Players[i].transform;
+			}
+		}
 
         /// <summary>The axis-aligned bounding box of the group, computed using the
         /// targets positions and radii</summary>
@@ -175,6 +187,13 @@ namespace Cinemachine
                     transform.rotation = CalculateAverageOrientation();
                     break;
             }
+
+			m_Players = GameObject.FindGameObjectsWithTag("Neck");
+
+			for (int i = 0; i < m_Players.Length; i++)
+			{
+				m_Targets[i].target = m_Players[i].transform;
+			}
         }
     }
 }

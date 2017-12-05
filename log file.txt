@@ -1,3 +1,15 @@
+Commit 18 (Dec 05, 2017)
+------------------------
+-Death animation
+-Red guy ultimate
+-Shoot, Buff & Guard VFX
+
+
+Commit 17 (Nov 24, 2017)
+------------------------
+-UnityChan w/ 1st & 2nd skill
+
+
 Commit 16 (Nov 10, 2017)
 ------------------------
 -Lesser Bug Version

@@ -23,6 +23,8 @@ public class BulletSkill : NetworkBehaviour
 	public float distance;
 	public float damage = 10;
 
+	bool maxCharge = false;
+
 	public GameObject impact;
 
 	void OnEnable()
@@ -79,7 +81,7 @@ public class BulletSkill : NetworkBehaviour
 			//other.gameObject.GetComponent<Animator>().SetTrigger("Death");
 			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (10.0f,"DamageDown");
 
-			if (PlayerControl03.Instance.maxCharge)
+			if (maxCharge)
 			{
 				other.gameObject.transform.root.position += (gameObject.transform.root.forward * distance);
 			}
@@ -99,5 +101,9 @@ public class BulletSkill : NetworkBehaviour
 		var direction = Vector3.Reflect(initialVelocity.normalized, collisionNormal);
 
 		rb.velocity = direction * Mathf.Max(speed, minVelocity);
+	}
+
+	public void setMaxCharge(bool max){
+		maxCharge = max;
 	}
 }

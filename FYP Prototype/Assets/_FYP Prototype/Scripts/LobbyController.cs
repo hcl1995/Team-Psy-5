@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using Cinemachine;
 
 public class LobbyController : NetworkManager {
 
@@ -36,6 +37,7 @@ public class LobbyController : NetworkManager {
 	public List<GameObject> playerNetwork = new List<GameObject> ();
 	public List<GameObject> playerChara = new List<GameObject> ();
 
+	public CinemachineTargetGroup targetGroup;
 
 	// Use this for initialization
 	void Start () {
@@ -151,6 +153,7 @@ public class LobbyController : NetworkManager {
 			playerChara.Add (pgo);
 			NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerNetwork>().conn, pgo,0);
 		}
+
 	}
 
 	public void PlayerUnready(){

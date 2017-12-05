@@ -44,51 +44,61 @@ public class PlayerControl03 : NetworkBehaviour
 	float completeTime;
 	float lerpSpeed = 10;
 
+	[Header("Punches")]
+	public GameObject attack01;
+	public GameObject attack02;
+	public GameObject attack03;
+	public GameObject ultiAttack;
+
 	[Header("Bullet")]
+	public Image skill01CD;
+	public Image fillCharge;
+	public GameObject chargeBar;
+	public GameObject projectile;
+	public GameObject projectileMax;
+
 	public float chargeRate;
 	public float bulletCooldownDuration;
 
 	[Header("EarthWallJutsu")]
-	public float wallCooldownDuration;
-
-	[Header("Ultimate")]
-	public float ultimateCooldownDuration;
-
-	[Header("Drag & Drop")]
-	public GameObject projectile;
-	public Transform spawnPoint;
-	public GameObject chargeBar;
-	public Image fillCharge;
+	public Image skill02CD;
 	public GameObject wallSkill;
 	public GameObject wallSkill02;
 	public Transform wallSpawnPoint;
 	public Transform wallSpawnPoint02;
 	public Transform wallSpawnPoint03;
 	public Transform wallSpawnPoint04;
+
+	public float wallCooldownDuration;
+
+	[Header("Ultimate")]
+	public Image skillUltiCD;
 	public GameObject ultimate;
-	public Transform ultimateSpawnPoint;
+
+	public float ultimateCooldownDuration;
+
+	[Header("Drag & Drop")]
+	public Transform spawnPoint;
+	public Transform skillSpawnPoint;
+	public GameObject playerCanvas;
 	public GameObject trailRendererObject;
+
+	[Header("Particles")]
+	public GameObject particleGuard;
+	public ParticleSystem particleBuff;
 
 	[Header("Observer Ward")]
 	public bool maxCharge;
 	public int dashCharge;
+	public bool skill02Buffed;
 	public float wallCooldown;
 	public float bulletCooldown;
 	public float ultimateCooldown;
 	public float dashChargeCooldown;
 
-	[HideInInspector]
-	public Transform recordEndPos;
-
 	int attack;
 	float attackInterval;
 	public float attackIntervalLimit;
-
-	public GameObject attack01;
-	public GameObject attack02;
-	public GameObject attack03;
-
-	bool toggleGuard = false;
 
 	public enum playerState
 	{
@@ -101,15 +111,24 @@ public class PlayerControl03 : NetworkBehaviour
 
 	public playerState state = playerState.Normal;
 
+	[HideInInspector]
+	public Transform recordEndPos;
+
+	bool toggleGuard = false;
+
 	protected void Awake()
 	{
 		rb = GetComponent<Rigidbody>();
 		animation = GetComponent<Animator>();
+		trailRendererObject.transform.parent = null;
 	}
 
 	protected void Start()
 	{
 		dashCharge = maxDashCharge;
+		if (isLocalPlayer) {
+			playerCanvas.SetActive (true);
+		}
 	}
 
 	protected void Update()
@@ -140,19 +159,18 @@ public class PlayerControl03 : NetworkBehaviour
 		//Movement(x, z);
 		ActionsInputKey();
 
-//		if (Input.GetKeyDown (KeyCode.K)) {
-//			if (toggleGuard) {
-//				animation.SetBool ("Guarding", false);
-//				CmdSetPlayerState (playerState.Normal);
-//				toggleGuard = false;
-//			} else if (!toggleGuard) {
-//				animation.SetTrigger("Guard");
-//				animation.SetBool("Guarding", true);
-//				CmdSetPlayerState (playerState.Guarding);
-//				toggleGuard = true;
-//			}
-//		}
-
+		if (Input.GetKeyDown (KeyCode.K)) {
+			if (toggleGuard) {
+				animation.SetBool ("Guarding", false);
+				CmdSetPlayerState (playerState.Normal);
+				toggleGuard = false;
+			} else if (!toggleGuard) {
+				animation.SetTrigger("Guard");
+				animation.SetBool("Guarding", true);
+				CmdSetPlayerState (playerState.Guarding);
+				toggleGuard = true;
+			}
+		}
 	}
 
 	void Movement(float x, float z)
@@ -178,7 +196,8 @@ public class PlayerControl03 : NetworkBehaviour
 					endPos = transform.position += (transform.forward * z);
 
 					dash = true;
-					animation.SetTrigger("Dash");
+					CmdAnimation("Dash");
+					//animation.SetTrigger("Dash");
 
 					count++;
 					dashCharge--;
@@ -262,7 +281,7 @@ public class PlayerControl03 : NetworkBehaviour
 		}
 	}
 
-	protected virtual void ActionsInputKey()
+	public virtual void ActionsInputKey()
 	{
 		if (state == playerState.Normal)
 		{
@@ -281,19 +300,23 @@ public class PlayerControl03 : NetworkBehaviour
 					chargeBar.SetActive(true);
 					animation.SetTrigger("Bullet");
 					animation.SetBool("ReleaseShot", false);
+					skill01CD.fillAmount = 1;
 				}
 			}
 			else if (Input.GetKeyDown(KeyCode.E))
 			{
 				if (wallCooldown <= 0)
 				{
-					recordEndPos = OpponentChan.Instance.transform;
+//					recordEndPos = OpponentChan.Instance.transform;
+					CmdShowParticle();
+					CmdAnimation("Wall");
+					//skill02Buffed = true;
+//					Instantiate(wallSkill, wallSpawnPoint.position, wallSpawnPoint.rotation);
+//					Instantiate(wallSkill, wallSpawnPoint02.position, wallSpawnPoint02.rotation);
+//					Instantiate(wallSkill, wallSpawnPoint03.position, wallSpawnPoint03.rotation);
+//					Instantiate(wallSkill02, wallSpawnPoint04.position, wallSpawnPoint04.rotation);
 
-					animation.SetTrigger("Wall");
-					Instantiate(wallSkill, wallSpawnPoint.position, wallSpawnPoint.rotation);
-					Instantiate(wallSkill, wallSpawnPoint02.position, wallSpawnPoint02.rotation);
-					Instantiate(wallSkill, wallSpawnPoint03.position, wallSpawnPoint03.rotation);
-					Instantiate(wallSkill02, wallSpawnPoint04.position, wallSpawnPoint04.rotation);
+					skill02CD.fillAmount = 1;
 
 					wallCooldown = wallCooldownDuration;
 				}
@@ -303,9 +326,10 @@ public class PlayerControl03 : NetworkBehaviour
 				if (ultimateCooldown <= 0)
 				{
 					RotateTowardMouseDuringAction();
-					//animation.SetTrigger("Ultimate");
-					Instantiate(ultimate, ultimateSpawnPoint.position, ultimateSpawnPoint.rotation);
+					CmdAnimation("Ultimate");
+					//skill02Buffed = false;
 
+					skillUltiCD.fillAmount = 1;
 					ultimateCooldown = ultimateCooldownDuration;
 				}
 			}
@@ -322,13 +346,25 @@ public class PlayerControl03 : NetworkBehaviour
 		{
 			if (Input.GetKeyUp(KeyCode.Q))
 			{
-				if (bulletCooldown <= 0)
+				if (bulletCooldown <= 0 && !maxCharge)
 				{
 					animation.SetBool("ReleaseShot", true);
 
 					RotateTowardMouseDuringAction();
-					CmdFire (spawnPoint.position,spawnPoint.rotation);
+					CmdFire (skillSpawnPoint.position, skillSpawnPoint.rotation, maxCharge);
 					chargeBar.SetActive(false);
+					//skill02Buffed = false;
+
+					bulletCooldown = bulletCooldownDuration;
+				}
+				else if (bulletCooldown <= 0 && maxCharge)
+				{
+					animation.SetBool("ReleaseShot", true);
+
+					RotateTowardMouseDuringAction();
+					CmdFire02 (skillSpawnPoint.position, skillSpawnPoint.rotation, maxCharge);
+					chargeBar.SetActive(false);
+					//skill02Buffed = false;
 
 					bulletCooldown = bulletCooldownDuration;
 				}
@@ -337,6 +373,7 @@ public class PlayerControl03 : NetworkBehaviour
 
 		if (bulletCooldown > 0)
 		{
+			skill01CD.fillAmount -= 1.0f / bulletCooldownDuration * Time.deltaTime;
 			bulletCooldown -= Time.deltaTime;
 		}
 		else
@@ -360,6 +397,7 @@ public class PlayerControl03 : NetworkBehaviour
 
 		if (wallCooldown > 0)
 		{
+			skill02CD.fillAmount -= 1.0f / wallCooldownDuration * Time.deltaTime;
 			wallCooldown -= Time.deltaTime;
 		}
 		else
@@ -369,6 +407,7 @@ public class PlayerControl03 : NetworkBehaviour
 
 		if (ultimateCooldown > 0)
 		{
+			skillUltiCD.fillAmount -= 1.0f / ultimateCooldownDuration * Time.deltaTime;
 			ultimateCooldown -= Time.deltaTime;
 		}
 		else
@@ -379,7 +418,7 @@ public class PlayerControl03 : NetworkBehaviour
 
 	void Attack()
 	{
-		if (attack >= 3 && attackInterval > attackIntervalLimit)
+		if (attack >= 3 || attackInterval > attackIntervalLimit)
 		{
 			attack = 0;
 			attackInterval = 0;
@@ -391,6 +430,7 @@ public class PlayerControl03 : NetworkBehaviour
 
 		if (Input.GetMouseButtonDown(0))
 		{
+			Cursor.lockState = CursorLockMode.Confined;
 			attack++;
 			attackInterval = 0;
 		}
@@ -401,6 +441,7 @@ public class PlayerControl03 : NetworkBehaviour
 			{
 				RotateTowardMouseDuringAction();
 				CmdAnimation("Attack");
+				//skill02Buffed = false;
 			}
 		}
 		else if (state == playerState.Attacking)
@@ -431,9 +472,6 @@ public class PlayerControl03 : NetworkBehaviour
 			this.animation.GetCurrentAnimatorStateInfo(0).IsName("Dash") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting02"))
 		{
 			state = playerState.Normal;
-//			animation.ResetTrigger("Attack");
-//			animation.ResetTrigger("Attack02");
-//			animation.ResetTrigger("Attack03");
 		}
 		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack02") ||
 				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack03"))
@@ -448,24 +486,60 @@ public class PlayerControl03 : NetworkBehaviour
 		{
 			state = playerState.SkillCharging;
 		}
-		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Wall") ||
-				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Ultimate") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown") ||
+		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Wall") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Ultimate") || 
+				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown") ||
 				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown02") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown03") ||
 				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Recover") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Death"))
 		{
 			state = playerState.OnAnimation;
 		}
+
+		CmdSetActive();
 	}
 
 	[Command]
-	public void CmdFire(Vector3 position, Quaternion rotation){
+	public void CmdFire(Vector3 position, Quaternion rotation, bool max){
 		var bullet = Instantiate(projectile, position, rotation);
+		bullet.GetComponent<BulletSkill> ().setMaxCharge (max);
 		NetworkServer.Spawn (bullet);
+	}
+
+	[Command]
+	public void CmdFire02(Vector3 position, Quaternion rotation, bool max){
+		var bullet = Instantiate(projectileMax, position, rotation);
+		bullet.GetComponent<BulletSkill> ().setMaxCharge (max);
+		NetworkServer.Spawn (bullet);
+	}
+
+	[Command]
+	void CmdSetActive()
+	{
+		RpcSetActive();
+	}
+
+	[ClientRpc]
+	void RpcSetActive()
+	{
+		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Idle") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Run") ||
+			this.animation.GetCurrentAnimatorStateInfo(0).IsName("Dash") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting02"))
+		{
+			particleGuard.SetActive(false);
+			ultiAttack.SetActive(false);
+		}
+		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Guard"))
+		{
+			particleGuard.SetActive(true);
+		}
+		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Ultimate"))
+		{
+			ultiAttack.SetActive(true);
+		}
 	}
 
 	[ClientRpc]
 	void RpcSetAnimation(string anim){
 		animation.SetTrigger(anim);
+
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
 		{
 			attack01.SetActive(true);
@@ -479,7 +553,6 @@ public class PlayerControl03 : NetworkBehaviour
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack02"))
 		{
 			attack02.SetActive(true);
-			animation.ResetTrigger("Attack02");
 		}
 		else
 		{
@@ -489,12 +562,27 @@ public class PlayerControl03 : NetworkBehaviour
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack03"))
 		{
 			attack03.SetActive(true);
+			animation.ResetTrigger("Attack02");
 			animation.ResetTrigger("Attack03");
 		}
 		else
 		{
 			attack03.SetActive(false);
 		}
+	}
+
+	[Command] // call by client to request the server to do this function (damage)
+	void CmdShowParticle()
+	{
+		RpcShowParticle();
+		skill02Buffed = true;
+	}
+
+	[ClientRpc]
+	void RpcShowParticle() // show both side
+	{
+		particleBuff.Play();
+		//skill02Buffed = true;
 	}
 
 	[Command]
@@ -511,7 +599,6 @@ public class PlayerControl03 : NetworkBehaviour
 	{
 		if (other.gameObject.CompareTag("OutofBound"))
 		{
-			Debug.Log("FUCK");
 			rb.drag = 1;
 			rb.constraints = RigidbodyConstraints.None;
 			animation.SetBool("OnGround", false);
