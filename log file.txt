@@ -1,3 +1,8 @@
+Commit 19 (Feb 01, 2018)
+------------------------
+-Refactor Character Scripts (Skills Inherit Base Control)
+
+
 Commit 18 (Dec 05, 2017)
 ------------------------
 -Death animation

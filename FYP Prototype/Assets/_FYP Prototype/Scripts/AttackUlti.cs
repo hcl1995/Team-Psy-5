@@ -7,7 +7,8 @@ public class AttackUlti : MonoBehaviour
 {
 	public GameObject impact;
 	public PlayerHealth selfHealth; 
-	public PlayerControl03 selfControl;
+	public PlayerControl selfControl;
+	public PlayerSkillControl selfPlayerSkill;
 	public float distance;
 	public bool isHit = false;
 	float timeElapsed = 0;
@@ -38,9 +39,19 @@ public class AttackUlti : MonoBehaviour
 		{
 			if (other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> () != selfHealth && selfControl.animation.GetCurrentAnimatorStateInfo (0).IsName ("Ultimate")) {
 				//other.gameObject.GetComponentInParent<Animator> ().SetTrigger ("DamageDown03");
-				other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> ().takeDamage (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position));
+				Vector3 UltKnockPos = gameObject.transform.root.forward * distance;
+
+				if (selfPlayerSkill.skill02Buffed == false)
+				{
+					other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position),other,UltKnockPos);
+				}
+				else if (selfPlayerSkill.skill02Buffed == true)
+				{
+					other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage * 1.5f,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position),other,UltKnockPos);
+					selfPlayerSkill.skill02Buffed = false;
+				}
 				isHit = true;
-				other.gameObject.transform.root.position += (gameObject.transform.root.forward * distance);
+				//other.gameObject.transform.root.position += (gameObject.transform.root.forward * distance);
 //
 //				impactGO = (GameObject)Instantiate (impact, other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position), Quaternion.identity);
 //				Destroy (impactGO, 0.5f);

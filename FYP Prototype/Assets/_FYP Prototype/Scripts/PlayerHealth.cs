@@ -10,7 +10,7 @@ public class PlayerHealth : NetworkBehaviour {
 	[SyncVar(hook = "OnChangeHealth")]
 	public float currentHealth = maxHealth;
 
-	public PlayerControl03 playerControl;
+	public PlayerControl playerControl;
 	public int playerNumber;
 	public PlayerNetwork pn;
 	public Animator anim;
@@ -22,6 +22,10 @@ public class PlayerHealth : NetworkBehaviour {
 	public RectTransform healthBar;
 
 	bool isDead = false;
+
+	bool isKnockback = false;
+	public float completeKnockback;
+	public float knockbackAnimationTime;
 
 	void Start(){
 		anim = GetComponent<Animator>();
@@ -49,6 +53,17 @@ public class PlayerHealth : NetworkBehaviour {
 			hitIndicator.OnHit ();
 			previousHealth = currentHealth;
 		}
+
+		if (isKnockback)
+		{
+			completeKnockback += (Time.deltaTime * knockbackAnimationTime);
+		}
+
+		if (completeKnockback >= 1)
+		{
+			isKnockback = false;
+			completeKnockback = 0;
+		}
 	}
 
 	void OnChangeHealth (float health)
@@ -60,14 +75,9 @@ public class PlayerHealth : NetworkBehaviour {
 	public void takeDamage(float damage, string animation, GameObject impact, Vector3 position, Vector3 euler,Vector3 colliderHit){
 		if (!isServer)
 			return;
-		if (playerControl.state == PlayerControl03.playerState.Guarding) {
+		if (playerControl.state == PlayerControl.playerState.Guarding) {
 			currentHealth -= 1.0f;
 		}
-//		else if (playerControl.skill02Buffed)
-//		{
-//			currentHealth -= damage * 1.5f;
-//			CmdAnimation (animation);
-//		}
 		else {
 			currentHealth -= damage;
 			CmdAnimation (animation);
@@ -89,22 +99,15 @@ public class PlayerHealth : NetworkBehaviour {
 		if (!isServer)
 			return;
 
-		if (playerControl.skill02Buffed)
-		{
-			currentHealth -= damage * 1.5f;
-			CmdAnimation (animation);
-		}
-		else
-		{
+//		if (playerControl.skill02Buffed)
+//		{
+//			currentHealth -= damage * 1.5f;
+//			CmdAnimation (animation);
+//		}
+//		else
+//		{
 			currentHealth -= damage;
 			CmdAnimation (animation);
-		}
-
-//		if (playerControl.state == PlayerControl03.playerState.Guarding) {
-//			currentHealth -= 1.0f;
-//		} else {
-//			currentHealth -= damage;
-//			CmdAnimation (animation);
 //		}
 		//CmdHit ();
 
@@ -129,7 +132,34 @@ public class PlayerHealth : NetworkBehaviour {
 		//CmdHit ();
 		checkDeath();
 	}
+	public void takeMuaiThaiUlt(float damage, string animation, GameObject impact, Vector3 position, Vector3 euler,Vector3 colliderHit,Collider other,Vector3 KnockPos){
+		if (!isServer)
+			return;
+		if (playerControl.state == PlayerControl.playerState.Guarding) {
+			currentHealth -= 1.0f;
+		}
+		else {
+			currentHealth -= damage;
+			CmdKnockBack (KnockPos);
+			CmdAnimation (animation);
+		}
+		//CmdHit ();
 
+		isKnockback = true;
+
+		impactGO =  (GameObject)Instantiate (impact,colliderHit, Quaternion.identity);
+		NetworkServer.Spawn (impactGO);
+		Destroy (impactGO, 0.5f);
+		transform.root.LookAt (position);
+		Vector3 eulerFucker = euler;
+		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
+		transform.root.rotation = Quaternion.Euler (eulerFucker);
+
+		//currPosition += (transform.root.forward * distance);
+		//other.transform.root.position = Vector3.Lerp (other.transform.root.position, KnockPos, completeKnockback);
+
+		checkDeath();
+	}
 	public void checkDeath()
 	{
 		if (currentHealth <= 0)
@@ -162,7 +192,15 @@ public class PlayerHealth : NetworkBehaviour {
 	public void RpcAmintion(string animation){
 		anim.SetTrigger (animation);
 	}
-
+	[Command]
+	void CmdKnockBack(Vector3 pos){
+		RpcKnockBack (pos);
+	}
+	[ClientRpc]
+	void RpcKnockBack(Vector3 pos){
+		gameObject.transform.root.position += pos;
+		//gameObject.transform.root.position = Vector3.Lerp (gameObject.transform.root.position, pos, completeKnockback);
+	}
 //	[Command]
 //	public void CmdHit(){
 //		RpcShowHitIndicator ();

@@ -64,22 +64,9 @@ public class BulletSkill : NetworkBehaviour
 		dir = dir.normalized;
 		//dir = -dir.normalized;
 
-		if (other.gameObject.CompareTag("Enemy"))
+		if (other.gameObject.CompareTag("Player"))
 		{
-//			Quaternion rotation = Quaternion.LookRotation(dir);
-//			other.transform.rotation = rotation;
-
-			other.gameObject.GetComponent<Animator>().SetTrigger("DamageDown");
-
-			NetworkServer.Destroy (gameObject);
-			Destroy(gameObject);
-
-		}
-		// DELETE, JUST FOR TESTING.
-		else if (other.gameObject.CompareTag("Player"))
-		{
-			//other.gameObject.GetComponent<Animator>().SetTrigger("Death");
-			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (10.0f,"DamageDown");
+			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (damage,"DamageDown");
 
 			if (maxCharge)
 			{
