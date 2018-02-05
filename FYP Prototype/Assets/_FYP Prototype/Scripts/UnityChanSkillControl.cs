@@ -10,16 +10,16 @@ public class UnityChanSkillControl : PlayerControl
 	public GameObject projectile;
 	public Transform skill01SpawnPoint;
 
-	float skill01Cooldown;
-	public float skill01CooldownDuration;
+	//float skill01Cooldown;
+	//public float skill01CooldownDuration;
 
 
 	[Header("Skill02")]
 	public GameObject skill02Object;
 	public Transform skill02SpawnPoint;
 
-	float skill02Cooldown;
-	public float skill02CooldownDuration;
+	//float skill02Cooldown;
+	//public float skill02CooldownDuration;
 
 
 	[Header("Ultimate")]
@@ -33,8 +33,8 @@ public class UnityChanSkillControl : PlayerControl
 
 	public GameObject ultimateObject;
 
-	float ultimateCooldown;
-	public float ultimateCooldownDuration;
+	//float ultimateCooldown;
+	//public float ultimateCooldownDuration;
 
 	public GameObject drillKickParticle;
 
@@ -45,14 +45,8 @@ public class UnityChanSkillControl : PlayerControl
 			return;
 		CheckInput();
 		InputSkills();
+		SkillCooldown();
 	}
-
-//	void Update()
-//	{
-//		if (!isLocalPlayer)
-//			return;
-//		InputSkills();
-//	}
 
 	public void InputSkills()
 	{

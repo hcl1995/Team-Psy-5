@@ -11,6 +11,7 @@ public class PlayerHealth : NetworkBehaviour {
 	public float currentHealth = maxHealth;
 
 	public PlayerControl playerControl;
+	public PlayerSkillControl playerSkillControl;
 	public int playerNumber;
 	public PlayerNetwork pn;
 	public Animator anim;
@@ -57,6 +58,7 @@ public class PlayerHealth : NetworkBehaviour {
 		if (isKnockback)
 		{
 			completeKnockback += (Time.deltaTime * knockbackAnimationTime);
+			//transform.root.position = Vector3.Lerp (transform.root.position, KnockPos, completeKnockback);
 		}
 
 		if (completeKnockback >= 1)
@@ -95,7 +97,7 @@ public class PlayerHealth : NetworkBehaviour {
 		checkDeath();
 	}
 
-	public void takeDamageBullet(float damage, string animation){
+	public void takeDamageBullet(float damage, string animation){ // give another parameter, detect player from bullet skill script
 		if (!isServer)
 			return;
 
@@ -106,7 +108,7 @@ public class PlayerHealth : NetworkBehaviour {
 //		}
 //		else
 //		{
-			currentHealth -= damage;
+		currentHealth -= damage; //(damage * playerSkillControl.fillCharge.fillAmount);
 			CmdAnimation (animation);
 //		}
 		//CmdHit ();
@@ -198,8 +200,8 @@ public class PlayerHealth : NetworkBehaviour {
 	}
 	[ClientRpc]
 	void RpcKnockBack(Vector3 pos){
-		gameObject.transform.root.position += pos;
-		//gameObject.transform.root.position = Vector3.Lerp (gameObject.transform.root.position, pos, completeKnockback);
+		//gameObject.transform.root.position += pos;
+		gameObject.transform.root.position = Vector3.Lerp (gameObject.transform.root.position, pos, completeKnockback);
 	}
 //	[Command]
 //	public void CmdHit(){

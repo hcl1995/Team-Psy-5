@@ -27,8 +27,17 @@ public class BulletSkill : NetworkBehaviour
 
 	public GameObject impact;
 
+	//PlayerSkillControl playerSkillControl;
+
+//	void Awake()
+//	{
+//		playerSkillControl = GetComponent<PlayerSkillControl>();
+//	}
+
 	void OnEnable()
 	{
+		//playerSkillControl = transform.parent.GetComponent<PlayerSkillControl>();
+
 		rb = GetComponent<Rigidbody>();
 		initialVelocity = transform.forward * projectileSpeed;
 		rb.velocity = initialVelocity;

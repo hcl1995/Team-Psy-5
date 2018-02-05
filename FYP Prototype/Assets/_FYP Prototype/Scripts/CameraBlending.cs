@@ -17,13 +17,15 @@ public class CameraBlending : MonoBehaviour
 
 	void Update()
 	{
-		if (Camera.main.fieldOfView > 15.5)
+		//transform.eulerAngles = new Vector3 (transform.rotation.x, 0, transform.rotation.z);
+
+		if (Camera.main.fieldOfView < 30)
 		{
-			vcam.enabled = false;
+			vcam.enabled = true;
 		}
 		else
 		{
-			vcam.enabled = true;
+			vcam.enabled = false;
 		}
 	}
 }

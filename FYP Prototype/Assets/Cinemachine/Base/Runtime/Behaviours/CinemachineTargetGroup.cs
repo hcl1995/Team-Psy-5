@@ -64,7 +64,7 @@ namespace Cinemachine
 		// TEMPORARY SOLUTION
 		public void Start()
 		{
-			m_Players = GameObject.FindGameObjectsWithTag("Neck");
+			m_Players = GameObject.FindGameObjectsWithTag("Player");
 
 			for (int i = 0; i < m_Players.Length; i++)
 			{
@@ -188,7 +188,7 @@ namespace Cinemachine
                     break;
             }
 
-			m_Players = GameObject.FindGameObjectsWithTag("Neck");
+			m_Players = GameObject.FindGameObjectsWithTag("Player");
 
 			for (int i = 0; i < m_Players.Length; i++)
 			{

@@ -6,7 +6,6 @@ using UnityEngine.Networking;
 
 public class PlayerControl : NetworkBehaviour
 {
-	Vector3 movement;
 	Vector3 targetDirection;
 	float rotationSpeed = 30;
 
@@ -15,7 +14,9 @@ public class PlayerControl : NetworkBehaviour
 
 
 	[Header("Movement")]
-	public float moveSpeed;
+	public float speed;
+	public float gravity;
+	Vector3 moveDirection = Vector3.zero;
 	public float dashDistance;
 
 	int dashCount;
@@ -41,18 +42,21 @@ public class PlayerControl : NetworkBehaviour
 	public float attackIntervalLimit;
 
 
-//	[Header("Skill Cooldown")]
-//	float skill01Cooldown;
-//	public float skill01CooldownDuration;
-//	public Image skill01CD;
-//
-//	float skill02Cooldown;
-//	public float skill02CooldownDuration;
-//	public Image skill02CD;
-//
-//	float ultimateCooldown;
-//	public float ultimateCooldownDuration;
-//	public Image ultimateCD;
+	[Header("Skill Cooldown w Icon")]
+	public float skill01CooldownDuration;
+	[HideInInspector]
+	public float skill01Cooldown;
+	public Image skill01CD;
+
+	[HideInInspector]
+	public float skill02Cooldown;
+	public float skill02CooldownDuration;
+	public Image skill02CD;
+
+	[HideInInspector]
+	public float ultimateCooldown;
+	public float ultimateCooldownDuration;
+	public Image ultimateCD;
 
 
 	[Header("Drag & Drop")]
@@ -91,32 +95,12 @@ public class PlayerControl : NetworkBehaviour
 		}
 	}
 
-//	protected void Update()
-//	{
-//		if (!isLocalPlayer)
-//			return;
-//		CheckInput();
-//	}
-
 	protected void CheckInput(){
+
 		RestrictInput();
-
-		float x = Input.GetAxisRaw("Horizontal");
-		float z = Input.GetAxisRaw("Vertical");
-
-		movement = new Vector3(x, 0, z);
-
-		if (state == playerState.Normal)
-		{
-			Movement(x, z);
-		}
-		else
-		{
-			Movement(0, 0);
-		}
-
 		Guard();
 		Attack();
+		Movement();
 
 		if (Input.GetKeyDown (KeyCode.K)) {
 			if (toggleGuard) {
@@ -132,30 +116,30 @@ public class PlayerControl : NetworkBehaviour
 		}
 	}
 
-	void Movement(float x, float z)
+	void Movement()
 	{
-		movement.Set (x, 0, z);
-		movement = movement.normalized * moveSpeed * Time.deltaTime;
-
-		rb.velocity = Vector3.zero;
-		rb.angularVelocity = Vector3.zero;
-		rb.MovePosition (transform.position + movement);
-
-		bool moving = x != 0f || z != 0f;
-		animation.SetBool("isMoving", moving);
-
-		GetCameraRelativeMovement();
-		RotateTowardMovementDirection();
+		CharacterController controller = GetComponent<CharacterController>();
 
 		if (state == playerState.Normal)
 		{
+			//GetAxis will be smoothed.
+			moveDirection = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+			moveDirection *= speed;
+
+			controller.Move(moveDirection * Time.deltaTime);
+		
+			bool moving = moveDirection != Vector3.zero;
+			animation.SetBool("isMoving", moving);
+
+			GetCameraRelativeMovement();
+			RotateTowardMovementDirection();
+
 			if (Input.GetKeyDown(KeyCode.LeftShift))
 			{
 				if (dashCharge > 0)
 				{
-					z = dashDistance;
 					startPos = transform.position;
-					endPos = transform.position += (transform.forward * z);
+					endPos = transform.position += (transform.forward * dashDistance);
 
 					isDash = true;
 					CmdAnimation("Dash");
@@ -221,7 +205,7 @@ public class PlayerControl : NetworkBehaviour
 
 	void RotateTowardMovementDirection()  
 	{
-		if (movement != Vector3.zero)
+		if (moveDirection != Vector3.zero)
 		{
 			transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetDirection), Time.deltaTime * rotationSpeed);
 		}
@@ -315,6 +299,39 @@ public class PlayerControl : NetworkBehaviour
 				RotateTowardMouseDuringAction();
 				CmdAnimation("Attack03");
 			}
+		}
+	}
+
+	protected void SkillCooldown()
+	{
+		if (skill01Cooldown > 0)
+		{
+			skill01CD.fillAmount -= 1.0f / skill01CooldownDuration * Time.deltaTime;
+			skill01Cooldown -= Time.deltaTime;
+		}
+		else
+		{
+			skill01Cooldown = 0;
+		}
+
+		if (skill02Cooldown > 0)
+		{
+			skill02CD.fillAmount -= 1.0f / skill02CooldownDuration * Time.deltaTime;
+			skill02Cooldown -= Time.deltaTime;
+		}
+		else
+		{
+			skill02Cooldown = 0;
+		}
+
+		if (ultimateCooldown > 0)
+		{
+			ultimateCD.fillAmount -= 1.0f / ultimateCooldownDuration * Time.deltaTime;
+			ultimateCooldown -= Time.deltaTime;
+		}
+		else
+		{
+			ultimateCooldown = 0;
 		}
 	}
 
@@ -464,13 +481,16 @@ public class PlayerControl : NetworkBehaviour
 		trailRendererObject.transform.position = gameObject.transform.position;
 	}
 
-	protected void OnTriggerEnter(Collider other)
+	protected void OnTriggerStay(Collider other)
 	{
 		if (other.gameObject.CompareTag("OutofBound"))
 		{
-			rb.drag = 1;
-			rb.constraints = RigidbodyConstraints.None;
+			//rb.drag = 1;
+			//rb.constraints = RigidbodyConstraints.None;
+			//moveDirection.y -= gravity * Time.deltaTime;
+			moveDirection.y -= gravity * Time.deltaTime;
 			animation.SetBool("OnGround", false);
+			Debug.Log("OUT OF BOUND");
 		}
 		//		else
 		//		{

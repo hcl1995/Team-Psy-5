@@ -6,38 +6,27 @@ using UnityEngine.Networking;
 
 public class PlayerSkillControl : PlayerControl
 {
+
 	[Header("Skill01")]
 	public GameObject projectile;
 	public GameObject projectileMax;
+	//public Transform playerParented;
 	public Transform skill01SpawnPoint;
 
-	public Image skill01CD;
 	public Image fillCharge;
 	public GameObject chargeBar;
 
 	public bool maxCharge;
 	public float chargeRate;
 
-	float skill01Cooldown;
-	public float skill01CooldownDuration;
-
 
 	[Header("Skill02")]
-	public Image skill02CD;
 	public bool skill02Buffed;
-
-	float skill02Cooldown;
-	public float skill02CooldownDuration;
-
 	public ParticleSystem skill02ParticleEffecct;
 
 
 	[Header("Ultimate")]
-	public Image ultiCD;
 	public GameObject ultiAttack;
-
-	float ultiCooldown;
-	public float ultiCooldownDuration;
 
 
 	void Update()
@@ -47,15 +36,8 @@ public class PlayerSkillControl : PlayerControl
 		CheckInput();
 		BarScan();
 		InputSkills();
+		SkillCooldown();
 	}
-
-//	void Update()
-//	{
-//		if (!isLocalPlayer)
-//			return;
-//		BarScan();
-//		InputSkills();
-//	}
 
 	void BarScan()
 	{
@@ -88,19 +70,18 @@ public class PlayerSkillControl : PlayerControl
 					CmdAnimation("Wall");
 
 					skill02CD.fillAmount = 1;
-
 					skill02Cooldown = skill02CooldownDuration;
 				}
 			}
 			else if (Input.GetKeyDown(KeyCode.Space))
 			{
-				if (ultiCooldown <= 0)
+				if (ultimateCooldown <= 0)
 				{
 					RotateTowardMouseDuringAction();
 					CmdAnimation("Ultimate");
 
-					ultiCD.fillAmount = 1;
-					ultiCooldown = ultiCooldownDuration;
+					ultimateCD.fillAmount = 1;
+					ultimateCooldown = ultimateCooldownDuration;
 				}
 			}
 		}
@@ -113,9 +94,11 @@ public class PlayerSkillControl : PlayerControl
 					animation.SetBool("ReleaseShot", true);
 
 					RotateTowardMouseDuringAction();
+					//CmdFire (skill01SpawnPoint.position, skill01SpawnPoint.rotation, maxCharge);
 					CmdFire (skill01SpawnPoint.position, skill01SpawnPoint.rotation, maxCharge);
 					chargeBar.SetActive(false);
 
+					StartCoroutine(ResetDelay());
 					skill01Cooldown = skill01CooldownDuration;
 				}
 				else if (skill01Cooldown <= 0 && maxCharge)
@@ -123,22 +106,14 @@ public class PlayerSkillControl : PlayerControl
 					animation.SetBool("ReleaseShot", true);
 
 					RotateTowardMouseDuringAction();
+					//CmdFire02 (skill01SpawnPoint.position, skill01SpawnPoint.rotation, maxCharge);
 					CmdFire02 (skill01SpawnPoint.position, skill01SpawnPoint.rotation, maxCharge);
 					chargeBar.SetActive(false);
 
+					StartCoroutine(ResetDelay());
 					skill01Cooldown = skill01CooldownDuration;
 				}
 			}
-		}
-
-		if (skill01Cooldown > 0)
-		{
-			skill01CD.fillAmount -= 1.0f / skill01CooldownDuration * Time.deltaTime;
-			skill01Cooldown -= Time.deltaTime;
-		}
-		else
-		{
-			skill01Cooldown = 0;
 		}
 
 		if (chargeBar.activeInHierarchy)
@@ -150,30 +125,12 @@ public class PlayerSkillControl : PlayerControl
 				maxCharge = true;
 			}
 		}
-		else
-		{
-			fillCharge.fillAmount = 0;
-		}
+	}
 
-		if (skill02Cooldown > 0)
-		{
-			skill02CD.fillAmount -= 1.0f / skill02CooldownDuration * Time.deltaTime;
-			skill02Cooldown -= Time.deltaTime;
-		}
-		else
-		{
-			skill02Cooldown = 0;
-		}
-
-		if (ultiCooldown > 0)
-		{
-			ultiCD.fillAmount -= 1.0f / ultiCooldownDuration * Time.deltaTime;
-			ultiCooldown -= Time.deltaTime;
-		}
-		else
-		{
-			ultiCooldown = 0;
-		}
+	IEnumerator ResetDelay()
+	{
+		yield return new WaitForSeconds(skill01CooldownDuration - 1);
+		fillCharge.fillAmount = 0;
 	}
 
 	void UltiAcitve()
