@@ -33,21 +33,21 @@ public class AttackUlti : MonoBehaviour
 		Debug.Log (other.gameObject);
 		if (isHit)
 			return;
-		if (other.gameObject.transform.parent == null)
+		if (other.gameObject.transform.root == null)
 			return;
-		if (other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth>() != null)
+		if (other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth>() != null)
 		{
-			if (other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> () != selfHealth && selfControl.animation.GetCurrentAnimatorStateInfo (0).IsName ("Ultimate")) {
+			if (other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> () != selfHealth && selfControl.animation.GetCurrentAnimatorStateInfo (0).IsName ("Ultimate")) {
 				//other.gameObject.GetComponentInParent<Animator> ().SetTrigger ("DamageDown03");
 				Vector3 UltKnockPos = gameObject.transform.root.forward * distance;
 
 				if (selfPlayerSkill.skill02Buffed == false)
 				{
-					other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position),other,UltKnockPos);
+					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position),other,UltKnockPos);
 				}
 				else if (selfPlayerSkill.skill02Buffed == true)
 				{
-					other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage * 1.5f,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position),other,UltKnockPos);
+					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage * 1.5f,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position),other,UltKnockPos);
 					selfPlayerSkill.skill02Buffed = false;
 				}
 				isHit = true;

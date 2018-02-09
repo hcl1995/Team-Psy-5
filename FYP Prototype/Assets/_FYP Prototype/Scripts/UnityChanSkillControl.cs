@@ -10,16 +10,10 @@ public class UnityChanSkillControl : PlayerControl
 	public GameObject projectile;
 	public Transform skill01SpawnPoint;
 
-	//float skill01Cooldown;
-	//public float skill01CooldownDuration;
-
 
 	[Header("Skill02")]
 	public GameObject skill02Object;
 	public Transform skill02SpawnPoint;
-
-	//float skill02Cooldown;
-	//public float skill02CooldownDuration;
 
 
 	[Header("Ultimate")]
@@ -32,10 +26,6 @@ public class UnityChanSkillControl : PlayerControl
 	//public float fixedDistance;
 
 	public GameObject ultimateObject;
-
-	//float ultimateCooldown;
-	//public float ultimateCooldownDuration;
-
 	public GameObject drillKickParticle;
 
 
@@ -45,7 +35,6 @@ public class UnityChanSkillControl : PlayerControl
 			return;
 		CheckInput();
 		InputSkills();
-		SkillCooldown();
 	}
 
 	public void InputSkills()
@@ -60,6 +49,7 @@ public class UnityChanSkillControl : PlayerControl
 					RotateTowardMouseDuringAction();
 					CmdSkill01 (skill01SpawnPoint.position, skill01SpawnPoint.rotation);
 
+					skill01CD.fillAmount = 1;
 					skill01Cooldown = skill01CooldownDuration;
 				}
 			}
@@ -69,6 +59,7 @@ public class UnityChanSkillControl : PlayerControl
 				{
 					CmdAnimation("Wall");
 
+					skill02CD.fillAmount = 1;
 					skill02Cooldown = skill02CooldownDuration;
 				}
 			}
@@ -85,36 +76,10 @@ public class UnityChanSkillControl : PlayerControl
 					//isUltimating = true;
 					//CmdUltimateActive();
 
+					ultimateCD.fillAmount = 1;
 					ultimateCooldown = ultimateCooldownDuration;
 				}
 			}
-		}
-
-		if (skill01Cooldown > 0)
-		{
-			skill01Cooldown -= Time.deltaTime;
-		}
-		else
-		{
-			skill01Cooldown = 0;
-		}
-
-		if (skill02Cooldown > 0)
-		{
-			skill02Cooldown -= Time.deltaTime;
-		}
-		else
-		{
-			skill02Cooldown = 0;
-		}
-
-		if (ultimateCooldown > 0)
-		{
-			ultimateCooldown -= Time.deltaTime;
-		}
-		else
-		{
-			ultimateCooldown = 0;
 		}
 
 //		if (isUltimating)

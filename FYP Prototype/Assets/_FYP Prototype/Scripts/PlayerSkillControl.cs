@@ -36,7 +36,6 @@ public class PlayerSkillControl : PlayerControl
 		CheckInput();
 		BarScan();
 		InputSkills();
-		SkillCooldown();
 	}
 
 	void BarScan()

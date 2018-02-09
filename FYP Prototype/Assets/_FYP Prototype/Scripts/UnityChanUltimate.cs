@@ -28,11 +28,11 @@ public class UnityChanUltimate : MonoBehaviour
 	{
 		if (isHit)
 			return;
-		if (other.gameObject.transform.parent == null)
+		if (other.gameObject.transform.root == null)
 			return;
-		if (other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth>() != null)
+		if (other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth>() != null)
 		{
-			if (other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> () != selfHealth)// && selfControl.animation.GetCurrentAnimatorStateInfo (0).IsName ("Ultimate"))
+			if (other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> () != selfHealth)// && selfControl.animation.GetCurrentAnimatorStateInfo (0).IsName ("Ultimate"))
 			{
 //				if (hitCount >= 0)
 //				{
@@ -60,12 +60,12 @@ public class UnityChanUltimate : MonoBehaviour
 				{
 					if (i < 5)
 					{
-						other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown02",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(randPos),other,UltKnockPos);
+						other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown02",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(randPos),other,UltKnockPos);
 					}
 					else if (i == 5)
 					{
 						UltKnockPos = gameObject.transform.root.forward * distance;
-						other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position),other,UltKnockPos);
+						other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position),other,UltKnockPos);
 					}
 				}
 				isHit = true;

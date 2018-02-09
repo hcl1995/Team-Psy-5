@@ -19,12 +19,12 @@ public class UnityChanSkill02 : MonoBehaviour
 	{
 		if (isHit)
 			return;
-		if (other.gameObject.transform.parent == null)
+		if (other.gameObject.transform.root == null)
 			return;
-		if (other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth>() != null && selfControl.animation.GetCurrentAnimatorStateInfo (0).IsName ("Wall"))
+		if (other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth>() != null && selfControl.animation.GetCurrentAnimatorStateInfo (0).IsName ("Wall"))
 		{
-			if (other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> () != selfHealth) {
-				other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> ().takeSkill02 (damage,"DamageDown");
+			if (other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> () != selfHealth) {
+				other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeSkill02 (damage,"DamageDown");
 				isHit = true;
 			}
 		}

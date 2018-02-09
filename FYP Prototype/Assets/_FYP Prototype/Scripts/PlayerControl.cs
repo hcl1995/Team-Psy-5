@@ -79,6 +79,7 @@ public class PlayerControl : NetworkBehaviour
 	bool callOnce;
 	bool toggleGuard = false;
 
+	public bool isFalling = false;
 
 	protected void Awake()
 	{
@@ -101,6 +102,7 @@ public class PlayerControl : NetworkBehaviour
 		Guard();
 		Attack();
 		Movement();
+		SkillCooldown();
 
 		if (Input.GetKeyDown (KeyCode.K)) {
 			if (toggleGuard) {
@@ -124,6 +126,19 @@ public class PlayerControl : NetworkBehaviour
 		{
 			//GetAxis will be smoothed.
 			moveDirection = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+
+			if (isFalling)
+			{
+				Debug.Log("Out of Fucking Bound");
+
+				animation.SetBool("OnGround", false);
+				moveDirection.y -= gravity * Time.deltaTime;
+			}
+			else
+			{
+				animation.SetBool("OnGround", true);
+			}
+
 			moveDirection *= speed;
 
 			controller.Move(moveDirection * Time.deltaTime);
@@ -211,7 +226,7 @@ public class PlayerControl : NetworkBehaviour
 		}
 	}
 
-	public void RotateTowardMouseDuringAction()
+	protected void RotateTowardMouseDuringAction()
 	{
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
@@ -224,14 +239,6 @@ public class PlayerControl : NetworkBehaviour
 			transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
 //			Quaternion rotation = Quaternion.LookRotation(hit.point);
 //			transform.rotation = rotation;
-
-//			Vector3 playerToMouse = hit.point - transform.position;
-//
-//			transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
-//
-//			Quaternion newRotation = Quaternion.LookRotation (playerToMouse);
-//
-//			rb.MoveRotation (newRotation);
 		}
 	}
 
@@ -338,7 +345,6 @@ public class PlayerControl : NetworkBehaviour
 	void Atk01Active()
 	{
 		attack01.SetActive(true);
-		//animation.ResetTrigger("Attack");
 	}
 
 	void Atk01NotActive()
@@ -359,8 +365,6 @@ public class PlayerControl : NetworkBehaviour
 	void Atk03Active()
 	{
 		attack03.SetActive(true);
-		//animation.ResetTrigger("Attack02");
-		//animation.ResetTrigger("Attack03");
 	}
 
 	void Atk03NotActive()
@@ -434,36 +438,6 @@ public class PlayerControl : NetworkBehaviour
 	[ClientRpc]
 	void RpcSetAnimation(string anim){
 		animation.SetTrigger(anim);
-
-//		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack"))
-//		{
-//			attack01.SetActive(true);
-//			animation.ResetTrigger("Attack");
-//		}
-//		else
-//		{
-//			attack01.SetActive(false);
-//		}
-//
-//		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack02"))
-//		{
-//			attack02.SetActive(true);
-//		}
-//		else
-//		{
-//			attack02.SetActive(false);
-//		}
-//
-//		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack03"))
-//		{
-//			attack03.SetActive(true);
-//			animation.ResetTrigger("Attack02");
-//			animation.ResetTrigger("Attack03");
-//		}
-//		else
-//		{
-//			attack03.SetActive(false);
-//		}
 	}
 
 	[Command]
@@ -481,22 +455,11 @@ public class PlayerControl : NetworkBehaviour
 		trailRendererObject.transform.position = gameObject.transform.position;
 	}
 
-	protected void OnTriggerStay(Collider other)
+	void OnTriggerEnter(Collider other)
 	{
 		if (other.gameObject.CompareTag("OutofBound"))
 		{
-			//rb.drag = 1;
-			//rb.constraints = RigidbodyConstraints.None;
-			//moveDirection.y -= gravity * Time.deltaTime;
-			moveDirection.y -= gravity * Time.deltaTime;
-			animation.SetBool("OnGround", false);
-			Debug.Log("OUT OF BOUND");
+			isFalling = true;
 		}
-		//		else
-		//		{
-		//			rb.drag = Mathf.Infinity;
-		//			rb.constraints = RigidbodyConstraints.FreezePositionY |	RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
-		//			animation.SetBool("OnGround", true);
-		//		}
 	}
 }

@@ -32,15 +32,15 @@ public class AttackKb : MonoBehaviour
 		Debug.Log (other.gameObject);
 		if (isHit)
 			return;
-		if (other.gameObject.transform.parent == null)
+		if (other.gameObject.transform.root == null)
 			return;
-		if (other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth>() != null)
+		if (other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth>() != null)
 		{
-			if (other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> () != selfHealth) {
+			if (other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> () != selfHealth) {
 				//other.gameObject.GetComponentInParent<Animator> ().SetTrigger ("DamageDown03");
 				Vector3 knockPos = gameObject.transform.root.forward * distance;
 
-				other.gameObject.transform.parent.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position), other, knockPos);
+				other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position), other, knockPos);
 				//other.transform.root.position += (transform.root.forward * distance);
 
 				isHit = true;

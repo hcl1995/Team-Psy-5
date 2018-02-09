@@ -200,8 +200,8 @@ public class PlayerHealth : NetworkBehaviour {
 	}
 	[ClientRpc]
 	void RpcKnockBack(Vector3 pos){
-		//gameObject.transform.root.position += pos;
-		gameObject.transform.root.position = Vector3.Lerp (gameObject.transform.root.position, pos, completeKnockback);
+		gameObject.transform.root.position += pos;
+		//gameObject.transform.root.position = Vector3.Lerp (gameObject.transform.root.position, pos, completeKnockback);
 	}
 //	[Command]
 //	public void CmdHit(){

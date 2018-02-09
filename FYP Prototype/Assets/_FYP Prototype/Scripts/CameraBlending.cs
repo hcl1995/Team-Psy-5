@@ -5,27 +5,40 @@ using Cinemachine;
 
 public class CameraBlending : MonoBehaviour
 {
-	public CinemachineVirtualCamera vcam;
-	//float minFOV;
+	public float distance;
+	public float centerOfZ;
 
-	void Start()
-	{
-		//var composer = vcam.AddCinemachineComponent<CinemachineComposer>();
-		//var composer = vcam.AddCinemachineComponent<CinemachineGroupComposer>();
-		//composer.m_MaximumFOV = minFOV;
-	}
+	public GameObject[] m_Players;
+
+	public CinemachineVirtualCamera vcam;
+	public CinemachineVirtualCamera vcam02;
+	public CinemachineVirtualCamera vcam03;
+
 
 	void Update()
 	{
-		//transform.eulerAngles = new Vector3 (transform.rotation.x, 0, transform.rotation.z);
+		m_Players = GameObject.FindGameObjectsWithTag("Player");
 
-		if (Camera.main.fieldOfView < 30)
-		{
-			vcam.enabled = true;
-		}
-		else
+		distance = Vector3.Distance(m_Players[0].transform.position, m_Players[1].transform.position);
+		centerOfZ = (m_Players[0].transform.position.z + m_Players[1].transform.position.z) / m_Players.Length;
+
+		if (centerOfZ <= 11 && distance > 12.5f)
 		{
 			vcam.enabled = false;
+			vcam02.enabled = false;
+			vcam03.enabled = true;
+		}
+		else if (centerOfZ >= 11 && distance > 12.5f)
+		{
+			vcam.enabled = true;
+			vcam02.enabled = false;
+			vcam03.enabled = false;
+		}
+		else if (distance < 12.5f)
+		{
+			vcam.enabled = false;
+			vcam02.enabled = true;
+			vcam03.enabled = false;
 		}
 	}
 }
