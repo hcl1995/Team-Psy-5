@@ -29,17 +29,21 @@ public class HealthManager : NetworkBehaviour {
 		singleton = this;
 	}
 	
-	public void takeDamage(int playerNumber,float damage, PlayerControl playerControl){
+	public bool takeDamage(int playerNumber,float damage, PlayerControl playerControl){
 		if (!isServer)
-			return;
+			return false;
 		if (playerNumber == 1) {			
 			player1HealthCurrent -= damage*3;
 			checkDeath (player1HealthCurrent,player1Life,playerControl,playerNumber);
+			if (player1HealthCurrent <= 0)
+				return true;
 		} else if (playerNumber == 2) {			
 			player2HealthCurrent -= damage*3;
 			checkDeath (player2HealthCurrent,player2Life,playerControl,playerNumber);
+			if (player2HealthCurrent <= 0)
+				return true;
 		}
-
+		return false;
 	}
 
 	void OnChangeHealth1 (float health)
@@ -65,14 +69,9 @@ public class HealthManager : NetworkBehaviour {
 				CmdMatchGame (playerNumber);
 				return;
 			}
-			if (playerNumber == 1) {
-				player1HealthCurrent = player1HealthMax;
-				player1Life--;
-			} else if (playerNumber == 2) {
-				player2HealthCurrent = player2HealthMax;
-				player2Life--;
-			}
-			playerControl.respawnNow ();
+
+			playerControl.playDeathAnim ();
+			StartCoroutine (respawn (playerNumber, playerControl));
 			//CmdAnimation("Death");
 			//Debug.Log("Dead!");
 
@@ -84,5 +83,16 @@ public class HealthManager : NetworkBehaviour {
 		LobbyController.s_Singleton.checkPlayerConditionNew (playerNumber);
 	}
 
-
+	public IEnumerator respawn(int playerNumber, PlayerControl playerControl){
+		yield return new WaitForSeconds(3f);
+		if (playerNumber == 1) {
+			player1HealthCurrent = player1HealthMax;
+			player1Life--;
+		} else if (playerNumber == 2) {
+			player2HealthCurrent = player2HealthMax;
+			player2Life--;
+		}
+		playerControl.respawnNow ();
+		playerDead = false;
+	}
 }

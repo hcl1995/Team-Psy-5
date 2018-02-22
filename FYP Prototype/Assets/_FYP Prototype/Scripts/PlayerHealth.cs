@@ -7,7 +7,6 @@ using UnityEngine.Networking;
 public class PlayerHealth : NetworkBehaviour {
 	public const float maxHealth = 100;
 
-	[SyncVar(hook = "OnChangeHealth")]
 	public float currentHealth = maxHealth;
 
 	public PlayerControl playerControl;
@@ -18,9 +17,6 @@ public class PlayerHealth : NetworkBehaviour {
 	GameObject impactGO;
 	public hitIndicator hitIndicator;
 	float previousHealth = maxHealth;
-
-
-	public RectTransform healthBar;
 
 	bool isDead = false;
 
@@ -71,7 +67,6 @@ public class PlayerHealth : NetworkBehaviour {
 	void OnChangeHealth (float health)
 	{
 		currentHealth = health;
-		healthBar.sizeDelta = new Vector2(health, healthBar.sizeDelta.y);
 	}
 
 	public void takeDamage(float damage, string animation, GameObject impact, Vector3 position, Vector3 euler,Vector3 colliderHit){
@@ -108,7 +103,7 @@ public class PlayerHealth : NetworkBehaviour {
 //		}
 //		else
 //		{
-		currentHealth -= damage; //(damage * playerSkillControl.fillCharge.fillAmount);
+		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl); //(damage * playerSkillControl.fillCharge.fillAmount);
 			CmdAnimation (animation);
 //		}
 		//CmdHit ();
@@ -120,7 +115,7 @@ public class PlayerHealth : NetworkBehaviour {
 		if (!isServer)
 			return;
 
-		currentHealth -= damage;
+		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
 		CmdAnimation (animation);
 
 		checkDeath();
@@ -130,7 +125,7 @@ public class PlayerHealth : NetworkBehaviour {
 		if (!isServer)
 			return;
 
-		currentHealth -= damage;
+		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
 		//CmdHit ();
 		checkDeath();
 	}
@@ -138,10 +133,10 @@ public class PlayerHealth : NetworkBehaviour {
 		if (!isServer)
 			return;
 		if (playerControl.state == PlayerControl.playerState.Guarding) {
-			currentHealth -= 1.0f;
+			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
 		}
 		else {
-			currentHealth -= damage;
+			HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
 			CmdKnockBack (KnockPos);
 			CmdAnimation (animation);
 		}

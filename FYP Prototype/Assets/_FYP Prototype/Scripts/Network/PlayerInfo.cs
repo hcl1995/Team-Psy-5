@@ -12,6 +12,8 @@ public class PlayerInfo : NetworkBehaviour {
 	public Image buttonImage;
 	public GameObject playerNetwork;
 	public GameObject localPlayerIndicator;
+	public int playerCharacter;
+	public GameObject CharaterSelector;
 	// Use this for initialization
 	void OnEnable(){
 		ready = false;
@@ -32,12 +34,15 @@ public class PlayerInfo : NetworkBehaviour {
 		}
 		if (isLocalPlayer) {
 			localPlayerIndicator.SetActive (true);
+			CharaterSelector.SetActive (true);
 		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		transform.position = transform.parent.position;
+
+		transform.localPosition = Vector3.zero;
 	}
 
 	public void OnClickPlayerReady(){
@@ -58,6 +63,12 @@ public class PlayerInfo : NetworkBehaviour {
 		}
 	}
 
+	public void setSelectCharacter(int character){
+		playerCharacter = character;
+		if(isLocalPlayer)
+			CmdSetSelectCharacter (playerCharacter, LocalPlayerInfo.singleton.playerNum);
+	}
+
 	[Command]
 	void CmdPlayerReady(){
 		LobbyController.s_Singleton.PlayerReady ();
@@ -72,6 +83,11 @@ public class PlayerInfo : NetworkBehaviour {
 	[Command]
 	void CmdReadyState(bool r){		
 		ready = r;
+	}
+
+	[Command]
+	void CmdSetSelectCharacter(int character,int playerNumber){
+		LobbyController.s_Singleton.SetPlayerCharacter (character, playerNumber);
 	}
 		
 	public void Ready(bool r){

@@ -21,7 +21,6 @@ public class LobbyController : NetworkManager {
 	public Transform uiPlayer2;
 	public GameObject uiWaiting;
 	public GameObject lobbyCanvas;
-	public GameObject gameCanvas;
 	public RectTransform playerHealth1;
 	public RectTransform playerHealth2;
 	public Transform playerWin01;
@@ -38,6 +37,7 @@ public class LobbyController : NetworkManager {
 
 	public List<GameObject> playerNetwork = new List<GameObject> ();
 	public List<GameObject> playerChara = new List<GameObject> ();
+	public List<GameObject> playerCharacterSelector = new List<GameObject> ();
 
 	public CinemachineTargetGroup targetGroup;
 
@@ -50,6 +50,13 @@ public class LobbyController : NetworkManager {
 
 	public void startHost (){
 		base.StartHost();
+		LocalPlayerInfo.singleton.playerNum = 1;
+	}
+
+	public void CancelFromMatchFinding(){
+		changeTo (LobbyPanel);
+		networkDiscovery.StopBroadcast ();
+		networkDiscovery.Initialize ();
 	}
 
 	public override void OnStartHost()
@@ -62,6 +69,7 @@ public class LobbyController : NetworkManager {
 		networkDiscovery.StartAsClient ();
 		changeTo (FindMatchPanel);
 		uiWaiting.SetActive (false);
+		LocalPlayerInfo.singleton.playerNum = 2;
 	}
 
 	public void changeTo(RectTransform newPanel){
@@ -164,7 +172,6 @@ public class LobbyController : NetworkManager {
 			foreach (GameObject go in playerNetwork) {
 				NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerNetwork> ().conn, go, 0);
 			}
-			//gameCanvas.SetActive (true);
 			readyPlayer = 0;
 		}
 	}
@@ -226,6 +233,15 @@ public class LobbyController : NetworkManager {
 		playerChara = new List<GameObject> ();
 		StartCoroutine(serverChangeScene());
 		//base.ServerChangeScene ("Lobby");
+	}
+
+	public void SetPlayerCharacter(int playerCharacter, int playerNumber){
+		Debug.Log ("SetPlayerCharacter");
+		if (playerNumber == 1) {
+			player1Character = playerCharacterSelector[playerCharacter];
+		} else {
+			player2Character = playerCharacterSelector[playerCharacter];
+		}
 	}
 
 	public IEnumerator serverChangeScene()

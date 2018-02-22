@@ -394,6 +394,12 @@ public class PlayerControl : NetworkBehaviour
 		CmdSetActive();
 	}
 
+	public void playDeathAnim(){
+		CmdAnimation ("Death");
+	}
+	public void playIdleAnim(){
+		CmdAnimation ("Idle");
+	}
 	[Command]
 	void CmdSetActive()
 	{
@@ -496,6 +502,7 @@ public class PlayerControl : NetworkBehaviour
 
 	public void respawnNow(){
 		RpcRespwan ();
+		CmdAnimation ("Guard");
 	}
 
 	[ClientRpc]
