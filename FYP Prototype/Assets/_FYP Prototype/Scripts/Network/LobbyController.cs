@@ -38,6 +38,7 @@ public class LobbyController : NetworkManager {
 	public List<GameObject> playerNetwork = new List<GameObject> ();
 	public List<GameObject> playerChara = new List<GameObject> ();
 	public List<GameObject> playerCharacterSelector = new List<GameObject> ();
+	public List<Sprite> selectedCharacterSprite = new List<Sprite> ();
 
 	public CinemachineTargetGroup targetGroup;
 

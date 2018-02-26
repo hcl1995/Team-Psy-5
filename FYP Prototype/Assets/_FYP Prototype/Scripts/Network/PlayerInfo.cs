@@ -10,10 +10,15 @@ public class PlayerInfo : NetworkBehaviour {
 	[SyncVar(hook="Ready")]
 	public bool ready = false;
 	public Image buttonImage;
+	public GameObject readyButton;
 	public GameObject playerNetwork;
 	public GameObject localPlayerIndicator;
+	public GameObject readyIndicator;
 	public int playerCharacter;
 	public GameObject CharaterSelector;
+	[SyncVar(hook="SelectedCharacter")]
+	public int selectedCharacterInt;
+	public Image characterSprite;
 	// Use this for initialization
 	void OnEnable(){
 		ready = false;
@@ -35,6 +40,10 @@ public class PlayerInfo : NetworkBehaviour {
 		if (isLocalPlayer) {
 			localPlayerIndicator.SetActive (true);
 			CharaterSelector.SetActive (true);
+			readyButton.SetActive (true);
+		}
+		if (!isLocalPlayer) {
+			readyIndicator.SetActive (true);
 		}
 	}
 	
@@ -88,15 +97,23 @@ public class PlayerInfo : NetworkBehaviour {
 	[Command]
 	void CmdSetSelectCharacter(int character,int playerNumber){
 		LobbyController.s_Singleton.SetPlayerCharacter (character, playerNumber);
+		selectedCharacterInt = character;
 	}
 		
 	public void Ready(bool r){
 		ready = r;
 		if (ready) {
 			buttonImage.color = Color.green;
+			readyIndicator.GetComponent<Image> ().color = Color.green;
 		} else if (!ready) {
 			buttonImage.color = Color.red;
+			readyIndicator.GetComponent<Image> ().color = Color.red;
 		}
+	}
+
+	public void SelectedCharacter(int i){
+		selectedCharacterInt = i;
+		characterSprite.sprite = LobbyController.s_Singleton.selectedCharacterSprite [i];
 	}
 
 	public void OnSceneChange(Scene scene1, Scene scene2){
