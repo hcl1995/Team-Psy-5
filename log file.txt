@@ -1,3 +1,10 @@
+Commit 22 (Feb 27, 2018)
+------------------------
+-Main Menu Layout
+-Cinemachine Edge Fix
+-Raycast Transparent Updated
+
+
 Commit 21 (Feb 10, 2018)
 ------------------------
 -Cinemachine Satisfy?

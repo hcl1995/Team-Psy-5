@@ -5,10 +5,10 @@ using Cinemachine;
 
 public class CameraBlending : MonoBehaviour
 {
-	public float distance;
-	public float centerOfZ;
+	float distance;
+	float centerOfZ;
 
-	public GameObject[] m_Players;
+	GameObject[] m_Players;
 
 	public CinemachineVirtualCamera vcam;
 	public CinemachineVirtualCamera vcam02;

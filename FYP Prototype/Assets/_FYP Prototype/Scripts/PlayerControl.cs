@@ -9,7 +9,6 @@ public class PlayerControl : NetworkBehaviour
 	Vector3 targetDirection;
 	float rotationSpeed = 30;
 
-	Rigidbody rb;
 	public Animator animation;
 
 
@@ -63,6 +62,7 @@ public class PlayerControl : NetworkBehaviour
 	public GameObject playerCanvas;
 	public GameObject trailRendererObject;
 	public GameObject particleGuard;
+	public bool isFalling = false;
 
 
 	public enum playerState
@@ -79,13 +79,14 @@ public class PlayerControl : NetworkBehaviour
 	bool callOnce;
 	bool toggleGuard = false;
 
-	public bool isFalling = false;
+	GameObject damnCamera;
+	public List <GameObject> inBetweenObjects = new List<GameObject>();
 
 	protected void Awake()
 	{
-		rb = GetComponent<Rigidbody>();
 		animation = GetComponent<Animator>();
 		trailRendererObject.transform.parent = null;
+		damnCamera = GameObject.FindGameObjectWithTag("MainCamera");
 	}
 
 	protected void Start()
@@ -103,6 +104,7 @@ public class PlayerControl : NetworkBehaviour
 		Attack();
 		Movement();
 		SkillCooldown();
+		CmdTransparentObjects();
 
 		if (Input.GetKeyDown (KeyCode.K)) {
 			if (toggleGuard) {
@@ -129,8 +131,6 @@ public class PlayerControl : NetworkBehaviour
 
 			if (isFalling)
 			{
-				Debug.Log("Out of Fucking Bound");
-
 				animation.SetBool("OnGround", false);
 				moveDirection.y -= gravity * Time.deltaTime;
 			}
@@ -461,5 +461,54 @@ public class PlayerControl : NetworkBehaviour
 		{
 			isFalling = true;
 		}
+	}
+
+	[Command]
+	void CmdTransparentObjects()
+	{
+		RpcTransparentObjects();
+	}
+
+	[ClientRpc]
+	void RpcTransparentObjects()
+	{
+		//Vector3 playerOffset = new Vector3(transform.position.x, transform.position.y, transform.position.z);
+
+		RaycastHit[] hits;
+		// Max Distance = Distance Between Camera & Characters | LayerMask = Walls / ANY Props Above Ground.
+		//hits = Physics.RaycastAll(transform.position, damnCamera.transform.position - transform.position, Mathf.Infinity, 1 << 8);
+		hits = Physics.BoxCastAll(transform.position, new Vector3(0.5f, 0, 0), damnCamera.transform.position - transform.position, Quaternion.identity, Mathf.Infinity, 1 << 8);
+
+//		foreach (RaycastHit hit in hits)
+//		{
+//			Renderer rend = hit.collider.GetComponent<Renderer>();
+//
+//			//rend.material.shader = Shader.Find("Transparent/Diffuse");
+//			Color tempColor = rend.material.color;
+//			tempColor.a = 0.1f;
+//			rend.material.color = tempColor;
+//		}
+
+//------------------------------------------------------------------------------------------------------------------------------------------------------
+
+		inBetweenObjects.Clear();
+		foreach (RaycastHit hit in hits)
+		{
+			inBetweenObjects.Add(hit.collider.gameObject);
+			Renderer rend = hit.collider.GetComponent<Renderer>();
+
+			if(inBetweenObjects.Contains(hit.collider.gameObject))
+			{ 
+				Color tempColor = rend.material.color;
+				tempColor.a = 0.1f;
+				rend.material.color = tempColor;
+			}
+		}
+	}
+
+	void OnDrawGizmos()
+	{
+		Gizmos.color = Color.red;
+		Gizmos.DrawWireCube(transform.position, new Vector3(0.25f, 0, 0));
 	}
 }
