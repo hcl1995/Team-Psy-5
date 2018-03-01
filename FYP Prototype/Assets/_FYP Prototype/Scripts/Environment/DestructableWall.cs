@@ -3,84 +3,38 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
-public class DestructableWall : MonoBehaviour
+public class DestructableWall : NetworkBehaviour
 {
+	public Mesh destroyMesh;
+
+	bool callOnce = false;
 	public float health = 3;
-	public float fadeSpeed;
-
-	bool yeBabe;
-	Renderer rend;
-
-	public GameObject[] m_Players;
-	public PlayerControl[] playerControl;
-
-	void Awake()
-	{
-		rend = GetComponent<Renderer>();
-	}
-
-	void Start()
-	{
-		m_Players = GameObject.FindGameObjectsWithTag("Player");
-
-		for (int i = 0; i < m_Players.Length; i++)
-		{
-			playerControl[i] = m_Players[i].GetComponent<PlayerControl>();
-		}
-	}
 
 	void Update()
 	{
-		//CmdRestoreAlpha();
+		CmdSwapMesh();
+	}
 
-		if (playerControl[0].inBetweenObjects.Contains(this.gameObject) || playerControl[1].inBetweenObjects.Contains(this.gameObject))
+	[Command]
+	void CmdSwapMesh()
+	{
+		RpcSwapMesh();
+		if (health <= 1.5f && callOnce == false)
 		{
-			yeBabe = false;
-		}
-		else //if (!playerControl[0].inBetweenObjects.Contains(this.gameObject) && !playerControl[1].inBetweenObjects.Contains(this.gameObject))
-		{
-			yeBabe = true;
-		}
-
-		if (yeBabe)
-		{
-			Color tempColor = rend.material.color;
-			if (tempColor.a < 1)
-			{
-				tempColor.a += fadeSpeed * Time.deltaTime;
-				rend.material.color = tempColor;
-			}
+			gameObject.GetComponent<MeshFilter>().mesh = destroyMesh;
+			callOnce = true;
 		}
 	}
 
-//	[Command]
-//	void CmdRestoreAlpha()
-//	{
-//		RpcRestoreAlpha();
-//	}
-//
-//	[ClientRpc]
-//	void RpcRestoreAlpha()
-//	{
-//		if (playerControl[0].inBetweenObjects.Contains(this.gameObject) || playerControl[1].inBetweenObjects.Contains(this.gameObject))
-//		{
-//			yeBabe = false;
-//		}
-//		else
-//		{
-//			yeBabe = true;
-//		}
-//
-//		if (yeBabe)
-//		{
-//			Color tempColor = rend.material.color;
-//			if (tempColor.a < 1)
-//			{
-//				tempColor.a += fadeSpeed * Time.deltaTime;
-//				rend.material.color = tempColor;
-//			}
-//		}
-//	}
+	[ClientRpc]
+	void RpcSwapMesh()
+	{
+		if (health <= 1.5f && callOnce == false)
+		{
+			gameObject.GetComponent<MeshFilter>().mesh = destroyMesh;
+			callOnce = true;
+		}
+	}
 
 	void OnCollisionEnter(Collision other)
 	{

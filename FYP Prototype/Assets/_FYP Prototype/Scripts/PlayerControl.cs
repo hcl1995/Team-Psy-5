@@ -62,8 +62,14 @@ public class PlayerControl : NetworkBehaviour
 	public GameObject playerCanvas;
 	public GameObject trailRendererObject;
 	public GameObject particleGuard;
+
+
+	[Header("Observer")]
 	public bool isFalling = false;
 
+	public List <GameObject> inBetweenObjects = new List<GameObject>();
+	public float materialAlpha;
+	GameObject damnCamera;
 
 	public enum playerState
 	{
@@ -79,8 +85,6 @@ public class PlayerControl : NetworkBehaviour
 	bool callOnce;
 	bool toggleGuard = false;
 
-	GameObject damnCamera;
-	public List <GameObject> inBetweenObjects = new List<GameObject>();
 
 	protected void Awake()
 	{
@@ -149,7 +153,7 @@ public class PlayerControl : NetworkBehaviour
 			GetCameraRelativeMovement();
 			RotateTowardMovementDirection();
 
-			if (Input.GetKeyDown(KeyCode.LeftShift))
+			if (KeyBindingManager.GetKeyDown(KeyAction.Dash))
 			{
 				if (dashCharge > 0)
 				{
@@ -246,7 +250,7 @@ public class PlayerControl : NetworkBehaviour
 	{
 		if (state == PlayerControl.playerState.Normal)
 		{
-			if (Input.GetMouseButtonDown(1))
+			if (KeyBindingManager.GetKeyDown(KeyAction.Guard))
 			{
 				RotateTowardMouseDuringAction();
 				animation.SetTrigger("Guard");
@@ -256,7 +260,7 @@ public class PlayerControl : NetworkBehaviour
 		}
 		else if (state == PlayerControl.playerState.Guarding)
 		{
-			if (Input.GetMouseButtonUp(1))
+			if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
 			{
 				animation.SetBool("Guarding", false);
 				CmdSetPlayerState (PlayerControl.playerState.Normal);
@@ -276,7 +280,7 @@ public class PlayerControl : NetworkBehaviour
 			attackInterval += Time.deltaTime;
 		}
 
-		if (Input.GetMouseButtonDown(0))
+		if (KeyBindingManager.GetKeyDown(KeyAction.Attack))
 		{
 			Cursor.lockState = CursorLockMode.Confined;
 			attackCount++;
@@ -500,7 +504,7 @@ public class PlayerControl : NetworkBehaviour
 			if(inBetweenObjects.Contains(hit.collider.gameObject))
 			{ 
 				Color tempColor = rend.material.color;
-				tempColor.a = 0.1f;
+				tempColor.a = materialAlpha;
 				rend.material.color = tempColor;
 			}
 		}

@@ -96,6 +96,7 @@ public class BulletSkill : NetworkBehaviour
 		var speed = initialVelocity.magnitude;
 		var direction = Vector3.Reflect(initialVelocity.normalized, collisionNormal);
 
+		transform.rotation = Quaternion.LookRotation(direction);
 		rb.velocity = direction * Mathf.Max(speed, minVelocity);
 	}
 

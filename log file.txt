@@ -1,5 +1,11 @@
 Commit 22 (Feb 27, 2018)
 ------------------------
+-Imperfect Game Input Manager
+-Testing Out New Assets (Character / Animation / Props)
+
+
+Commit 22 (Feb 27, 2018)
+------------------------
 -Main Menu Layout
 -Cinemachine Edge Fix
 -Raycast Transparent Updated

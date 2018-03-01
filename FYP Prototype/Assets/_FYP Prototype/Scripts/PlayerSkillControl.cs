@@ -50,7 +50,7 @@ public class PlayerSkillControl : PlayerControl
 	{
 		if (state == playerState.Normal)
 		{
-			if (Input.GetKeyDown(KeyCode.Q))
+			if (KeyBindingManager.GetKeyDown(KeyAction.Skill01))
 			{
 				if (skill01Cooldown <= 0)
 				{
@@ -61,7 +61,7 @@ public class PlayerSkillControl : PlayerControl
 					skill01CD.fillAmount = 1;
 				}
 			}
-			else if (Input.GetKeyDown(KeyCode.E))
+			else if (KeyBindingManager.GetKeyDown(KeyAction.Skill02))
 			{
 				if (skill02Cooldown <= 0)
 				{
@@ -72,7 +72,7 @@ public class PlayerSkillControl : PlayerControl
 					skill02Cooldown = skill02CooldownDuration;
 				}
 			}
-			else if (Input.GetKeyDown(KeyCode.Space))
+			else if (KeyBindingManager.GetKeyDown(KeyAction.Ultimate))
 			{
 				if (ultimateCooldown <= 0)
 				{
@@ -86,7 +86,7 @@ public class PlayerSkillControl : PlayerControl
 		}
 		else if (state == playerState.SkillCharging)
 		{
-			if (Input.GetKeyUp(KeyCode.Q))
+			if (KeyBindingManager.GetKeyUp(KeyAction.Skill01))
 			{
 				if (skill01Cooldown <= 0 && !maxCharge)
 				{

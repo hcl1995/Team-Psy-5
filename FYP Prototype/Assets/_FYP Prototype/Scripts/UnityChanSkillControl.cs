@@ -41,7 +41,7 @@ public class UnityChanSkillControl : PlayerControl
 	{
 		if (state == playerState.Normal)
 		{
-			if (Input.GetKeyDown(KeyCode.Q))
+			if (KeyBindingManager.GetKeyDown(KeyAction.Skill01))
 			{
 				if (skill01Cooldown <= 0)
 				{
@@ -53,7 +53,7 @@ public class UnityChanSkillControl : PlayerControl
 					skill01Cooldown = skill01CooldownDuration;
 				}
 			}
-			else if (Input.GetKeyDown(KeyCode.E))
+			else if (KeyBindingManager.GetKeyDown(KeyAction.Skill02))
 			{
 				if (skill02Cooldown <= 0)
 				{
@@ -63,7 +63,7 @@ public class UnityChanSkillControl : PlayerControl
 					skill02Cooldown = skill02CooldownDuration;
 				}
 			}
-			else if (Input.GetKeyDown(KeyCode.Space))
+			else if (KeyBindingManager.GetKeyDown(KeyAction.Ultimate))
 			{
 				if (ultimateCooldown <= 0)
 				{
