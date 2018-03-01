@@ -1,20 +1,30 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class LevelGenerator : MonoBehaviour
+public class LevelGenerator : NetworkBehaviour
 {
 	public Texture2D[] texture;
 	public ColorToPrefab[] colorMappings;
 
+	void Awake(){
+		foreach(ColorToPrefab colorMapping in colorMappings){
+			ClientScene.RegisterPrefab (colorMapping.prefab,NetworkHash128.Parse(colorMapping.prefab.name));
+		}
+	}
+
 	void Start ()
-	{
+	{			
+		if (!isServer)
+			return;
 		GenerateLevel();
 
 		foreach (ColorToPrefab colorMapping in colorMappings)
 		{
 			colorMapping.prefab.GetComponent<Renderer>().sharedMaterial.color = colorMapping.color;
 		}
+
 	}
 
 	void GenerateLevel()
@@ -62,7 +72,8 @@ public class LevelGenerator : MonoBehaviour
 					float yPosition = oriYPosition + (scale * 0.5f);
 
 					Vector3 position = new Vector3(x, yPosition, z);
-					Instantiate(colorMapping.prefab, position, Quaternion.identity, transform);
+					GameObject prefeb = Instantiate(colorMapping.prefab, position, Quaternion.identity, transform);
+					NetworkServer.Spawn (prefeb);
 					// Required Grouping The Shapes Into Game Object & Modify. FUCK THIS SHIT, BLOCKS CMI.
 				}
 			}

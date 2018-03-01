@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class HealthManager : NetworkBehaviour {
 
@@ -11,22 +12,41 @@ public class HealthManager : NetworkBehaviour {
 	float player1HealthCurrent;
 	[SyncVar(hook = "OnChangeHealth2")]
 	float player2HealthCurrent;
+	[SyncVar(hook = "OnPlayer1Character")]
+	public int player1Character;
+	[SyncVar(hook = "OnPlayer2Character")]
+	public int player2Character;
 
-	int player1Life = 1;
-	int player2Life = 1;
+
+	public int player1Life = 3;
+	public int player2Life = 3;
 
 	public RectTransform healthBar1;
 	public RectTransform healthBar2;
 
+	public List<GameObject> player1LifeNode = new List<GameObject> ();
+	public List<GameObject> player2LifeNode = new List<GameObject> ();
+
+
+	public Image player1Protrait;
+	public Image player2Protrait;
+	public List<Sprite> CharacterProtrait = new List<Sprite> ();
+
 	static public HealthManager singleton;
 
 	bool playerDead = false;
+	bool player1Dead = false;
+	bool player2Dead = false;
 
 	// Use this for initialization
 	void Start () {
 		player1HealthCurrent = player1HealthMax;
 		player2HealthCurrent = player2HealthMax;
 		singleton = this;
+		if (isServer)
+			CmdGetProtrait ();
+		player1Protrait.sprite = CharacterProtrait [player1Character];
+		player2Protrait.sprite = CharacterProtrait [player2Character];
 	}
 	
 	public bool takeDamage(int playerNumber,float damage, PlayerControl playerControl){
@@ -64,13 +84,22 @@ public class HealthManager : NetworkBehaviour {
 		{
 			if (playerDead)
 				return;
-			if (life <= 0) {
+			playerControl.playDeathAnim ();
+			if (playerNumber == 1 && !player1Dead) {
+				player1Life--;
+				RpcLifeDecrease (playerNumber, player1Life);
+				player1Dead = true;
+
+			} else if (playerNumber == 2 && !player2Dead) {
+				player2Life--;
+				RpcLifeDecrease (playerNumber, player2Life);
+				player2Dead = true;
+			}
+			if (player2Life <= 0 || player1Life <=0) {
 				playerDead = true;
 				CmdMatchGame (playerNumber);
 				return;
 			}
-
-			playerControl.playDeathAnim ();
 			StartCoroutine (respawn (playerNumber, playerControl));
 			//CmdAnimation("Death");
 			//Debug.Log("Dead!");
@@ -87,12 +116,41 @@ public class HealthManager : NetworkBehaviour {
 		yield return new WaitForSeconds(3f);
 		if (playerNumber == 1) {
 			player1HealthCurrent = player1HealthMax;
-			player1Life--;
+			player1Dead = false;
 		} else if (playerNumber == 2) {
 			player2HealthCurrent = player2HealthMax;
-			player2Life--;
+			player2Dead = false;
 		}
 		playerControl.respawnNow ();
 		playerDead = false;
+	}
+
+	[Command]
+	void CmdGetProtrait(){
+		//RpcPlayer1Protrait (LobbyController.s_Singleton.player1CharaterProtrait);
+		//RpcPlayer2Protrait (LobbyController.s_Singleton.player2CharaterProtrait);
+		player1Character = LobbyController.s_Singleton.player1CharaterProtrait;
+		player2Character = LobbyController.s_Singleton.player2CharaterProtrait;
+	}
+
+	//[ClientRpc]
+	void OnPlayer1Character(int playerCharacter){
+		player1Character = playerCharacter;
+		player1Protrait.sprite = CharacterProtrait [player1Character];
+	}
+
+	//[ClientRpc]
+	void OnPlayer2Character(int playerCharacter){
+		player2Character = playerCharacter;
+		player2Protrait.sprite = CharacterProtrait [player2Character];
+	}
+
+	[ClientRpc]
+	void RpcLifeDecrease(int playerNumber, int Life){
+		if (playerNumber == 1) {
+			player1LifeNode [Life].SetActive (false);
+		} else if (playerNumber == 2) {
+			player2LifeNode [Life].SetActive (false);
+		}
 	}
 }

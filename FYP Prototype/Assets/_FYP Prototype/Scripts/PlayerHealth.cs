@@ -72,6 +72,9 @@ public class PlayerHealth : NetworkBehaviour {
 	public void takeDamage(float damage, string animation, GameObject impact, Vector3 position, Vector3 euler,Vector3 colliderHit){
 		if (!isServer)
 			return;
+		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
+			return;
+		}
 		if (playerControl.state == PlayerControl.playerState.Guarding) {
 			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
 		}
@@ -95,7 +98,9 @@ public class PlayerHealth : NetworkBehaviour {
 	public void takeDamageBullet(float damage, string animation){ // give another parameter, detect player from bullet skill script
 		if (!isServer)
 			return;
-
+		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
+			return;
+		}
 //		if (playerControl.skill02Buffed)
 //		{
 //			currentHealth -= damage * 1.5f;
@@ -114,7 +119,9 @@ public class PlayerHealth : NetworkBehaviour {
 	public void takeSkill02(float damage, string animation){
 		if (!isServer)
 			return;
-
+		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
+			return;
+		}
 		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
 		CmdAnimation (animation);
 
@@ -124,7 +131,9 @@ public class PlayerHealth : NetworkBehaviour {
 	public void takeDamageHazard(float damage){
 		if (!isServer)
 			return;
-
+		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
+			return;
+		}
 		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
 		//CmdHit ();
 		checkDeath();
@@ -132,6 +141,9 @@ public class PlayerHealth : NetworkBehaviour {
 	public void takeMuaiThaiUlt(float damage, string animation, GameObject impact, Vector3 position, Vector3 euler,Vector3 colliderHit,Collider other,Vector3 KnockPos){
 		if (!isServer)
 			return;
+		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
+			return;
+		}
 		if (playerControl.state == PlayerControl.playerState.Guarding) {
 			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
 		}

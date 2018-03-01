@@ -34,6 +34,8 @@ public class LobbyController : NetworkManager {
 	public int intPlayer=0;
 	public GameObject player1Character;
 	public GameObject player2Character;
+	public int player1CharaterProtrait;
+	public int player2CharaterProtrait;
 
 	public List<GameObject> playerNetwork = new List<GameObject> ();
 	public List<GameObject> playerChara = new List<GameObject> ();
@@ -240,9 +242,13 @@ public class LobbyController : NetworkManager {
 		Debug.Log ("SetPlayerCharacter");
 		if (playerNumber == 1) {
 			player1Character = playerCharacterSelector[playerCharacter];
+			player1CharaterProtrait = playerCharacter;
+
 		} else {
 			player2Character = playerCharacterSelector[playerCharacter];
+			player2CharaterProtrait = playerCharacter;
 		}
+		//RpcCharacterProtrait (playerCharacter, playerNumber);
 	}
 
 	public IEnumerator serverChangeScene()
@@ -250,4 +256,13 @@ public class LobbyController : NetworkManager {
 		yield return new WaitForSeconds(5f);
 		base.ServerChangeScene ("Lobby");
 	}
+
+//	[ClientRpc]
+//	void RpcCharacterProtrait(int playerCharacter, int playerNumber){
+//		if (playerNumber == 1) {
+//			player1CharaterProtrait = playerCharacter;
+//		} else {
+//			player2CharaterProtrait = playerCharacter;
+//		}
+//	}
 }

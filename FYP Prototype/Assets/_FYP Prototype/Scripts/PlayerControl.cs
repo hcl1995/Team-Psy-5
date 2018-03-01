@@ -60,11 +60,19 @@ public class PlayerControl : NetworkBehaviour
 
 
 
+
+
 	[Header("Drag & Drop")]
 	public GameObject playerCanvas;
 	public GameObject trailRendererObject;
 	public GameObject particleGuard;
+	public GameObject CharaterModel;
 
+	[SyncVar]
+	public bool invincible = false;
+	public float blinkTime = 0.3f;
+	public float invincibleDuration = 3.0f;
+	public float invincibleElapsed = 0;
 
 	public enum playerState
 	{
@@ -72,9 +80,11 @@ public class PlayerControl : NetworkBehaviour
 		Guarding,
 		Attacking,
 		SkillCharging,
-		OnAnimation
+		OnAnimation,
+		Death
 	}
 
+	[SyncVar]
 	public playerState state = playerState.Normal;
 
 	bool callOnce;
@@ -115,6 +125,27 @@ public class PlayerControl : NetworkBehaviour
 				CmdSetPlayerState (playerState.Guarding);
 				toggleGuard = true;
 			}
+		}
+
+		if (invincible) {
+			blinkTime += Time.deltaTime;
+			invincibleElapsed += Time.deltaTime;
+			if (invincibleElapsed <= invincibleDuration) {
+				if (blinkTime >= 0.3) {
+					if (CharaterModel.activeSelf)
+						CmdBlinkCharacter (false);
+					else
+						CmdBlinkCharacter (true);
+					blinkTime = 0.0f;
+				}
+			} else {
+				CmdInvincible (false);
+				CmdBlinkCharacter (true);
+				invincibleElapsed = 0.0f;
+				blinkTime = 0.3f;
+			}
+		} else {
+			CmdBlinkCharacter (true);
 		}
 	}
 
@@ -365,32 +396,26 @@ public class PlayerControl : NetworkBehaviour
 
 	void RestrictInput()
 	{
-		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Idle") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Run") ||
-			this.animation.GetCurrentAnimatorStateInfo(0).IsName("Dash") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting02"))
-		{
+		if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Idle") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Run") ||
+		    this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Dash") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("ShootCasting02")) {
 			state = playerState.Normal;
-		}
-		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack02") ||
-				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack03"))
-		{
+		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack02") ||
+		         this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack03")) {
 			callOnce = false;
 			state = playerState.Attacking;
-		}
-		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Guard"))
-		{
+		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Guard")) {
 			state = playerState.Guarding;
-		}
-		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting01"))
-		{
+		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("ShootCasting01")) {
 			state = playerState.SkillCharging;
-		}
-		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Wall") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Ultimate") || 
-				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown") ||
-				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown02") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown03") ||
-				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Recover") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Death"))
-		{
+		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Wall") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Ultimate") ||
+		         this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown") ||
+		         this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown02") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown03") ||
+		         this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Recover")) {
 			state = playerState.OnAnimation;
+		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Death")) {
+			state = playerState.Death;
 		}
+		CmdSetPlayerState (state);
 		CmdSetActive();
 	}
 
@@ -503,10 +528,36 @@ public class PlayerControl : NetworkBehaviour
 	public void respawnNow(){
 		RpcRespwan ();
 		CmdAnimation ("Guard");
+		CmdInvincible(true);
 	}
 
 	[ClientRpc]
-	public void RpcRespwan(){
+	public void RpcRespwan(){		
 		transform.root.position = new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z);
+		transform.root.TransformPoint(new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z));
+	}
+
+//	public IEnumerator PlayerInvincible()
+//	{
+//		CmdInvincible(true);
+//		yield return new WaitForSeconds(3f);
+//		CmdInvincible(false);
+//	}
+
+	[Command]
+	void CmdInvincible(bool invinc){
+		invincible = invinc;
+
+		RpcBlinkCharacter (true);
+	}
+
+	[Command]
+	void CmdBlinkCharacter(bool b){
+		RpcBlinkCharacter (b);
+	}
+
+	[ClientRpc]
+	void RpcBlinkCharacter(bool b){
+		CharaterModel.SetActive (b);
 	}
 }
