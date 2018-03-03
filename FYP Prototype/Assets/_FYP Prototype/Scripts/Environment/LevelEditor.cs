@@ -73,7 +73,7 @@ public class LevelEditor : NetworkBehaviour
 					float yPosition = oriYPosition + (scale * 0.5f);
 
 					Vector3 position = new Vector3(x, yPosition, z);
-					GameObject prefeb = Instantiate(colorMapping.prefab, position, Quaternion.identity, transform);
+					GameObject prefeb = Instantiate(colorMapping.prefab, position, colorMapping.prefab.transform.rotation, transform);
 					NetworkServer.Spawn (prefeb);
 				}
 			}

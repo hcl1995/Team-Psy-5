@@ -37,7 +37,18 @@ public class UnityChanSkill01 : NetworkBehaviour
 		}
 	}
 
-	void OnCollisionEnter(Collision other)
+//	void OnCollisionEnter(Collision other)
+//	{
+//		if (other.gameObject.CompareTag("Player"))
+//		{
+//			//other.gameObject.GetComponent<Animator>().SetTrigger("Death");
+//			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (damage, "DamageDown");
+//		}
+//		NetworkServer.Destroy (gameObject);
+//		Destroy(gameObject);
+//	}
+
+	void OnTriggerEnter(Collider other)
 	{
 		if (other.gameObject.CompareTag("Player"))
 		{

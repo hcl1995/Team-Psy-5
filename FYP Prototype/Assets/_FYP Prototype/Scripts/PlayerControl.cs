@@ -17,6 +17,11 @@ public class PlayerControl : NetworkBehaviour
 	public float gravity;
 	Vector3 moveDirection = Vector3.zero;
 	public float dashDistance;
+	//Vector3 moveDirectionX = Vector3.right;
+	//Vector3 moveDirection_X = Vector3.left;
+	//Vector3 moveDirectionZ = Vector3.forward;
+	//Vector3 moveDirection_Z = Vector3.back;
+
 
 	int dashCount;
 	int dashCharge;
@@ -128,30 +133,55 @@ public class PlayerControl : NetworkBehaviour
 	{
 		CharacterController controller = GetComponent<CharacterController>();
 
+		controller.Move(Vector3.down * gravity * Time.deltaTime);
+
+		if (isFalling)
+		{
+			// add fall animation --> OnAnim
+			//state = playerState.OnAnimation;
+			animation.SetBool("OnGround", false);
+		}
+		else
+		{
+			animation.SetBool("OnGround", true);
+		}
+
 		if (state == playerState.Normal)
 		{
 			//GetAxis will be smoothed.
-			moveDirection = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+			//moveDirection = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
+			//moveDirection *= speed;
+			//controller.Move(moveDirection * Time.deltaTime);
 
-			if (isFalling)
+			moveDirection = new Vector3(0, 0, 0);
+
+			// Fucking Game Input Manager..
+			if (KeyBindingManager.GetKey(KeyAction.Up))
 			{
-				animation.SetBool("OnGround", false);
-				moveDirection.y -= gravity * Time.deltaTime;
+				moveDirection = new Vector3(0, 0, 1);
+				controller.Move(moveDirection * speed * Time.deltaTime);
 			}
-			else
+			else if (KeyBindingManager.GetKey(KeyAction.Down))
 			{
-				animation.SetBool("OnGround", true);
+				moveDirection = new Vector3(0, 0, -1);
+				controller.Move(moveDirection * speed * Time.deltaTime);
 			}
 
-			moveDirection *= speed;
+			if (KeyBindingManager.GetKey(KeyAction.Left))
+			{
+				moveDirection = new Vector3(-1, 0, 0);
+				controller.Move(moveDirection * speed * Time.deltaTime);
+			}
+			else if (KeyBindingManager.GetKey(KeyAction.Right))
+			{
+				moveDirection = new Vector3(1, 0, 0);
+				controller.Move(moveDirection * speed * Time.deltaTime);
+			}
 
-			controller.Move(moveDirection * Time.deltaTime);
-		
 			bool moving = moveDirection != Vector3.zero;
 			animation.SetBool("isMoving", moving);
 
 			GetCameraRelativeMovement();
-			RotateTowardMovementDirection();
 
 			if (KeyBindingManager.GetKeyDown(KeyAction.Dash))
 			{
@@ -214,16 +244,9 @@ public class PlayerControl : NetworkBehaviour
 		// Always orthogonal to the forward vector
 		Vector3 right = new Vector3(forward.z, 0, -forward.x);
 
-		//directional inputs
-		float x = Input.GetAxisRaw("Horizontal");
-		float z = Input.GetAxisRaw("Vertical");
-
 		// Target direction relative to the camera
-		targetDirection = x * right + z * forward;
-	}
+		targetDirection = moveDirection.x * right + moveDirection.z * forward;
 
-	void RotateTowardMovementDirection()  
-	{
 		if (moveDirection != Vector3.zero)
 		{
 			transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(targetDirection), Time.deltaTime * rotationSpeed);
@@ -458,7 +481,7 @@ public class PlayerControl : NetworkBehaviour
 	public void RpcDashTrail(){
 		trailRendererObject.transform.position = gameObject.transform.position;
 	}
-
+		
 	void OnTriggerEnter(Collider other)
 	{
 		if (other.gameObject.CompareTag("OutofBound"))
@@ -480,8 +503,8 @@ public class PlayerControl : NetworkBehaviour
 
 		RaycastHit[] hits;
 		// Max Distance = Distance Between Camera & Characters | LayerMask = Walls / ANY Props Above Ground.
-		//hits = Physics.RaycastAll(transform.position, damnCamera.transform.position - transform.position, Mathf.Infinity, 1 << 8);
-		hits = Physics.BoxCastAll(transform.position, new Vector3(0.5f, 0, 0), damnCamera.transform.position - transform.position, Quaternion.identity, Mathf.Infinity, 1 << 8);
+		hits = Physics.RaycastAll(transform.position, damnCamera.transform.position - transform.position, Mathf.Infinity, 1 << 8);
+		//hits = Physics.BoxCastAll(transform.position, new Vector3(0.5f, 0, 0), damnCamera.transform.position - transform.position, Quaternion.identity, Mathf.Infinity, 1 << 8);
 
 //		foreach (RaycastHit hit in hits)
 //		{
@@ -510,9 +533,9 @@ public class PlayerControl : NetworkBehaviour
 		}
 	}
 
-	void OnDrawGizmos()
-	{
-		Gizmos.color = Color.red;
-		Gizmos.DrawWireCube(transform.position, new Vector3(0.25f, 0, 0));
-	}
+//	void OnDrawGizmos()
+//	{
+//		Gizmos.color = Color.red;
+//		Gizmos.DrawWireCube(transform.position, new Vector3(0.25f, 0, 0));
+//	}
 }

@@ -1,4 +1,10 @@
-Commit 22 (Feb 27, 2018)
+Commit 24 (Mar 03, 2018)
+------------------------
+-Playtest Build
+-Enabled "Gravity All The Time"
+
+
+Commit 23 (Mar 01, 2018)
 ------------------------
 -Imperfect Game Input Manager
 -Testing Out New Assets (Character / Animation / Props)
