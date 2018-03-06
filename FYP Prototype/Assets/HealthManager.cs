@@ -48,7 +48,12 @@ public class HealthManager : NetworkBehaviour {
 		player1Protrait.sprite = CharacterProtrait [player1Character];
 		player2Protrait.sprite = CharacterProtrait [player2Character];
 	}
-	
+
+	void Update(){
+		player1Protrait.sprite = CharacterProtrait [player1Character];
+		player2Protrait.sprite = CharacterProtrait [player2Character];
+	}
+
 	public bool takeDamage(int playerNumber,float damage, PlayerControl playerControl){
 		if (!isServer)
 			return false;
@@ -124,8 +129,9 @@ public class HealthManager : NetworkBehaviour {
 			player2HealthCurrent = player2HealthMax;
 			player2Dead = false;
 		}
-		playerControl.respawnNow ();
-		playerDead = false;
+		if(!playerDead)
+			playerControl.respawnNow ();
+		//playerDead = false;
 	}
 
 	[Command]

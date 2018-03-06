@@ -36,6 +36,7 @@ public class LobbyController : NetworkManager {
 	public GameObject player2Character;
 	public int player1CharaterProtrait;
 	public int player2CharaterProtrait;
+	int matchCount = 1;
 
 	public List<GameObject> playerNetwork = new List<GameObject> ();
 	public List<GameObject> playerChara = new List<GameObject> ();
@@ -234,12 +235,22 @@ public class LobbyController : NetworkManager {
 			NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerHealth>().pn.conn, go.GetComponent<PlayerHealth>().pn.playerInfo,0);
 		}
 		playerChara = new List<GameObject> ();
+		matchCount++;
 		StartCoroutine(serverChangeScene());
 		//base.ServerChangeScene ("Lobby");
 	}
 
-	public void SetPlayerCharacter(int playerCharacter, int playerNumber){
-		Debug.Log ("SetPlayerCharacter");
+	public int SetPlayerCharacter(int playerCharacter, int playerNumber){
+		int selectedCharacterInt = playerCharacter;
+
+		if (matchCount % 3 == 0) {
+			if (playerCharacter == 1) {
+				playerCharacter = 3;
+			}else if(playerCharacter == 2){
+				playerCharacter = 4;
+			}
+		}
+
 		if (playerNumber == 1) {
 			player1Character = playerCharacterSelector[playerCharacter];
 			player1CharaterProtrait = playerCharacter;
@@ -248,7 +259,9 @@ public class LobbyController : NetworkManager {
 			player2Character = playerCharacterSelector[playerCharacter];
 			player2CharaterProtrait = playerCharacter;
 		}
+
 		//RpcCharacterProtrait (playerCharacter, playerNumber);
+		return playerCharacter;
 	}
 
 	public IEnumerator serverChangeScene()

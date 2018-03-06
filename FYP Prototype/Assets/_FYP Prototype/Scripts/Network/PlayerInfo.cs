@@ -19,6 +19,8 @@ public class PlayerInfo : NetworkBehaviour {
 	[SyncVar(hook="SelectedCharacter")]
 	public int selectedCharacterInt;
 	public Image characterSprite;
+	[SyncVar]
+	public int playerNumber = 0;
 	// Use this for initialization
 	void OnEnable(){
 		ready = false;
@@ -41,6 +43,7 @@ public class PlayerInfo : NetworkBehaviour {
 			localPlayerIndicator.SetActive (true);
 			CharaterSelector.SetActive (true);
 			readyButton.SetActive (true);
+			CmdSetPlayerNumber (LocalPlayerInfo.singleton.playerNum);
 		}
 		if (!isLocalPlayer) {
 			readyIndicator.SetActive (true);
@@ -89,7 +92,7 @@ public class PlayerInfo : NetworkBehaviour {
 	public void setSelectCharacter(int character){
 		playerCharacter = character;
 		if(isLocalPlayer)
-			CmdSetSelectCharacter (playerCharacter, LocalPlayerInfo.singleton.playerNum);
+			CmdSetSelectCharacter (playerCharacter, playerNumber);
 	}
 
 	[Command]
@@ -110,10 +113,13 @@ public class PlayerInfo : NetworkBehaviour {
 
 	[Command]
 	void CmdSetSelectCharacter(int character,int playerNumber){
-		LobbyController.s_Singleton.SetPlayerCharacter (character, playerNumber);
-		selectedCharacterInt = character;
+		selectedCharacterInt = LobbyController.s_Singleton.SetPlayerCharacter (character, playerNumber);
+		//selectedCharacterInt = character;
 	}
-		
+	[Command]
+	void CmdSetPlayerNumber(int i){
+		playerNumber = i;
+	}
 	public void Ready(bool r){
 		ready = r;
 		if (ready) {

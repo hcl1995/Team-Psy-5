@@ -9,6 +9,7 @@ public class LocalPlayerInfo : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		singleton = this;
+		//DontDestroyOnLoad(transform.gameObject);
 	}
 
 	public void assginPlayerNumber(int playerNumber){
