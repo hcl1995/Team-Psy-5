@@ -30,15 +30,15 @@ public class PlayerInfo : NetworkBehaviour {
 		
 	}
 	void Start () {
-		infoLoction.Add(LobbyController.s_Singleton.uiPlayer1);
-		infoLoction.Add(LobbyController.s_Singleton.uiPlayer2);
-		if (LobbyController.s_Singleton.uiPlayer1.GetComponentInChildren<NetworkIdentity> () == null) {
-			transform.SetParent (infoLoction [0]);
-			transform.localPosition = Vector3.zero;
-		} else {
-			transform.SetParent (infoLoction [1]);
-			transform.localPosition = Vector3.zero;
-		}
+//		infoLoction.Add(LobbyController.s_Singleton.uiPlayer1);
+//		infoLoction.Add(LobbyController.s_Singleton.uiPlayer2);
+//		if (LobbyController.s_Singleton.uiPlayer1.GetComponentInChildren<NetworkIdentity> () == null) {
+		transform.SetParent (LobbyController.s_Singleton.MatchPanel.transform,false);
+//			transform.localPosition = Vector3.zero;
+//		} else {
+//			transform.SetParent (infoLoction [1]);
+//			transform.localPosition = Vector3.zero;
+//		}
 		if (isLocalPlayer) {
 			localPlayerIndicator.SetActive (true);
 			CharaterSelector.SetActive (true);
@@ -52,9 +52,9 @@ public class PlayerInfo : NetworkBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		transform.position = transform.parent.position;
-
-		transform.localPosition = Vector3.zero;
+//		transform.position = Vector3.zero;
+//
+//		transform.localPosition = Vector3.zero;
 
 		if (isLocalPlayer)
 			return;

@@ -58,12 +58,12 @@ public class HealthManager : NetworkBehaviour {
 		if (!isServer)
 			return false;
 		if (playerNumber == 1) {			
-			player1HealthCurrent -= damage*3;
+			player1HealthCurrent -= damage;
 			checkDeath (player1HealthCurrent,player1Life,playerControl,playerNumber);
 			if (player1HealthCurrent <= 0)
 				return true;
 		} else if (playerNumber == 2) {			
-			player2HealthCurrent -= damage*3;
+			player2HealthCurrent -= damage;
 			checkDeath (player2HealthCurrent,player2Life,playerControl,playerNumber);
 			if (player2HealthCurrent <= 0)
 				return true;

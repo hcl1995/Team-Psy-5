@@ -40,7 +40,8 @@ public class TransparentRecover : NetworkBehaviour
 			yeBabe = true;
 		}
 
-		CmdRestoreAlpha();
+		if(isLocalPlayer)
+			CmdRestoreAlpha();
 
 		//		if (yeBabe)
 		//		{

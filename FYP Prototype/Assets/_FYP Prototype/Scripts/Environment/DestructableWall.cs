@@ -12,7 +12,8 @@ public class DestructableWall : NetworkBehaviour
 
 	void Update()
 	{
-		CmdSwapMesh();
+		if(isServer)
+			CmdSwapMesh();
 	}
 
 	[Command]

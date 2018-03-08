@@ -73,12 +73,12 @@ public class PlayerNetwork : NetworkBehaviour {
 	[Command]
 	void CmdspawnPlayerInfo(){
 		GameObject go;
-		if (LobbyController.s_Singleton.uiPlayer1.GetComponentInChildren<NetworkIdentity> () == null) {
-			playerInfo = Instantiate (player1, Vector3.zero, Quaternion.identity);
+		if (playerNumber == 1) {
+			playerInfo = Instantiate (player1, Vector3.zero,Quaternion.identity);
 			playerInfo.GetComponent<PlayerInfo> ().playerNetwork = thisGO;
 			NetworkServer.ReplacePlayerForConnection (conn, playerInfo,0);
 		} else {
-			playerInfo = Instantiate (player2, Vector3.zero, Quaternion.identity);
+			playerInfo = Instantiate (player2, Vector3.zero,Quaternion.identity);
 			playerInfo.GetComponent<PlayerInfo> ().playerNetwork = thisGO;
 			NetworkServer.ReplacePlayerForConnection (conn, playerInfo,0);
 		}

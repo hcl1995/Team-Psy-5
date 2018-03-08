@@ -15,7 +15,7 @@ public class PlayerControl : NetworkBehaviour
 	[Header("Movement")]
 	public float speed;
 	public float gravity;
-	Vector3 moveDirection = Vector3.zero;
+	public Vector3 moveDirection = Vector3.zero;
 	public float dashDistance;
 	//Vector3 moveDirectionX = Vector3.right;
 	//Vector3 moveDirection_X = Vector3.left;
@@ -94,7 +94,7 @@ public class PlayerControl : NetworkBehaviour
 
 	[SyncVar]
 	public playerState state = playerState.Normal;
-
+	[SyncVar]
 	bool callOnce;
 	bool toggleGuard = false;
 
@@ -123,19 +123,6 @@ public class PlayerControl : NetworkBehaviour
 		Movement();
 		SkillCooldown();
 		CmdTransparentObjects();
-
-		if (Input.GetKeyDown (KeyCode.K)) {
-			if (toggleGuard) {
-				animation.SetBool ("Guarding", false);
-				CmdSetPlayerState (playerState.Normal);
-				toggleGuard = false;
-			} else if (!toggleGuard) {
-				animation.SetTrigger("Guard");
-				animation.SetBool("Guarding", true);
-				CmdSetPlayerState (playerState.Guarding);
-				toggleGuard = true;
-			}
-		}
 
 		if (invincible) {
 			blinkTime += Time.deltaTime;
@@ -207,7 +194,6 @@ public class PlayerControl : NetworkBehaviour
 				moveDirection = new Vector3(1, 0, 0);
 				controller.Move(moveDirection * speed * Time.deltaTime);
 			}
-
 			bool moving = moveDirection != Vector3.zero;
 			animation.SetBool("isMoving", moving);
 
@@ -301,23 +287,27 @@ public class PlayerControl : NetworkBehaviour
 
 	void Guard()
 	{
-		if (state == PlayerControl.playerState.Normal)
+		
+		if (KeyBindingManager.GetKey(KeyAction.Guard))
 		{
-			if (KeyBindingManager.GetKeyDown(KeyAction.Guard))
-			{
+			if (state == PlayerControl.playerState.Normal) {
+				//animation.SetBool("isMoving", false);
 				RotateTowardMouseDuringAction();
-				animation.SetTrigger("Guard");
+				//animation.SetTrigger("Guard");
+				if(!toggleGuard)
+					CmdAnimation ("Guard");
+				toggleGuard = true;
 				animation.SetBool("Guarding", true);
 				CmdSetPlayerState (PlayerControl.playerState.Guarding);
-			}
-		}
-		else if (state == PlayerControl.playerState.Guarding)
-		{
-			if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
-			{
-				animation.SetBool("Guarding", false);
-				CmdSetPlayerState (PlayerControl.playerState.Normal);
-			}
+			}				
+		}else if (state == PlayerControl.playerState.Guarding){
+//			if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
+//			{
+			//animation.SetBool("isMoving", false);
+			animation.SetBool("Guarding", false);
+			CmdSetPlayerState (PlayerControl.playerState.Normal);
+			toggleGuard = false;
+		//}
 		}
 	}
 
@@ -438,18 +428,24 @@ public class PlayerControl : NetworkBehaviour
 		           this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack03")) {
 			callOnce = false;
 			state = playerState.Attacking;
+			animation.SetBool("isMoving", false);
 		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Guard")) {
 			state = playerState.Guarding;
+			animation.SetBool("isMoving", false);
 		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("ShootCasting01")) {
 			state = playerState.SkillCharging;
+			animation.SetBool("isMoving", false);
 		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Wall") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Ultimate") ||
 		           this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown") ||
 		           this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown02") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown03") ||
 		           this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Recover")) {
 			state = playerState.OnAnimation;
+			animation.SetBool("isMoving", false);
 		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Death")) {
 			state = playerState.Death;
+			animation.SetBool("isMoving", false);
 		}
+		CmdSetPlayerState (state);
 		CmdSetActive();
 	}
 	public void playDeathAnim(){
@@ -459,6 +455,7 @@ public class PlayerControl : NetworkBehaviour
 	[Command]
 	void CmdSetActive()
 	{
+		callOnce = false;
 		RpcSetActive();
 	}
 
@@ -471,15 +468,16 @@ public class PlayerControl : NetworkBehaviour
 			particleGuard.SetActive(false);
 			if (callOnce == false)
 			{
-				animation.ResetTrigger("Attack01");
+				animation.ResetTrigger("Attack");
 				animation.ResetTrigger("Attack02");
 				animation.ResetTrigger("Attack03");
 				callOnce = true;
 			}
 		}
-		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Guard"))
-		{
-			particleGuard.SetActive(true);
+		if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Guard")) {
+			particleGuard.SetActive (true);
+		} else {
+			particleGuard.SetActive(false);
 		}
 	}
 		
@@ -577,7 +575,6 @@ public class PlayerControl : NetworkBehaviour
 		transform.root.TransformPoint(new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z));
 		isFalling = false;
 	}
-
 	[Command]
 	void CmdInvincible(bool invinc){
 		invincible = invinc;

@@ -150,13 +150,16 @@ public class PlayerHealth : NetworkBehaviour {
 	}
 
 	public void takeDamageHazard(float damage){
+		Debug.Log ("1");
 		if (!isServer)
 			return;
 		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
+			Debug.Log ("2");
 			return;
 		}
 		if (harzardDamageCD)
 			return;
+		Debug.Log ("3");
 		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
 //		harzardDamageCD = true;
 //		StartCoroutine(hazardCoolDown());
