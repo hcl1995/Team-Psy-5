@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
-public class LavaScript : MonoBehaviour {
+public class LavaScript : NetworkBehaviour {
 
 	public float damage = 1.0f;
 	// Use this for initialization
@@ -16,6 +17,8 @@ public class LavaScript : MonoBehaviour {
 	}
 
 	void OnCollisionStay(Collision other){
+		if (!isServer)
+			return;
 		if (other.gameObject.CompareTag("Player"))
 		{
 			other.gameObject.GetComponent<PlayerHealth> ().takeDamageHazard (damage);

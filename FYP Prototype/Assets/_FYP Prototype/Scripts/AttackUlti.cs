@@ -43,11 +43,13 @@ public class AttackUlti : MonoBehaviour
 
 				if (selfPlayerSkill.skill02Buffed == false)
 				{
-					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position),other,UltKnockPos);
+					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position),other);
+					AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
 				}
 				else if (selfPlayerSkill.skill02Buffed == true)
 				{
-					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage * 1.5f,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position),other,UltKnockPos);
+					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage * 1.5f,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position),other);
+					AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
 					selfPlayerSkill.skill02Buffed = false;
 				}
 				isHit = true;

@@ -70,6 +70,8 @@ public class PlayerSkillControl : PlayerControl
 
 					skill02CD.fillAmount = 1;
 					skill02Cooldown = skill02CooldownDuration;
+
+					soundEffect.PlaySFX(SFXAudioClipID.SFX_SKILL02);
 				}
 			}
 			else if (KeyBindingManager.GetKeyDown(KeyAction.Ultimate))
@@ -99,6 +101,8 @@ public class PlayerSkillControl : PlayerControl
 
 					StartCoroutine(ResetDelay());
 					skill01Cooldown = skill01CooldownDuration;
+
+					soundEffect.PlaySFX(SFXAudioClipID.SFX_SKILL01);
 				}
 				else if (skill01Cooldown <= 0 && maxCharge)
 				{
@@ -111,6 +115,8 @@ public class PlayerSkillControl : PlayerControl
 
 					StartCoroutine(ResetDelay());
 					skill01Cooldown = skill01CooldownDuration;
+
+					soundEffect.PlaySFX(SFXAudioClipID.SFX_SKILL01);
 				}
 			}
 		}
@@ -135,6 +141,7 @@ public class PlayerSkillControl : PlayerControl
 	void UltiAcitve()
 	{
 		ultiAttack.SetActive(true);
+		soundEffect.PlaySFX(SFXAudioClipID.SFX_ULTIMATE);
 	}
 
 	void UltiNotAcitve()

@@ -33,7 +33,7 @@ public class UnityChanSkill01 : NetworkBehaviour
 
 		if (travelingDistance >= travelingThreshold)
 		{
-			Destroy(gameObject);
+			Destroy(transform.root.gameObject);
 		}
 	}
 
@@ -54,8 +54,9 @@ public class UnityChanSkill01 : NetworkBehaviour
 		{
 			//other.gameObject.GetComponent<Animator>().SetTrigger("Death");
 			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (damage, "DamageDown");
+			AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
 		}
-		NetworkServer.Destroy (gameObject);
-		Destroy(gameObject);
+		NetworkServer.Destroy (transform.root.gameObject);
+		Destroy(transform.root.gameObject);
 	}
 }

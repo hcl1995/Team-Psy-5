@@ -5,7 +5,6 @@ using UnityEngine.Networking;
 
 public class TransparentRecover : NetworkBehaviour
 {
-	public bool yeBabe;
 	Renderer rend;
 
 	public float fadeSpeed;
@@ -33,24 +32,13 @@ public class TransparentRecover : NetworkBehaviour
 	{
 		if (playerControl[0].inBetweenObjects.Contains(this.gameObject) || playerControl[1].inBetweenObjects.Contains(this.gameObject))
 		{
-			yeBabe = false;
+			return;
 		}
 		else //if (!playerControl[0].inBetweenObjects.Contains(this.gameObject) && !playerControl[1].inBetweenObjects.Contains(this.gameObject))
 		{
-			yeBabe = true;
+			RpcRestoreAlpha();
+			//CmdRestoreAlpha();
 		}
-
-		CmdRestoreAlpha();
-
-		//		if (yeBabe)
-		//		{
-		//			Color tempColor = rend.material.color;
-		//			if (tempColor.a < 1)
-		//			{
-		//				tempColor.a += fadeSpeed * Time.deltaTime;
-		//				rend.material.color = tempColor;
-		//			}
-		//		}
 	}
 
 	[Command]
@@ -62,23 +50,11 @@ public class TransparentRecover : NetworkBehaviour
 	[ClientRpc]
 	void RpcRestoreAlpha()
 	{
-		//		if (playerControl[0].inBetweenObjects.Contains(this.gameObject) || playerControl[1].inBetweenObjects.Contains(this.gameObject))
-		//		{
-		//			yeBabe = false;
-		//		}
-		//		else
-		//		{
-		//			yeBabe = true;
-		//		}
-
-		if (yeBabe)
+		Color tempColor = rend.material.color;
+		if (tempColor.a < 1)
 		{
-			Color tempColor = rend.material.color;
-			if (tempColor.a < 1)
-			{
-				tempColor.a += fadeSpeed * Time.deltaTime;
-				rend.material.color = tempColor;
-			}
+			tempColor.a += fadeSpeed * Time.deltaTime;
+			rend.material.color = tempColor;
 		}
 	}
 }

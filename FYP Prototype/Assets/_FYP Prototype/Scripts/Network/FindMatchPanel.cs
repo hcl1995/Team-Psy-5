@@ -11,6 +11,7 @@ public class FindMatchPanel : MonoBehaviour {
 	}
 
 	public void OnClickJoinGame(string ipAddress){
+		LobbyController.s_Singleton.networkDiscovery.StopBroadcast ();
 		LobbyController.s_Singleton.FindMatchPanel.gameObject.SetActive (false);
 		LobbyController.s_Singleton.changeTo(LobbyController.s_Singleton.MatchPanel);
 

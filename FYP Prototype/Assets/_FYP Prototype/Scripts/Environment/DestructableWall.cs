@@ -5,51 +5,88 @@ using UnityEngine.Networking;
 
 public class DestructableWall : NetworkBehaviour
 {
-	public Mesh destroyMesh;
+	//public Mesh destroyMesh;
 
 	bool callOnce = false;
 	public float health = 3;
 
+	Animator animation;
+	SoundEffect soundEffect;
+
+	public Collider[] m_Collider;
+
+	void Awake()
+	{
+		animation = GetComponent<Animator>();
+		soundEffect = GetComponent<SoundEffect>();
+	}
+
 	void Update()
 	{
-		CmdSwapMesh();
-	}
-
-	[Command]
-	void CmdSwapMesh()
-	{
-		RpcSwapMesh();
-		if (health <= 1.5f && callOnce == false)
+		if (health <= 0 && callOnce == false)
 		{
-			gameObject.GetComponent<MeshFilter>().mesh = destroyMesh;
+			//gameObject.GetComponent<MeshFilter>().mesh = destroyMesh;
+			RpcSetAnimation("Break");
+//			foreach (Collider c in m_Collider)
+//			{
+//				c.enabled = !c.enabled;
+//			}
+			//m_Collider.enabled = !m_Collider.enabled;
 			callOnce = true;
 		}
+
+		//CmdSwapMesh();
 	}
 
+//	[Command]
+//	void CmdSwapMesh()
+//	{
+//		RpcSwapMesh();
+//	}
+//
+//	[ClientRpc]
+//	void RpcSwapMesh()
+//	{
+//		if (health <= 0 && callOnce == false)
+//		{
+//			gameObject.GetComponent<MeshFilter>().mesh = destroyMesh;
+//			CmdAnimation("Break");
+//			callOnce = true;
+//		}
+//	}
+
+//	[Command]
+//	void CmdAnimation(string anim){
+//		RpcSetAnimation (anim);
+//	}
+//
 	[ClientRpc]
-	void RpcSwapMesh()
-	{
-		if (health <= 1.5f && callOnce == false)
+	void RpcSetAnimation(string anim){
+		animation.SetTrigger(anim);
+		foreach (Collider c in m_Collider)
 		{
-			gameObject.GetComponent<MeshFilter>().mesh = destroyMesh;
-			callOnce = true;
+			c.enabled = !c.enabled;
 		}
 	}
 
 	void OnCollisionEnter(Collision other)
 	{
-		
 		if (other.gameObject.CompareTag("Attack"))
 		{
 			health -= 1;
-			if(health<=0)
-				Destroy(gameObject);			
+			soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACK);
+			//if(health<=0)
+				//Destroy(gameObject);			
 		}
 	}
 
 	void OnTriggerEnter(Collider other){
-		health -= 1;
-		if(health<=0)
-			Destroy(gameObject);	
+		if (other.gameObject.CompareTag("Attack"))
+		{
+			health -= 1;
+			soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACK);
+		//if(health<=0)
+			//Destroy(gameObject);
+		}
 	}
 }

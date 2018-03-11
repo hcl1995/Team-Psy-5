@@ -10,17 +10,13 @@ public class PlayerControl : NetworkBehaviour
 	float rotationSpeed = 30;
 
 	public Animator animation;
-
+	public Vector3 startSpawnPosition;
 
 	[Header("Movement")]
 	public float speed;
 	public float gravity;
 	Vector3 moveDirection = Vector3.zero;
 	public float dashDistance;
-	//Vector3 moveDirectionX = Vector3.right;
-	//Vector3 moveDirection_X = Vector3.left;
-	//Vector3 moveDirectionZ = Vector3.forward;
-	//Vector3 moveDirection_Z = Vector3.back;
 
 
 	int dashCount;
@@ -29,8 +25,8 @@ public class PlayerControl : NetworkBehaviour
 	public int maxDashChargeCount;
 	public float dashChargeCooldownDuration;
 
-	Vector3 endPos;
-	Vector3 startPos;
+	Vector3 dashEndPos;
+	Vector3 dashStartPos;
 	bool isDash = false;
 	float completeDashTime;
 	float dashLerpSpeed = 10;
@@ -67,7 +63,7 @@ public class PlayerControl : NetworkBehaviour
 	public GameObject playerCanvas;
 	public GameObject trailRendererObject;
 	public GameObject particleGuard;
-
+	public GameObject CharaterModel;
 
 	[Header("Observer")]
 	public bool isFalling = false;
@@ -76,23 +72,41 @@ public class PlayerControl : NetworkBehaviour
 	public float materialAlpha;
 	GameObject damnCamera;
 
+	[SyncVar]
+	public bool invincible = false;
+	public float blinkTime = 0.3f;
+	public float invincibleDuration = 3.0f;
+	public float invincibleElapsed = 0;
+
 	public enum playerState
 	{
 		Normal,
 		Guarding,
 		Attacking,
 		SkillCharging,
-		OnAnimation
+		OnAnimation,
+		Death
 	}
 
+	[SyncVar]
 	public playerState state = playerState.Normal;
 
 	bool callOnce;
 	bool toggleGuard = false;
 
+	Vector3 flyEndPos;
+	Vector3 flyStartPos;
+	public bool flying;
+	public bool seriouslyFlying;
+	public float flyDistance;
+	public float completeFlyTime;
+	public float flyLerpSpeed;
+
+	protected SoundEffect soundEffect;
 
 	protected void Awake()
 	{
+		soundEffect = GetComponent<SoundEffect>();
 		animation = GetComponent<Animator>();
 		trailRendererObject.transform.parent = null;
 		damnCamera = GameObject.FindGameObjectWithTag("MainCamera");
@@ -104,6 +118,7 @@ public class PlayerControl : NetworkBehaviour
 		if (isLocalPlayer){
 			playerCanvas.SetActive (true);
 		}
+		startSpawnPosition = gameObject.transform.root.position;
 	}
 
 	protected void CheckInput(){
@@ -127,6 +142,29 @@ public class PlayerControl : NetworkBehaviour
 				toggleGuard = true;
 			}
 		}
+
+		if (invincible) {
+			blinkTime += Time.deltaTime;
+			invincibleElapsed += Time.deltaTime;
+			if (invincibleElapsed <= invincibleDuration) {
+				if (blinkTime >= 0.3) {
+					if (CharaterModel.activeSelf)
+						CmdBlinkCharacter (false);
+					else
+						CmdBlinkCharacter (true);
+					blinkTime = 0.0f;
+				}
+			} else {
+				CmdInvincible (false);
+				CmdBlinkCharacter (true);
+				invincibleElapsed = 0.0f;
+				blinkTime = 0.3f;
+			}
+		} else {
+			CmdBlinkCharacter (true);
+		}
+
+		//if(HealthManager.singleton.player
 	}
 
 	void Movement()
@@ -144,6 +182,33 @@ public class PlayerControl : NetworkBehaviour
 		else
 		{
 			animation.SetBool("OnGround", true);
+		}
+
+		if (flying)
+		{
+			flyStartPos = transform.position;
+			flyEndPos = transform.position += (-transform.forward * flyDistance);
+
+			completeFlyTime += (Time.deltaTime * flyLerpSpeed);
+			transform.position = Vector3.Lerp (flyStartPos, flyEndPos, completeFlyTime);
+			seriouslyFlying = true;
+		}
+
+		if (seriouslyFlying)
+		{
+			flying = false;
+
+			completeFlyTime += (Time.deltaTime * flyLerpSpeed);
+			transform.position = Vector3.Lerp (flyStartPos, flyEndPos, completeFlyTime);
+
+			// How the fuck do i lerp with character controller?
+			//controller.Move(Vector3.Lerp(flyStartPos, flyEndPos, completeFlyTime));
+		}
+
+		if (completeFlyTime >= 1)
+		{
+			seriouslyFlying = false;
+			completeFlyTime = 0;
 		}
 
 		if (state == playerState.Normal)
@@ -187,8 +252,8 @@ public class PlayerControl : NetworkBehaviour
 			{
 				if (dashCharge > 0)
 				{
-					startPos = transform.position;
-					endPos = transform.position += (transform.forward * dashDistance);
+					dashStartPos = transform.position;
+					dashEndPos = transform.position += (transform.forward * dashDistance);
 
 					isDash = true;
 					CmdAnimation("Dash");
@@ -196,6 +261,8 @@ public class PlayerControl : NetworkBehaviour
 					dashCount++;
 					dashCharge--;
 					dashChargeCooldown += dashChargeCooldownDuration;
+
+					soundEffect.PlaySFX(SFXAudioClipID.SFX_DASH);
 				}
 			}
 		}
@@ -203,7 +270,7 @@ public class PlayerControl : NetworkBehaviour
 		if (isDash)
 		{
 			completeDashTime += (Time.deltaTime * dashLerpSpeed);
-			transform.position = Vector3.Lerp (startPos, endPos, completeDashTime);
+			transform.position = Vector3.Lerp (dashStartPos, dashEndPos, completeDashTime);
 			//trailRendererObject.transform.position = gameObject.transform.position;
 			CmdDashTrail();
 		}
@@ -258,7 +325,7 @@ public class PlayerControl : NetworkBehaviour
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
 
-		if (Physics.Raycast (ray, out hit))
+		if (Physics.Raycast (ray, out hit, Mathf.Infinity, 1 << 9))
 		{
 			transform.LookAt(hit.point);
 
@@ -372,6 +439,7 @@ public class PlayerControl : NetworkBehaviour
 	void Atk01Active()
 	{
 		attack01.SetActive(true);
+		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKMISSED);
 	}
 
 	void Atk01NotActive()
@@ -382,6 +450,7 @@ public class PlayerControl : NetworkBehaviour
 	void Atk02Active()
 	{
 		attack02.SetActive(true);
+		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKMISSED);
 	}
 
 	void Atk02NotActive()
@@ -392,6 +461,7 @@ public class PlayerControl : NetworkBehaviour
 	void Atk03Active()
 	{
 		attack03.SetActive(true);
+		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKMISSED);
 	}
 
 	void Atk03NotActive()
@@ -401,33 +471,31 @@ public class PlayerControl : NetworkBehaviour
 
 	void RestrictInput()
 	{
-		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Idle") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Run") ||
-			this.animation.GetCurrentAnimatorStateInfo(0).IsName("Dash") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting02"))
-		{
+		if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Idle") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Run") ||
+		    this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Dash") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("ShootCasting02")) {
 			state = playerState.Normal;
-		}
-		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack02") ||
-				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Attack03"))
-		{
+		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack02") ||
+		           this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack03")) {
 			callOnce = false;
 			state = playerState.Attacking;
-		}
-		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Guard"))
-		{
+		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Guard")) {
 			state = playerState.Guarding;
-		}
-		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting01"))
-		{
+		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("ShootCasting01")) {
 			state = playerState.SkillCharging;
-		}
-		else if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Wall") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Ultimate") || 
-				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown") ||
-				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown02") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("DamageDown03") ||
-				 this.animation.GetCurrentAnimatorStateInfo(0).IsName("Recover") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Death"))
-		{
+		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Wall") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Ultimate") ||
+		           this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown") ||
+		           this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown02") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown03") ||
+		           this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Recover")) {
 			state = playerState.OnAnimation;
+		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Death")) {
+			state = playerState.Death;
 		}
 		CmdSetActive();
+	}
+
+	public void playDeathAnim(){
+		CmdAnimation ("Death");
+		soundEffect.PlaySFX(SFXAudioClipID.SFX_DEATH);
 	}
 
 	[Command]
@@ -490,6 +558,11 @@ public class PlayerControl : NetworkBehaviour
 		}
 	}
 
+	void OnControllerColliderHit(ControllerColliderHit hit)
+	{
+		
+	}
+
 	[Command]
 	void CmdTransparentObjects()
 	{
@@ -538,4 +611,34 @@ public class PlayerControl : NetworkBehaviour
 //		Gizmos.color = Color.red;
 //		Gizmos.DrawWireCube(transform.position, new Vector3(0.25f, 0, 0));
 //	}
+
+	public void respawnNow(){
+		RpcRespwan ();
+		CmdAnimation ("Idle");
+		CmdInvincible(true);
+	}
+
+	[ClientRpc]
+	public void RpcRespwan(){		
+		transform.root.position = new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z);
+		transform.root.TransformPoint(new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z));
+		isFalling = false;
+	}
+
+	[Command]
+	void CmdInvincible(bool invinc){
+		invincible = invinc;
+
+		RpcBlinkCharacter (true);
+	}
+
+	[Command]
+	void CmdBlinkCharacter(bool b){
+		RpcBlinkCharacter (b);
+	}
+
+	[ClientRpc]
+	void RpcBlinkCharacter(bool b){
+		CharaterModel.SetActive (b);
+	}
 }

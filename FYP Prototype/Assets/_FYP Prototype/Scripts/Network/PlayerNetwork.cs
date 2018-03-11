@@ -49,6 +49,9 @@ public class PlayerNetwork : NetworkBehaviour {
 		this.conn = conn;
 		this.playerControllerId = playerControllerId;
 		this.playerNumber = playerNumber;
+		if (isLocalPlayer) {
+			Debug.Log (true);
+		}
 	}
 
 	void OnSceneChange(Scene scene1, Scene scene2){

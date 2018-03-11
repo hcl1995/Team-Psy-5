@@ -24,7 +24,6 @@ public class LevelEditor : NetworkBehaviour
 //		{
 //			colorMapping.prefab.GetComponent<Renderer>().sharedMaterial.color = colorMapping.color;
 //		}
-
 	}
 
 	void GenerateLevel()

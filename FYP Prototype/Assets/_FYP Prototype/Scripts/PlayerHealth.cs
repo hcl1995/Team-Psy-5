@@ -7,7 +7,6 @@ using UnityEngine.Networking;
 public class PlayerHealth : NetworkBehaviour {
 	public const float maxHealth = 100;
 
-	[SyncVar(hook = "OnChangeHealth")]
 	public float currentHealth = maxHealth;
 
 	public PlayerControl playerControl;
@@ -18,9 +17,9 @@ public class PlayerHealth : NetworkBehaviour {
 	GameObject impactGO;
 	public hitIndicator hitIndicator;
 	float previousHealth = maxHealth;
-
-
-	public RectTransform healthBar;
+	public bool harzardDamageCD = false;
+	public float harzardDamageCDDuration = 1.0f;
+	public float harzardDamageCDElapsed = 0.0f;
 
 	bool isDead = false;
 
@@ -41,19 +40,23 @@ public class PlayerHealth : NetworkBehaviour {
 	}
 
 	void Update(){
+//		if (isServer) {
+//			if (gameObject.transform.position.y <= -5)
+//			{
+//				
+//			}
+//		}
+
+
 		if (!isLocalPlayer)
 			return;
 
-		if (gameObject.transform.position.y <= -5)
-		{
-			currentHealth -= maxHealth;
-			checkDeath();
-		}
 
-		if (currentHealth < previousHealth) {
-			hitIndicator.OnHit ();
-			previousHealth = currentHealth;
-		}
+
+//		if (currentHealth < previousHealth) {
+//			hitIndicator.OnHit ();
+//			previousHealth = currentHealth;
+//		}
 
 		if (isKnockback)
 		{
@@ -66,22 +69,38 @@ public class PlayerHealth : NetworkBehaviour {
 			isKnockback = false;
 			completeKnockback = 0;
 		}
+
+//		if (harzardDamageCD) {
+//			harzardDamageCDElapsed += Time.deltaTime;
+//			if (harzardDamageCDElapsed >= harzardDamageCDDuration) {
+//				harzardDamageCD = false;
+//				harzardDamageCDElapsed = 0.0f;
+//			}
+//		}
+	}
+
+	public IEnumerator hazardCoolDown(){
+		yield return new WaitForSeconds (harzardDamageCDDuration);
+		harzardDamageCD = false;
+		harzardDamageCDElapsed = 0.0f;
 	}
 
 	void OnChangeHealth (float health)
 	{
 		currentHealth = health;
-		healthBar.sizeDelta = new Vector2(health, healthBar.sizeDelta.y);
 	}
 
 	public void takeDamage(float damage, string animation, GameObject impact, Vector3 position, Vector3 euler,Vector3 colliderHit){
 		if (!isServer)
 			return;
+		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
+			return;
+		}
 		if (playerControl.state == PlayerControl.playerState.Guarding) {
-			currentHealth -= 1.0f;
+			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
 		}
 		else {
-			currentHealth -= damage;
+			HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
 			CmdAnimation (animation);
 		}
 		//CmdHit ();
@@ -89,7 +108,9 @@ public class PlayerHealth : NetworkBehaviour {
 		impactGO =  (GameObject)Instantiate (impact,colliderHit, Quaternion.identity);
 		NetworkServer.Spawn (impactGO);
 		Destroy (impactGO, 0.5f);
-		transform.root.LookAt (position);
+
+		// doesn't seems working here.
+		transform.root.LookAt (colliderHit);
 		Vector3 eulerFucker = euler;
 		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
 		transform.root.rotation = Quaternion.Euler (eulerFucker);
@@ -100,17 +121,19 @@ public class PlayerHealth : NetworkBehaviour {
 	public void takeDamageBullet(float damage, string animation){ // give another parameter, detect player from bullet skill script
 		if (!isServer)
 			return;
-
-//		if (playerControl.skill02Buffed)
-//		{
-//			currentHealth -= damage * 1.5f;
-//			CmdAnimation (animation);
-//		}
-//		else
-//		{
-		currentHealth -= damage; //(damage * playerSkillControl.fillCharge.fillAmount);
-			CmdAnimation (animation);
-//		}
+		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
+			return;
+		}
+		//		if (playerControl.skill02Buffed)
+		//		{
+		//			currentHealth -= damage * 1.5f;
+		//			CmdAnimation (animation);
+		//		}
+		//		else
+		//		{
+		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl); //(damage * playerSkillControl.fillCharge.fillAmount);
+		CmdAnimation (animation);
+		//		}
 		//CmdHit ();
 
 		checkDeath();
@@ -119,8 +142,10 @@ public class PlayerHealth : NetworkBehaviour {
 	public void takeSkill02(float damage, string animation){
 		if (!isServer)
 			return;
-
-		currentHealth -= damage;
+		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
+			return;
+		}
+		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
 		CmdAnimation (animation);
 
 		checkDeath();
@@ -129,26 +154,36 @@ public class PlayerHealth : NetworkBehaviour {
 	public void takeDamageHazard(float damage){
 		if (!isServer)
 			return;
-
-		currentHealth -= damage;
+		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
+			return;
+		}
+		if (harzardDamageCD)
+			return;
+		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
+//		harzardDamageCD = true;
+//		StartCoroutine(hazardCoolDown());
 		//CmdHit ();
 		checkDeath();
 	}
-	public void takeMuaiThaiUlt(float damage, string animation, GameObject impact, Vector3 position, Vector3 euler,Vector3 colliderHit,Collider other,Vector3 KnockPos){
+	public void takeMuaiThaiUlt(float damage, string animation, GameObject impact, Vector3 position, Vector3 euler,Vector3 colliderHit,Collider other){
 		if (!isServer)
 			return;
+		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
+			return;
+		}
 		if (playerControl.state == PlayerControl.playerState.Guarding) {
-			currentHealth -= 1.0f;
+			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
 		}
 		else {
-			currentHealth -= damage;
-			CmdKnockBack (KnockPos);
+			HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
+			//CmdKnockBack (KnockPos);
 			CmdAnimation (animation);
 		}
 		//CmdHit ();
 
-		isKnockback = true;
+		//isKnockback = true;
 
+		// only server side do, so the kena hit look won't trigger in client
 		impactGO =  (GameObject)Instantiate (impact,colliderHit, Quaternion.identity);
 		NetworkServer.Spawn (impactGO);
 		Destroy (impactGO, 0.5f);
@@ -156,7 +191,6 @@ public class PlayerHealth : NetworkBehaviour {
 		Vector3 eulerFucker = euler;
 		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
 		transform.root.rotation = Quaternion.Euler (eulerFucker);
-
 		//currPosition += (transform.root.forward * distance);
 		//other.transform.root.position = Vector3.Lerp (other.transform.root.position, KnockPos, completeKnockback);
 
@@ -172,9 +206,20 @@ public class PlayerHealth : NetworkBehaviour {
 			isDead = true;
 			CmdAnimation("Death");
 			//Debug.Log("Dead!");
-			CmdLose ();
+			//CmdLose ();
 		}
 	}
+
+	void OnTriggerEnter(Collider other)
+	{
+		if (!isServer)
+			return;
+		if (other.gameObject.CompareTag("OutOfBoundDeathZone"))
+		{
+			HealthManager.singleton.takeDamage (playerNumber, 200,playerControl);
+		}
+	}
+
 
 	[Command]
 	public void CmdLose(){
@@ -203,13 +248,13 @@ public class PlayerHealth : NetworkBehaviour {
 		gameObject.transform.root.position += pos;
 		//gameObject.transform.root.position = Vector3.Lerp (gameObject.transform.root.position, pos, completeKnockback);
 	}
-//	[Command]
-//	public void CmdHit(){
-//		RpcShowHitIndicator ();
-//	}
-//
-//	[ClientRpc]
-//	public void RpcShowHitIndicator(){
-//		hitIndicator.SetActive (true);
-//	}
+	//	[Command]
+	//	public void CmdHit(){
+	//		RpcShowHitIndicator ();
+	//	}
+	//
+	//	[ClientRpc]
+	//	public void RpcShowHitIndicator(){
+	//		hitIndicator.SetActive (true);
+	//	}
 }

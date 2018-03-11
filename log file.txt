@@ -1,3 +1,12 @@
+Commit 25 (Mar 11, 2018)
+------------------------
+-Sound Manager (bgm setted to 0 volume too noisy / finish fight back to char select no change dao music)
+-New Ong-Bak Character (No dash / ulti / 2nd skill animation), Environment, Props & Skybox
+-New Prop Can't Recover From Transparent (Probably child wasn't registered problem)
+-Camera won't follow fall down character anymore (not sure satisfy not, tuesday discuss)
+-Fixed other blue colour status bug in bug list excel file (To be confirm)
+
+
 Commit 24 (Mar 03, 2018)
 ------------------------
 -Playtest Build

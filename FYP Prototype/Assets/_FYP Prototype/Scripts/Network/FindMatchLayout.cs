@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 public class FindMatchLayout : MonoBehaviour {
-
+	float refresh = 0;
 	[SerializeField]
 	private GameObject _matchListingPrefab;
 	public GameObject MatchListingPrefab{
@@ -20,20 +20,26 @@ public class FindMatchLayout : MonoBehaviour {
 
 	public Dictionary<string,NetworkBroadcastResult> nbr;
 
+	void OnEnable(){
+		StartSearch ();
+	}
+
 	public void StartSearch(){
-		if (MatchListingButtons.Count > 0) {
-			foreach (MatchListing networkListing in MatchListingButtons) {
-				GameObject gameListingObj = networkListing.gameObject;
-				MatchListingButtons.Remove (networkListing);
-				Destroy (gameListingObj);
-			}
-		}
 		nbr = networkDiscovery.broadcastsReceived;
 		StartCoroutine (SearchGame());
 	}
 
 	private IEnumerator SearchGame(){
 		yield return new WaitForSeconds (1.5f);
+		if (MatchListingButtons.Count > 0) {
+			foreach (MatchListing networkListing in MatchListingButtons) {
+				GameObject gameListingObj = networkListing.gameObject;
+				//MatchListingButtons.Remove (networkListing);
+				Destroy (gameListingObj);
+
+			}
+			MatchListingButtons.Clear();
+		}
 		foreach (string str in nbr.Keys) {			
 			string ip = str.Remove (0, 7);
 			Debug.Log (ip);
@@ -46,4 +52,5 @@ public class FindMatchLayout : MonoBehaviour {
 		}
 
 	}
+		
 }

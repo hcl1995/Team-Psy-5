@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
 using Cinemachine;
+using UnityEngine.SceneManagement;
 
 public class LobbyController : NetworkManager {
 
@@ -20,7 +21,6 @@ public class LobbyController : NetworkManager {
 	public Transform uiPlayer2;
 	public GameObject uiWaiting;
 	public GameObject lobbyCanvas;
-	public GameObject gameCanvas;
 	public RectTransform playerHealth1;
 	public RectTransform playerHealth2;
 	public Transform playerWin01;
@@ -34,9 +34,14 @@ public class LobbyController : NetworkManager {
 	public int intPlayer=0;
 	public GameObject player1Character;
 	public GameObject player2Character;
+	public int player1CharaterProtrait;
+	public int player2CharaterProtrait;
+	int matchCount = 1;
 
 	public List<GameObject> playerNetwork = new List<GameObject> ();
 	public List<GameObject> playerChara = new List<GameObject> ();
+	public List<GameObject> playerCharacterSelector = new List<GameObject> ();
+	public List<Sprite> selectedCharacterSprite = new List<Sprite> ();
 
 	public CinemachineTargetGroup targetGroup;
 
@@ -49,19 +54,26 @@ public class LobbyController : NetworkManager {
 
 	public void startHost (){
 		base.StartHost();
+		LocalPlayerInfo.singleton.playerNum = 1;
+	}
+
+	public void CancelFromMatchFinding(){
+		changeTo (LobbyPanel);
+		networkDiscovery.StopBroadcast ();
+		networkDiscovery.Initialize ();
 	}
 
 	public override void OnStartHost()
 	{
 		networkDiscovery.StartAsServer ();
 		changeTo (MatchPanel);
-		Debug.Log("OnPlayerConnected");
 	}
 
 	public void startClient(){
 		networkDiscovery.StartAsClient ();
 		changeTo (FindMatchPanel);
 		uiWaiting.SetActive (false);
+		LocalPlayerInfo.singleton.playerNum = 2;
 	}
 
 	public void changeTo(RectTransform newPanel){
@@ -92,14 +104,41 @@ public class LobbyController : NetworkManager {
 		Debug.Log ("OnServerConnect");
 		if (numPlayers > 0) {
 			uiWaiting.SetActive (false);
+			networkDiscovery.StopBroadcast ();
 		}
 		intPlayer++;
 		Debug.Log (base.numPlayers);
+
+
 	}
 
-	public void OnPlayerDisconnect(NetworkPlayer id){
+	public override void OnServerDisconnect(NetworkConnection conn){		
+		networkDiscovery.Initialize ();
+
+		if (SceneManager.GetActiveScene().name == "LevelEditor") {
+			foreach (GameObject go in playerChara) {
+				NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerHealth>().pn.conn, go.GetComponent<PlayerHealth>().pn.playerInfo,0);
+			}
+			base.ServerChangeScene ("Lobby");
+			SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
+		}
+		NetworkServer.DestroyPlayersForConnection (conn);
 		uiWaiting.SetActive (true);
-		Network.DestroyPlayerObjects (id);
+		networkDiscovery.StartAsServer ();
+		playerNetwork.RemoveAt (1);
+		playerChara.Clear ();
+	}
+
+	public override void OnClientDisconnect(NetworkConnection conn){
+		if (SceneManager.GetActiveScene().name == "Lobby") {
+			changeTo (LobbyPanel);
+		} else if (SceneManager.GetActiveScene().name == "LevelEditor") {
+			//SceneManager.LoadScene ("Lobby");
+			base.ServerChangeScene ("Lobby");
+			changeTo (LobbyPanel);
+			SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_MAINMENU);
+		}
+		base.StopClient ();
 	}
 
 
@@ -139,7 +178,6 @@ public class LobbyController : NetworkManager {
 			foreach (GameObject go in playerNetwork) {
 				NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerNetwork> ().conn, go, 0);
 			}
-			//gameCanvas.SetActive (true);
 			readyPlayer = 0;
 		}
 	}
@@ -187,9 +225,60 @@ public class LobbyController : NetworkManager {
 		//base.ServerChangeScene ("Lobby");
 	}
 
+	public void checkPlayerConditionNew(int playerNumber){		
+			
+		foreach (GameObject go2 in playerNetwork) {
+			if (go2.GetComponent<PlayerNetwork> ().playerNumber == playerNumber) {
+					go2.GetComponent<PlayerNetwork> ().WinCount++;
+				}
+		}			
+
+		foreach(GameObject go in playerChara) {
+			NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerHealth>().pn.conn, go.GetComponent<PlayerHealth>().pn.playerInfo,0);
+		}
+		playerChara = new List<GameObject> ();
+		matchCount++;
+		StartCoroutine(serverChangeScene());
+		//base.ServerChangeScene ("Lobby");
+	}
+
+	public int SetPlayerCharacter(int playerCharacter, int playerNumber){
+		int selectedCharacterInt = playerCharacter;
+
+		if (matchCount % 3 == 0) {
+			if (playerCharacter == 1) {
+				playerCharacter = 3;
+			}else if(playerCharacter == 2){
+				playerCharacter = 4;
+			}
+		}
+
+		if (playerNumber == 1) {
+			player1Character = playerCharacterSelector[playerCharacter];
+			player1CharaterProtrait = playerCharacter;
+
+		} else {
+			player2Character = playerCharacterSelector[playerCharacter];
+			player2CharaterProtrait = playerCharacter;
+		}
+
+		//RpcCharacterProtrait (playerCharacter, playerNumber);
+		return playerCharacter;
+	}
+
 	public IEnumerator serverChangeScene()
 	{
 		yield return new WaitForSeconds(5f);
+		SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
 		base.ServerChangeScene ("Lobby");
 	}
+
+//	[ClientRpc]
+//	void RpcCharacterProtrait(int playerCharacter, int playerNumber){
+//		if (playerNumber == 1) {
+//			player1CharaterProtrait = playerCharacter;
+//		} else {
+//			player2CharaterProtrait = playerCharacter;
+//		}
+//	}
 }

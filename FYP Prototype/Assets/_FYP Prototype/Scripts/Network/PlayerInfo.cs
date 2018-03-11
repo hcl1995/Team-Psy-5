@@ -10,11 +10,19 @@ public class PlayerInfo : NetworkBehaviour {
 	[SyncVar(hook="Ready")]
 	public bool ready = false;
 	public Image buttonImage;
+	public GameObject readyButton;
 	public GameObject playerNetwork;
 	public GameObject localPlayerIndicator;
+	public GameObject readyIndicator;
+	public int playerCharacter;
+	public GameObject CharaterSelector;
+	[SyncVar(hook="SelectedCharacter")]
+	public int selectedCharacterInt;
+	public Image characterSprite;
+	[SyncVar]
+	public int playerNumber = 0;
 	// Use this for initialization
 	void OnEnable(){
-		SceneManager.activeSceneChanged += OnSceneChange;
 		ready = false;
 		buttonImage.color = Color.red;
 	}
@@ -32,17 +40,41 @@ public class PlayerInfo : NetworkBehaviour {
 			transform.localPosition = Vector3.zero;
 		}
 		if (isLocalPlayer) {
+			SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
+
 			localPlayerIndicator.SetActive (true);
+			CharaterSelector.SetActive (true);
+			readyButton.SetActive (true);
+			CmdSetPlayerNumber (LocalPlayerInfo.singleton.playerNum);
+		}
+		if (!isLocalPlayer) {
+			readyIndicator.SetActive (true);
 		}
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		transform.position = transform.parent.position;
+
+		transform.localPosition = Vector3.zero;
+
+		if (isLocalPlayer)
+			return;
+		
+		if (ready) {
+			buttonImage.color = Color.green;
+			readyIndicator.GetComponent<Image> ().color = Color.green;
+		} else if (!ready) {
+			buttonImage.color = Color.red;
+			readyIndicator.GetComponent<Image> ().color = Color.red;
+		}
+		characterSprite.sprite = LobbyController.s_Singleton.selectedCharacterSprite [selectedCharacterInt];
 	}
 
 	public void OnClickPlayerReady(){
 		if (!isLocalPlayer)
+			return;
+		if (selectedCharacterInt == 0)
 			return;
 
 		if (!ready) {
@@ -57,6 +89,12 @@ public class PlayerInfo : NetworkBehaviour {
 			//RpcReady ();
 			buttonImage.color = Color.red;
 		}
+	}
+
+	public void setSelectCharacter(int character){
+		playerCharacter = character;
+		if(isLocalPlayer)
+			CmdSetSelectCharacter (playerCharacter, playerNumber);
 	}
 
 	[Command]
@@ -74,14 +112,30 @@ public class PlayerInfo : NetworkBehaviour {
 	void CmdReadyState(bool r){		
 		ready = r;
 	}
-		
+
+	[Command]
+	void CmdSetSelectCharacter(int character,int playerNumber){
+		selectedCharacterInt = LobbyController.s_Singleton.SetPlayerCharacter (character, playerNumber);
+		//selectedCharacterInt = character;
+	}
+	[Command]
+	void CmdSetPlayerNumber(int i){
+		playerNumber = i;
+	}
 	public void Ready(bool r){
 		ready = r;
 		if (ready) {
 			buttonImage.color = Color.green;
+			readyIndicator.GetComponent<Image> ().color = Color.green;
 		} else if (!ready) {
 			buttonImage.color = Color.red;
+			readyIndicator.GetComponent<Image> ().color = Color.red;
 		}
+	}
+
+	public void SelectedCharacter(int i){
+		selectedCharacterInt = i;
+		characterSprite.sprite = LobbyController.s_Singleton.selectedCharacterSprite [i];
 	}
 
 	public void OnSceneChange(Scene scene1, Scene scene2){
