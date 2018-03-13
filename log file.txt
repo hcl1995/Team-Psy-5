@@ -1,3 +1,9 @@
+Commit 26 (Mar 13, 2018)
+------------------------
+-Merged PlayerControl
+-Particle Scale No Zoom With Camera
+
+
 Commit 25 (Mar 11, 2018)
 ------------------------
 -Sound Manager (bgm setted to 0 volume too noisy / finish fight back to char select no change dao music)
