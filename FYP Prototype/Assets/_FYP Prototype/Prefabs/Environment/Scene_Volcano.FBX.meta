@@ -1,0 +1,185 @@
+fileFormatVersion: 2
+guid: 2e353f254dbe4ce4d87dbbda5ba6a558
+timeCreated: 1520919338
+licenseType: Free
+ModelImporter:
+  serializedVersion: 21
+  fileIDToRecycleName:
+    100000: arena mountain
+    100002: delete this please
+    100004: floor plane
+    100006: Lava pit
+    100008: middle moutain
+    100010: //RootNode
+    100012: Side Cover
+    100014: Side Cover 1
+    100016: Side Cover 2
+    100018: Side Cover 3
+    100020: Side Cover 4
+    100022: Side Cover 5
+    100024: Side Cover 6
+    100026: Side Cover 7
+    100028: side mountain
+    100030: side mountain 1
+    100032: Stone A
+    100034: Stone A001
+    100036: stone B
+    100038: stone B001
+    100040: stone B002
+    400000: arena mountain
+    400002: delete this please
+    400004: floor plane
+    400006: Lava pit
+    400008: middle moutain
+    400010: //RootNode
+    400012: Side Cover
+    400014: Side Cover 1
+    400016: Side Cover 2
+    400018: Side Cover 3
+    400020: Side Cover 4
+    400022: Side Cover 5
+    400024: Side Cover 6
+    400026: Side Cover 7
+    400028: side mountain
+    400030: side mountain 1
+    400032: Stone A
+    400034: Stone A001
+    400036: stone B
+    400038: stone B001
+    400040: stone B002
+    2300000: arena mountain
+    2300002: delete this please
+    2300004: floor plane
+    2300006: Lava pit
+    2300008: middle moutain
+    2300010: Side Cover
+    2300012: Side Cover 1
+    2300014: Side Cover 2
+    2300016: Side Cover 3
+    2300018: Side Cover 4
+    2300020: Side Cover 5
+    2300022: Side Cover 6
+    2300024: Side Cover 7
+    2300026: side mountain
+    2300028: side mountain 1
+    2300030: Stone A
+    2300032: Stone A001
+    2300034: stone B
+    2300036: stone B001
+    2300038: stone B002
+    3300000: arena mountain
+    3300002: delete this please
+    3300004: floor plane
+    3300006: Lava pit
+    3300008: middle moutain
+    3300010: Side Cover
+    3300012: Side Cover 1
+    3300014: Side Cover 2
+    3300016: Side Cover 3
+    3300018: Side Cover 4
+    3300020: Side Cover 5
+    3300022: Side Cover 6
+    3300024: Side Cover 7
+    3300026: side mountain
+    3300028: side mountain 1
+    3300030: Stone A
+    3300032: Stone A001
+    3300034: stone B
+    3300036: stone B001
+    3300038: stone B002
+    4300000: Lava pit
+    4300002: Side Cover
+    4300004: Side Cover
+    4300006: Side Cover
+    4300008: Side Cover
+    4300010: Side Cover
+    4300012: Side Cover
+    4300014: Side Cover
+    4300016: side mountain
+    4300018: delete this please
+    4300020: floor plane
+    4300022: arena mountain
+    4300024: Side Cover
+    4300026: middle moutain
+    4300028: side mountain
+    4300030: Stone A
+    4300032: stone B
+    4300034: Stone A001
+    4300036: stone B001
+    4300038: stone B002
+    9500000: //RootNode
+  materials:
+    importMaterials: 1
+    materialName: 0
+    materialSearch: 1
+  animations:
+    legacyGenerateAnimations: 4
+    bakeSimulation: 0
+    resampleCurves: 1
+    optimizeGameObjects: 0
+    motionNodeName: 
+    rigImportErrors: 
+    rigImportWarnings: 
+    animationImportErrors: 
+    animationImportWarnings: 
+    animationRetargetingWarnings: 
+    animationDoRetargetingWarnings: 0
+    animationCompression: 1
+    animationRotationError: 0.5
+    animationPositionError: 0.5
+    animationScaleError: 0.5
+    animationWrapMode: 0
+    extraExposedTransformPaths: []
+    extraUserProperties: []
+    clipAnimations: []
+    isReadable: 1
+  meshes:
+    lODScreenPercentages: []
+    globalScale: 1
+    meshCompression: 0
+    addColliders: 0
+    importVisibility: 1
+    importBlendShapes: 1
+    importCameras: 1
+    importLights: 1
+    swapUVChannels: 0
+    generateSecondaryUV: 0
+    useFileUnits: 1
+    optimizeMeshForGPU: 1
+    keepQuads: 0
+    weldVertices: 1
+    secondaryUVAngleDistortion: 8
+    secondaryUVAreaDistortion: 15.000001
+    secondaryUVHardAngle: 88
+    secondaryUVPackMargin: 4
+    useFileScale: 1
+  tangentSpace:
+    normalSmoothAngle: 60
+    normalImportMode: 0
+    tangentImportMode: 3
+    normalCalculationMode: 4
+  importAnimation: 1
+  copyAvatar: 0
+  humanDescription:
+    serializedVersion: 2
+    human: []
+    skeleton: []
+    armTwist: 0.5
+    foreArmTwist: 0.5
+    upperLegTwist: 0.5
+    legTwist: 0.5
+    armStretch: 0.05
+    legStretch: 0.05
+    feetSpacing: 0
+    rootMotionBoneName: 
+    rootMotionBoneRotation: {x: 0, y: 0, z: 0, w: 1}
+    hasTranslationDoF: 0
+    hasExtraRoot: 0
+    skeletonHasParents: 1
+  lastHumanDescriptionAvatarSource: {instanceID: 0}
+  animationType: 2
+  humanoidOversampling: 1
+  additionalBone: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

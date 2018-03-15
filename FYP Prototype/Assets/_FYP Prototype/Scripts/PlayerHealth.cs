@@ -108,7 +108,9 @@ public class PlayerHealth : NetworkBehaviour {
 		impactGO =  (GameObject)Instantiate (impact,colliderHit, Quaternion.identity);
 		NetworkServer.Spawn (impactGO);
 		Destroy (impactGO, 0.5f);
-		transform.root.LookAt (position);
+
+		// doesn't seems working here.
+		transform.root.LookAt (colliderHit);
 		Vector3 eulerFucker = euler;
 		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
 		transform.root.rotation = Quaternion.Euler (eulerFucker);
@@ -150,23 +152,20 @@ public class PlayerHealth : NetworkBehaviour {
 	}
 
 	public void takeDamageHazard(float damage){
-		Debug.Log ("1");
 		if (!isServer)
 			return;
 		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
-			Debug.Log ("2");
 			return;
 		}
 		if (harzardDamageCD)
 			return;
-		Debug.Log ("3");
 		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
 //		harzardDamageCD = true;
 //		StartCoroutine(hazardCoolDown());
 		//CmdHit ();
 		checkDeath();
 	}
-	public void takeMuaiThaiUlt(float damage, string animation, GameObject impact, Vector3 position, Vector3 euler,Vector3 colliderHit,Collider other,Vector3 KnockPos){
+	public void takeMuaiThaiUlt(float damage, string animation, GameObject impact, Vector3 position, Vector3 euler,Vector3 colliderHit,Collider other){
 		if (!isServer)
 			return;
 		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
@@ -177,13 +176,14 @@ public class PlayerHealth : NetworkBehaviour {
 		}
 		else {
 			HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
-			CmdKnockBack (KnockPos);
+			//CmdKnockBack (KnockPos);
 			CmdAnimation (animation);
 		}
 		//CmdHit ();
 
-		isKnockback = true;
+		//isKnockback = true;
 
+		// only server side do, so the kena hit look won't trigger in client
 		impactGO =  (GameObject)Instantiate (impact,colliderHit, Quaternion.identity);
 		NetworkServer.Spawn (impactGO);
 		Destroy (impactGO, 0.5f);
@@ -191,7 +191,6 @@ public class PlayerHealth : NetworkBehaviour {
 		Vector3 eulerFucker = euler;
 		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
 		transform.root.rotation = Quaternion.Euler (eulerFucker);
-
 		//currPosition += (transform.root.forward * distance);
 		//other.transform.root.position = Vector3.Lerp (other.transform.root.position, KnockPos, completeKnockback);
 

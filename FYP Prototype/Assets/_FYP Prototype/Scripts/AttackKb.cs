@@ -38,9 +38,11 @@ public class AttackKb : MonoBehaviour
 		{
 			if (other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> () != selfHealth) {
 				//other.gameObject.GetComponentInParent<Animator> ().SetTrigger ("DamageDown03");
-				Vector3 knockPos = gameObject.transform.root.forward * distance;
-
-				other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position), other, knockPos);
+				//Vector3 knockPos = gameObject.transform.root.forward * distance;
+				other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flying = true;
+				other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flyDistance = distance;
+				other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position), other);
+				AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
 				//other.transform.root.position += (transform.root.forward * distance);
 
 				isHit = true;

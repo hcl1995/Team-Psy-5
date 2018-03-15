@@ -15,13 +15,8 @@ public class PlayerControl : NetworkBehaviour
 	[Header("Movement")]
 	public float speed;
 	public float gravity;
-	public Vector3 moveDirection = Vector3.zero;
+	Vector3 moveDirection = Vector3.zero;
 	public float dashDistance;
-	//Vector3 moveDirectionX = Vector3.right;
-	//Vector3 moveDirection_X = Vector3.left;
-	//Vector3 moveDirectionZ = Vector3.forward;
-	//Vector3 moveDirection_Z = Vector3.back;
-
 
 	int dashCount;
 	int dashCharge;
@@ -29,8 +24,8 @@ public class PlayerControl : NetworkBehaviour
 	public int maxDashChargeCount;
 	public float dashChargeCooldownDuration;
 
-	Vector3 endPos;
-	Vector3 startPos;
+	Vector3 dashEndPos;
+	Vector3 dashStartPos;
 	bool isDash = false;
 	float completeDashTime;
 	float dashLerpSpeed = 10;
@@ -98,9 +93,19 @@ public class PlayerControl : NetworkBehaviour
 	bool callOnce;
 	bool toggleGuard = false;
 
+	Vector3 flyEndPos;
+	Vector3 flyStartPos;
+	public bool flying;
+	public bool seriouslyFlying;
+	public float flyDistance;
+	public float completeFlyTime;
+	public float flyLerpSpeed;
+
+	protected SoundEffect soundEffect;
 
 	protected void Awake()
 	{
+		soundEffect = GetComponent<SoundEffect>();
 		animation = GetComponent<Animator>();
 		trailRendererObject.transform.parent = null;
 		damnCamera = GameObject.FindGameObjectWithTag("MainCamera");
@@ -163,6 +168,28 @@ public class PlayerControl : NetworkBehaviour
 			animation.SetBool("OnGround", true);
 		}
 
+		if (flying)
+		{
+			flyStartPos = transform.position;
+			flyEndPos = transform.position += (-transform.forward * flyDistance);
+
+			seriouslyFlying = true;
+		}
+
+		if (seriouslyFlying)
+		{
+			flying = false;
+
+			completeFlyTime += (Time.deltaTime * flyLerpSpeed);
+			transform.position = Vector3.Lerp (flyStartPos, flyEndPos, completeFlyTime);
+		}
+
+		if (completeFlyTime >= 1)
+		{
+			seriouslyFlying = false;
+			completeFlyTime = 0;
+		}
+
 		if (state == playerState.Normal)
 		{
 			//GetAxis will be smoothed.
@@ -194,6 +221,7 @@ public class PlayerControl : NetworkBehaviour
 				moveDirection = new Vector3(1, 0, 0);
 				controller.Move(moveDirection * speed * Time.deltaTime);
 			}
+
 			bool moving = moveDirection != Vector3.zero;
 			animation.SetBool("isMoving", moving);
 
@@ -203,8 +231,8 @@ public class PlayerControl : NetworkBehaviour
 			{
 				if (dashCharge > 0)
 				{
-					startPos = transform.position;
-					endPos = transform.position += (transform.forward * dashDistance);
+					dashStartPos = transform.position;
+					dashEndPos = transform.position += (transform.forward * dashDistance);
 
 					isDash = true;
 					CmdAnimation("Dash");
@@ -212,6 +240,8 @@ public class PlayerControl : NetworkBehaviour
 					dashCount++;
 					dashCharge--;
 					dashChargeCooldown += dashChargeCooldownDuration;
+
+					soundEffect.PlaySFX(SFXAudioClipID.SFX_DASH);
 				}
 			}
 		}
@@ -219,7 +249,7 @@ public class PlayerControl : NetworkBehaviour
 		if (isDash)
 		{
 			completeDashTime += (Time.deltaTime * dashLerpSpeed);
-			transform.position = Vector3.Lerp (startPos, endPos, completeDashTime);
+			transform.position = Vector3.Lerp (dashStartPos, dashEndPos, completeDashTime);
 			//trailRendererObject.transform.position = gameObject.transform.position;
 			CmdDashTrail();
 		}
@@ -274,7 +304,7 @@ public class PlayerControl : NetworkBehaviour
 		Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 		RaycastHit hit;
 
-		if (Physics.Raycast (ray, out hit))
+		if (Physics.Raycast (ray, out hit, Mathf.Infinity, 1 << 9))
 		{
 			transform.LookAt(hit.point);
 
@@ -287,7 +317,6 @@ public class PlayerControl : NetworkBehaviour
 
 	void Guard()
 	{
-		
 		if (KeyBindingManager.GetKey(KeyAction.Guard))
 		{
 			if (state == PlayerControl.playerState.Normal) {
@@ -301,13 +330,13 @@ public class PlayerControl : NetworkBehaviour
 				CmdSetPlayerState (PlayerControl.playerState.Guarding);
 			}				
 		}else if (state == PlayerControl.playerState.Guarding){
-//			if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
-//			{
+			//			if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
+			//			{
 			//animation.SetBool("isMoving", false);
 			animation.SetBool("Guarding", false);
 			CmdSetPlayerState (PlayerControl.playerState.Normal);
 			toggleGuard = false;
-		//}
+			//}
 		}
 	}
 
@@ -392,6 +421,7 @@ public class PlayerControl : NetworkBehaviour
 	void Atk01Active()
 	{
 		attack01.SetActive(true);
+		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKMISSED);
 	}
 
 	void Atk01NotActive()
@@ -402,6 +432,7 @@ public class PlayerControl : NetworkBehaviour
 	void Atk02Active()
 	{
 		attack02.SetActive(true);
+		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKMISSED);
 	}
 
 	void Atk02NotActive()
@@ -412,6 +443,7 @@ public class PlayerControl : NetworkBehaviour
 	void Atk03Active()
 	{
 		attack03.SetActive(true);
+		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKMISSED);
 	}
 
 	void Atk03NotActive()
@@ -448,8 +480,10 @@ public class PlayerControl : NetworkBehaviour
 		CmdSetPlayerState (state);
 		CmdSetActive();
 	}
+
 	public void playDeathAnim(){
 		CmdAnimation ("Death");
+		soundEffect.PlaySFX(SFXAudioClipID.SFX_DEATH);
 	}
 
 	[Command]
@@ -514,6 +548,11 @@ public class PlayerControl : NetworkBehaviour
 		}
 	}
 
+	void OnControllerColliderHit(ControllerColliderHit hit)
+	{
+		
+	}
+
 	[Command]
 	void CmdTransparentObjects()
 	{
@@ -565,7 +604,7 @@ public class PlayerControl : NetworkBehaviour
 
 	public void respawnNow(){
 		RpcRespwan ();
-		CmdAnimation ("Guard");
+		CmdAnimation ("Idle");
 		CmdInvincible(true);
 	}
 
@@ -575,6 +614,7 @@ public class PlayerControl : NetworkBehaviour
 		transform.root.TransformPoint(new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z));
 		isFalling = false;
 	}
+
 	[Command]
 	void CmdInvincible(bool invinc){
 		invincible = invinc;

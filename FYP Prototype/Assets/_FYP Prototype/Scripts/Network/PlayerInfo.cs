@@ -19,6 +19,7 @@ public class PlayerInfo : NetworkBehaviour {
 	[SyncVar(hook="SelectedCharacter")]
 	public int selectedCharacterInt;
 	public Image characterSprite;
+	public RectTransform rt;
 	[SyncVar]
 	public int playerNumber = 0;
 	// Use this for initialization
@@ -27,19 +28,21 @@ public class PlayerInfo : NetworkBehaviour {
 		buttonImage.color = Color.red;
 	}
 	void Awake(){
-		
+		rt = (RectTransform)transform;
 	}
 	void Start () {
-//		infoLoction.Add(LobbyController.s_Singleton.uiPlayer1);
-//		infoLoction.Add(LobbyController.s_Singleton.uiPlayer2);
-//		if (LobbyController.s_Singleton.uiPlayer1.GetComponentInChildren<NetworkIdentity> () == null) {
-		transform.SetParent (LobbyController.s_Singleton.MatchPanel.transform,false);
-//			transform.localPosition = Vector3.zero;
-//		} else {
-//			transform.SetParent (infoLoction [1]);
-//			transform.localPosition = Vector3.zero;
-//		}
+		//		infoLoction.Add(LobbyController.s_Singleton.uiPlayer1);
+		//		infoLoction.Add(LobbyController.s_Singleton.uiPlayer2);
+		//		if (LobbyController.s_Singleton.uiPlayer1.GetComponentInChildren<NetworkIdentity> () == null) {
+		rt.SetParent (LobbyController.s_Singleton.MatchPanel.transform,false);
+		//			transform.localPosition = Vector3.zero;
+		//		} else {
+		//			transform.SetParent (infoLoction [1]);
+		//			transform.localPosition = Vector3.zero;
+		//		}
 		if (isLocalPlayer) {
+			SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
+
 			localPlayerIndicator.SetActive (true);
 			CharaterSelector.SetActive (true);
 			readyButton.SetActive (true);
@@ -54,7 +57,7 @@ public class PlayerInfo : NetworkBehaviour {
 	void Update () {
 //		transform.position = Vector3.zero;
 //
-//		transform.localPosition = Vector3.zero;
+		transform.localPosition = Vector3.zero;
 
 		if (isLocalPlayer)
 			return;

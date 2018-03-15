@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using Cinemachine;
 
 public class HealthManager : NetworkBehaviour {
 
@@ -38,8 +39,13 @@ public class HealthManager : NetworkBehaviour {
 	bool player1Dead = false;
 	bool player2Dead = false;
 
+	public CinemachineTargetGroup playerGroup;
+	public CinemachineVirtualCamera[] manyCamera;
+
 	// Use this for initialization
 	void Start () {
+		SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_INGAME);
+
 		player1HealthCurrent = player1HealthMax;
 		player2HealthCurrent = player2HealthMax;
 		singleton = this;
@@ -54,21 +60,23 @@ public class HealthManager : NetworkBehaviour {
 		player2Protrait.sprite = CharacterProtrait [player2Character];
 	}
 
-	public bool takeDamage(int playerNumber,float damage, PlayerControl playerControl){
+	public void takeDamage(int playerNumber,float damage, PlayerControl playerControl){
+		if (playerDead)
+			return;
 		if (!isServer)
-			return false;
-		if (playerNumber == 1) {			
+			return;
+		if (playerNumber == 1) {	
+			if (player1HealthCurrent <= 0)
+				return;
 			player1HealthCurrent -= damage;
 			checkDeath (player1HealthCurrent,player1Life,playerControl,playerNumber);
-			if (player1HealthCurrent <= 0)
-				return true;
-		} else if (playerNumber == 2) {			
+		} else if (playerNumber == 2) {
+			if (player2HealthCurrent <= 0)
+				return;
 			player2HealthCurrent -= damage;
 			checkDeath (player2HealthCurrent,player2Life,playerControl,playerNumber);
-			if (player2HealthCurrent <= 0)
-				return true;
+
 		}
-		return false;
 	}
 
 	void OnChangeHealth1 (float health)
@@ -94,6 +102,7 @@ public class HealthManager : NetworkBehaviour {
 				player1Dead = true;
 				RpcLifeDecrease (playerNumber, player1Life);
 				playerControl.playDeathAnim ();
+				RpcBrainDead();
 				StartCoroutine (respawn (playerNumber, playerControl));
 
 			} else if (playerNumber == 2 && !player2Dead) {
@@ -101,6 +110,7 @@ public class HealthManager : NetworkBehaviour {
 				player2Dead = true;
 				RpcLifeDecrease (playerNumber, player2Life);
 				playerControl.playDeathAnim ();
+				RpcBrainDead();
 				StartCoroutine (respawn (playerNumber, playerControl));
 			}
 			if (player2Life <= 0 || player1Life <=0) {
@@ -117,7 +127,28 @@ public class HealthManager : NetworkBehaviour {
 
 	[Command]
 	void CmdMatchGame(int playerNumber){
+		RpcPlayThis ();
 		LobbyController.s_Singleton.checkPlayerConditionNew (playerNumber);
+	}
+
+	[ClientRpc]
+	void RpcBrainDead()
+	{
+		playerGroup.enabled = false;
+		foreach (CinemachineVirtualCamera vc in manyCamera)
+		{
+			vc.enabled = false;
+		}
+	}
+
+	[ClientRpc]
+	void RpcBrainAlive()
+	{
+		playerGroup.enabled = true;
+		foreach (CinemachineVirtualCamera vc in manyCamera)
+		{
+			vc.enabled = true;
+		}
 	}
 
 	public IEnumerator respawn(int playerNumber, PlayerControl playerControl){
@@ -130,7 +161,11 @@ public class HealthManager : NetworkBehaviour {
 			player2Dead = false;
 		}
 		if(!playerDead)
+		{
 			playerControl.respawnNow ();
+			if (player1Dead == false && player2Dead == false)
+				RpcBrainAlive();
+		}
 		//playerDead = false;
 	}
 
@@ -161,5 +196,10 @@ public class HealthManager : NetworkBehaviour {
 		} else if (playerNumber == 2) {
 			player2LifeNode [Life].SetActive (false);
 		}
+	}
+
+	[ClientRpc]
+	void RpcPlayThis(){
+		SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
 	}
 }
