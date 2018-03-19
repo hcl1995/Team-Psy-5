@@ -75,7 +75,7 @@ public class BulletSkill : NetworkBehaviour
 
 		if (other.gameObject.CompareTag("Player"))
 		{
-			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (damage,"DamageDown");
+			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (damage,"DamageDown", impact, other.transform.position);
 			AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
 
 			if (maxCharge)
@@ -97,8 +97,10 @@ public class BulletSkill : NetworkBehaviour
 		var speed = initialVelocity.magnitude;
 		var direction = Vector3.Reflect(initialVelocity.normalized, collisionNormal);
 
-		transform.rotation = Quaternion.LookRotation(direction);
+		//transform.rotation = Quaternion.LookRotation(direction);
 		rb.velocity = direction * Mathf.Max(speed, minVelocity);
+		transform.rotation = Quaternion.LookRotation(direction);
+		Debug.Log("Bounced"); // GG Bounce Liek Crazy
 	}
 
 	public void setMaxCharge(bool max){

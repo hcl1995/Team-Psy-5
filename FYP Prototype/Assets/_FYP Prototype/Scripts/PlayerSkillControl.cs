@@ -12,6 +12,8 @@ public class PlayerSkillControl : PlayerControl
 	public GameObject projectileMax;
 	//public Transform playerParented;
 	public Transform skill01SpawnPoint;
+	public ParticleSystem skill01ParticleEffect;
+	public ParticleSystem _skill01ParticleEffect;
 
 	public Image fillCharge;
 	public GameObject chargeBar;
@@ -22,12 +24,12 @@ public class PlayerSkillControl : PlayerControl
 
 	[Header("Skill02")]
 	public bool skill02Buffed;
-	public ParticleSystem skill02ParticleEffecct;
+	public ParticleSystem skill02ParticleEffect;
 
 
 	[Header("Ultimate")]
 	public GameObject ultiAttack;
-
+	public ParticleSystem ultiParticleEffect;
 
 	void Update()
 	{
@@ -56,6 +58,7 @@ public class PlayerSkillControl : PlayerControl
 				{
 					maxCharge = false;
 					chargeBar.SetActive(true);
+					CmdSkill01PlayParticle();
 					CmdAnimation("Bullet");
 					animation.SetBool("ReleaseShot", false);
 					skill01CD.fillAmount = 1;
@@ -65,7 +68,7 @@ public class PlayerSkillControl : PlayerControl
 			{
 				if (skill02Cooldown <= 0)
 				{
-					CmdShowParticle();
+					CmdSkill02PlayParticle();
 					CmdAnimation("Wall");
 
 					skill02CD.fillAmount = 1;
@@ -80,6 +83,7 @@ public class PlayerSkillControl : PlayerControl
 				{
 					RotateTowardMouseDuringAction();
 					CmdAnimation("Ultimate");
+					CmdUltiPlayParticle();
 
 					ultimateCD.fillAmount = 1;
 					ultimateCooldown = ultimateCooldownDuration;
@@ -92,10 +96,10 @@ public class PlayerSkillControl : PlayerControl
 			{
 				if (skill01Cooldown <= 0 && !maxCharge)
 				{
+					CmdSkill01StopParticle();
 					animation.SetBool("ReleaseShot", true);
 
 					RotateTowardMouseDuringAction();
-					//CmdFire (skill01SpawnPoint.position, skill01SpawnPoint.rotation, maxCharge);
 					CmdFire (skill01SpawnPoint.position, skill01SpawnPoint.rotation, maxCharge);
 					chargeBar.SetActive(false);
 
@@ -106,10 +110,10 @@ public class PlayerSkillControl : PlayerControl
 				}
 				else if (skill01Cooldown <= 0 && maxCharge)
 				{
+					CmdSkill01StopParticle();
 					animation.SetBool("ReleaseShot", true);
 
 					RotateTowardMouseDuringAction();
-					//CmdFire02 (skill01SpawnPoint.position, skill01SpawnPoint.rotation, maxCharge);
 					CmdFire02 (skill01SpawnPoint.position, skill01SpawnPoint.rotation, maxCharge);
 					chargeBar.SetActive(false);
 
@@ -138,6 +142,16 @@ public class PlayerSkillControl : PlayerControl
 		fillCharge.fillAmount = 0;
 	}
 
+	void Skill01Casting()
+	{
+		CmdSkill01PlayParticle();
+	}
+
+	void Skill01NotCasting()
+	{
+		CmdSkill01StopParticle();
+	}
+
 	void UltiAcitve()
 	{
 		ultiAttack.SetActive(true);
@@ -163,16 +177,54 @@ public class PlayerSkillControl : PlayerControl
 		NetworkServer.Spawn (bullet);
 	}
 
-	[Command] // call by client to request the server to do this function (damage)
-	void CmdShowParticle()
+	[Command]
+	void CmdSkill02PlayParticle()
 	{
-		RpcShowParticle();
+		RpcSkill02PlayParticle();
 		skill02Buffed = true;
 	}
 
 	[ClientRpc]
-	void RpcShowParticle() // show both side
+	void RpcSkill02PlayParticle()
 	{
-		skill02ParticleEffecct.Play();
+		skill02ParticleEffect.Play();
+	}
+
+	[Command]
+	void CmdSkill01PlayParticle()
+	{
+		RpcSkill01PlayParticle();
+	}
+
+	[ClientRpc]
+	void RpcSkill01PlayParticle()
+	{
+		_skill01ParticleEffect.Play();
+		skill01ParticleEffect.Play();
+	}
+
+	[Command]
+	void CmdSkill01StopParticle()
+	{
+		RpcSkill01StopParticle();
+	}
+
+	[ClientRpc]
+	void RpcSkill01StopParticle()
+	{
+		_skill01ParticleEffect.Stop();
+		skill01ParticleEffect.Stop();
+	}
+
+	[Command]
+	void CmdUltiPlayParticle()
+	{
+		RpcUltiPlayParticle();
+	}
+
+	[ClientRpc]
+	void RpcUltiPlayParticle()
+	{
+		ultiParticleEffect.Play();
 	}
 }

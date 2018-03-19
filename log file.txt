@@ -1,3 +1,10 @@
+Commit 27 (Mar 19, 2018)
+------------------------
+-Audio Volume Setting
+-Test New Particles
+-Fixed Knockback Through Props
+
+
 Commit 26 (Mar 13, 2018)
 ------------------------
 -Merged PlayerControl

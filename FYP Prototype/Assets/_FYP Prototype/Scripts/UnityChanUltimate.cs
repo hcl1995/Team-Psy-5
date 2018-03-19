@@ -65,6 +65,9 @@ public class UnityChanUltimate : MonoBehaviour
 					}
 					else if (i == 5)
 					{
+						other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flying = true;
+						other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flyDistance = distance;
+
 						UltKnockPos = gameObject.transform.root.forward * distance;
 						other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position),other);
 						AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);

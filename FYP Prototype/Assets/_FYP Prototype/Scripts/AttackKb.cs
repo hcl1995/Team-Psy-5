@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 public class AttackKb : MonoBehaviour
 {
 	public GameObject impact;
+	public GameObject gImpact;
 	public PlayerHealth selfHealth; 
 	public PlayerControl selfControl;
 	public float distance;
@@ -39,10 +40,18 @@ public class AttackKb : MonoBehaviour
 			if (other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> () != selfHealth) {
 				//other.gameObject.GetComponentInParent<Animator> ().SetTrigger ("DamageDown03");
 				//Vector3 knockPos = gameObject.transform.root.forward * distance;
-				other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flying = true;
-				other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flyDistance = distance;
-				other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position), other);
-				AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+				if (other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().state != PlayerControl.playerState.Guarding)
+				{
+					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flying = true;
+					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flyDistance = distance;
+					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeKnockbackDamage (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position), other, gImpact);
+					AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+				}
+				else
+				{
+					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeKnockbackDamage (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position), other, gImpact);
+					AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+				}
 				//other.transform.root.position += (transform.root.forward * distance);
 
 				isHit = true;

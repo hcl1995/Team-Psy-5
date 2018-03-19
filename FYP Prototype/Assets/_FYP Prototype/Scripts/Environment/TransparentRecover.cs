@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
-public class TransparentRecover : NetworkBehaviour
+public class TransparentRecover : MonoBehaviour
 {
 	Renderer rend;
 
@@ -36,25 +35,31 @@ public class TransparentRecover : NetworkBehaviour
 		}
 		else //if (!playerControl[0].inBetweenObjects.Contains(this.gameObject) && !playerControl[1].inBetweenObjects.Contains(this.gameObject))
 		{
-			RpcRestoreAlpha();
+			Color tempColor = rend.material.color;
+			if (tempColor.a < 1)
+			{
+				tempColor.a += fadeSpeed * Time.deltaTime;
+				rend.material.color = tempColor;
+			}
+			//RpcRestoreAlpha();
 			//CmdRestoreAlpha();
 		}
 	}
 
-	[Command]
-	void CmdRestoreAlpha()
-	{
-		RpcRestoreAlpha();
-	}
-
-	[ClientRpc]
-	void RpcRestoreAlpha()
-	{
-		Color tempColor = rend.material.color;
-		if (tempColor.a < 1)
-		{
-			tempColor.a += fadeSpeed * Time.deltaTime;
-			rend.material.color = tempColor;
-		}
-	}
+//	[Command]
+//	void CmdRestoreAlpha()
+//	{
+//		RpcRestoreAlpha();
+//	}
+//
+//	[ClientRpc]
+//	void RpcRestoreAlpha()
+//	{
+//		Color tempColor = rend.material.color;
+//		if (tempColor.a < 1)
+//		{
+//			tempColor.a += fadeSpeed * Time.deltaTime;
+//			rend.material.color = tempColor;
+//		}
+//	}
 }

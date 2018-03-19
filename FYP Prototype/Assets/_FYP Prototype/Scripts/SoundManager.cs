@@ -13,12 +13,20 @@ public enum BGMAudioClipID
 public enum SFXAudioClipID
 {
 	SFX_ATTACK = 0,
-	SFX_ATTACKMISSED,
+	SFX_ATTACKLAUNCH,
 	SFX_DASH,
 	SFX_SKILL01,
 	SFX_SKILL02,
 	SFX_ULTIMATE,
 	SFX_DEATH,
+
+	SFX_U_ATTACK,
+	SFX_U_ATTACKLAUNCH,
+	SFX_U_DASH,
+	SFX_U_SKILL01,
+	SFX_U_SKILL02,
+	SFX_U_ULTIMATE,
+	SFX_U_DEATH,
 	TOTAL
 }
 
@@ -91,7 +99,7 @@ public class SoundManager : MonoBehaviour {
 	}
 
 	public float GetMusicVolume () {
-		return PlayerPrefs.GetFloat (musicVolumeSetting, 0.0f); // 0.7f too noisy
+		return PlayerPrefs.GetFloat (musicVolumeSetting, 1.0f);
 	}
 
 	public void SetMasterVolume (float value) {

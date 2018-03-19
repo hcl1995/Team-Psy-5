@@ -52,7 +52,7 @@ public class UnityChanSkillControl : PlayerControl
 					skill01CD.fillAmount = 1;
 					skill01Cooldown = skill01CooldownDuration;
 
-					soundEffect.PlaySFX(SFXAudioClipID.SFX_SKILL01);
+					soundEffect.PlaySFX(SFXAudioClipID.SFX_U_SKILL01);
 				}
 			}
 			else if (KeyBindingManager.GetKeyDown(KeyAction.Skill02))
@@ -64,7 +64,7 @@ public class UnityChanSkillControl : PlayerControl
 					skill02CD.fillAmount = 1;
 					skill02Cooldown = skill02CooldownDuration;
 
-					soundEffect.PlaySFX(SFXAudioClipID.SFX_SKILL02);
+					soundEffect.PlaySFX(SFXAudioClipID.SFX_U_SKILL02);
 				}
 			}
 			else if (KeyBindingManager.GetKeyDown(KeyAction.Ultimate))
@@ -110,7 +110,7 @@ public class UnityChanSkillControl : PlayerControl
 	{
 		ultimateObject.SetActive(true);
 		drillKickParticle.SetActive(true);
-		soundEffect.PlaySFX(SFXAudioClipID.SFX_ULTIMATE);
+		soundEffect.PlaySFX(SFXAudioClipID.SFX_U_ULTIMATE);
 	}
 
 	void UltimateNotActive()
