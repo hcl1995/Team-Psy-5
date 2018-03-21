@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 public class Attack : MonoBehaviour
 {
 	public GameObject impact;
+	public GameObject Gimpact;
 	public PlayerHealth selfHealth;
 	public PlayerControl selfControl;
 	public PlayerSkillControl selfPlayerSkill;
@@ -37,19 +38,19 @@ public class Attack : MonoBehaviour
 			if (other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> () != selfHealth) {
 				if (selfPlayerSkill == null)
 				{
-					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeDamage (damage,"DamageDown02",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position));
+					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeDamage (damage,"DamageDown02",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position), Gimpact);
 					AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
 				}
 				else if (selfPlayerSkill != null)
 				{
 					if (selfPlayerSkill.skill02Buffed == false)
 					{
-						other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeDamage (damage,"DamageDown02",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position));
+						other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeDamage (damage,"DamageDown02",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position), Gimpact);
 						AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
 					}
 					else if (selfPlayerSkill.skill02Buffed == true)
 					{
-						other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeDamage (damage * 1.5f,"DamageDown02",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position));
+						other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeDamage (damage * 1.5f,"DamageDown02",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position), Gimpact);
 						AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
 						selfPlayerSkill.skill02Buffed = false;
 					}

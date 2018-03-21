@@ -93,18 +93,20 @@ public class PlayerControl : NetworkBehaviour
 	bool callOnce;
 	bool toggleGuard = false;
 
-	Vector3 flyEndPos;
-	Vector3 flyStartPos;
+	Vector3 flyTargetPos;
+	float flySpeed;
 	public bool flying;
 	public bool seriouslyFlying;
 	public float flyDistance;
-	public float completeFlyTime;
-	public float flyLerpSpeed;
 
 	protected SoundEffect soundEffect;
 
+	Rigidbody rb;
+	Vector3 velocity = Vector3.zero;
+
 	protected void Awake()
 	{
+		rb = GetComponent<Rigidbody>();
 		soundEffect = GetComponent<SoundEffect>();
 		animation = GetComponent<Animator>();
 		trailRendererObject.transform.parent = null;
@@ -170,24 +172,22 @@ public class PlayerControl : NetworkBehaviour
 
 		if (flying)
 		{
-			flyStartPos = transform.position;
-			flyEndPos = transform.position += (-transform.forward * flyDistance);
-
+			flySpeed = flyDistance / 2.5f;
+			flyTargetPos = transform.position + (-transform.forward * flyDistance);
 			seriouslyFlying = true;
+			flying = false;
 		}
 
 		if (seriouslyFlying)
 		{
-			flying = false;
+			Vector3 direction = (flyTargetPos - transform.position).normalized;
+			controller.Move(direction * flySpeed * Time.deltaTime);
+			//rb.MovePosition(direction * flyLerpSpeed * Time.deltaTime);
+			//rb.MovePosition (Vector3.MoveTowards(transform.position, direction, flyLerpSpeed * Time.deltaTime));
 
-			completeFlyTime += (Time.deltaTime * flyLerpSpeed);
-			transform.position = Vector3.Lerp (flyStartPos, flyEndPos, completeFlyTime);
-		}
-
-		if (completeFlyTime >= 1)
-		{
-			seriouslyFlying = false;
-			completeFlyTime = 0;
+			// Doesn't Do Shit
+			//transform.position = Vector3.SmoothDamp (flyStartPos, flyEndPos, ref velocity, 0.3f);
+			// add force don't do shit also with no constraint
 		}
 
 		if (state == playerState.Normal)
@@ -317,9 +317,33 @@ public class PlayerControl : NetworkBehaviour
 
 	void Guard()
 	{
-		if (KeyBindingManager.GetKey(KeyAction.Guard))
+//		if (KeyBindingManager.GetKey(KeyAction.Guard))
+//		{
+//			if (state == PlayerControl.playerState.Normal) {
+//				//animation.SetBool("isMoving", false);
+//				RotateTowardMouseDuringAction();
+//				//animation.SetTrigger("Guard");
+//				if(!toggleGuard)
+//					CmdAnimation ("Guard");
+//				toggleGuard = true;
+//				animation.SetBool("Guarding", true);
+//				CmdSetPlayerState (PlayerControl.playerState.Guarding);
+//			}				
+//		}else if (state == PlayerControl.playerState.Guarding){
+//			//			if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
+//			//			{
+//			//animation.SetBool("isMoving", false);
+//			animation.SetBool("Guarding", false);
+//			CmdSetPlayerState (PlayerControl.playerState.Normal);
+//			toggleGuard = false;
+//			//}
+//		}
+
+
+		if (state == PlayerControl.playerState.Normal)
 		{
-			if (state == PlayerControl.playerState.Normal) {
+			if (KeyBindingManager.GetKey(KeyAction.Guard))
+			{
 				//animation.SetBool("isMoving", false);
 				RotateTowardMouseDuringAction();
 				//animation.SetTrigger("Guard");
@@ -330,13 +354,14 @@ public class PlayerControl : NetworkBehaviour
 				CmdSetPlayerState (PlayerControl.playerState.Guarding);
 			}				
 		}else if (state == PlayerControl.playerState.Guarding){
-			//			if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
-			//			{
+						if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
+						{
 			//animation.SetBool("isMoving", false);
 			animation.SetBool("Guarding", false);
 			CmdSetPlayerState (PlayerControl.playerState.Normal);
 			toggleGuard = false;
 			//}
+		}
 		}
 	}
 
@@ -421,7 +446,7 @@ public class PlayerControl : NetworkBehaviour
 	void Atk01Active()
 	{
 		attack01.SetActive(true);
-		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKMISSED);
+		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
 	}
 
 	void Atk01NotActive()
@@ -432,7 +457,7 @@ public class PlayerControl : NetworkBehaviour
 	void Atk02Active()
 	{
 		attack02.SetActive(true);
-		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKMISSED);
+		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
 	}
 
 	void Atk02NotActive()
@@ -443,12 +468,17 @@ public class PlayerControl : NetworkBehaviour
 	void Atk03Active()
 	{
 		attack03.SetActive(true);
-		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKMISSED);
+		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
 	}
 
 	void Atk03NotActive()
 	{
 		attack03.SetActive(false);
+	}
+
+	void SeriouslyFlyingNotActive()
+	{
+		seriouslyFlying = false;
 	}
 
 	void RestrictInput()
@@ -502,7 +532,7 @@ public class PlayerControl : NetworkBehaviour
 			particleGuard.SetActive(false);
 			if (callOnce == false)
 			{
-				animation.ResetTrigger("Attack");
+				animation.ResetTrigger("Attack01");
 				animation.ResetTrigger("Attack02");
 				animation.ResetTrigger("Attack03");
 				callOnce = true;

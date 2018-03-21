@@ -17,6 +17,8 @@ public class UnityChanSkill01 : NetworkBehaviour
 
 	public float damage = 10;
 
+	GameObject impact;
+
 	void OnEnable()
 	{
 		rb = GetComponent<Rigidbody>();
@@ -53,7 +55,7 @@ public class UnityChanSkill01 : NetworkBehaviour
 		if (other.gameObject.CompareTag("Player"))
 		{
 			//other.gameObject.GetComponent<Animator>().SetTrigger("Death");
-			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (damage, "DamageDown");
+			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (damage, "DamageDown", impact, other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position));
 			AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
 		}
 		NetworkServer.Destroy (transform.root.gameObject);

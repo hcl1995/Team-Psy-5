@@ -32,6 +32,19 @@ public class KeyBinding : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 	Event curEvent;
     bool isHovering = false; //used for mouse controls
 
+	void Awake()
+	{
+		buttonImage = button.GetComponent<Image>();
+		originalColor = buttonImage.color;
+		button.GetComponent<Button>().onClick.AddListener(() => ChangeKeyCode(true));
+	}
+
+	//Loads keycodes from player preferences
+	void OnEnable()
+	{
+		AssignKey();
+	}
+
 	//Changes in button behavior should be made here
 	void OnGUI()
 	{
@@ -41,8 +54,7 @@ public class KeyBinding : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         {
             keyCode = curEvent.keyCode;
             ChangeKeyCode(false);
-            UpdateKeyCode();
-            SaveKeyCode();
+			keyDisplay.text = keyCode.ToString();
         }
         //checks if mouse is pressed and assigns appropriate keycode
         else if (curEvent.isMouse && reassignKey && isHovering && allowMouseButtons)
@@ -54,8 +66,7 @@ public class KeyBinding : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 
             keyCode = mouseKeyCode;
             ChangeKeyCode(false);
-            UpdateKeyCode();
-            SaveKeyCode();
+			keyDisplay.text = keyCode.ToString();
         }
         //cancels binding if not hovering and mouse clicked
         else if(curEvent.isMouse && !isHovering)
@@ -74,16 +85,8 @@ public class KeyBinding : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         isHovering = false;
     }
 
-    //Initializes
-    void Awake()
-	{
-		buttonImage = button.GetComponent<Image>();
-		originalColor = buttonImage.color;
-		button.GetComponent<Button>().onClick.AddListener(() => ChangeKeyCode(true));
-	}
-
 	//Loads keycodes from player preferences
-	void OnEnable()
+	void AssignKey()
 	{
 		//Comment out this line it you want to allow multiple simultaneous assignments
 		KeyBinding.keyRemap += PreventDoubleAssign;
@@ -94,14 +97,11 @@ public class KeyBinding : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 		if(tempKey.ToString() == "None")
 		{
 			Debug.Log(keyCode.ToString());
-			keyDisplay.text = keyCode.ToString();	
-			UpdateKeyCode();
 			SaveKeyCode();
 		}
 		else
 		{	
 			keyCode = tempKey;
-			keyDisplay.text = keyCode.ToString();	
 			UpdateKeyCode();
 		}
 	}
@@ -130,9 +130,13 @@ public class KeyBinding : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 	//saves keycode to player prefs
 	public void SaveKeyCode()
 	{
-		keyDisplay.text = keyCode.ToString();
+		UpdateKeyCode();
 		PlayerPrefs.SetInt(keyAction.ToString(),(int)keyCode);
-		PlayerPrefs.Save();
+	}
+
+	public void ResetKeyCode()
+	{
+		AssignKey();
 	}
 
 	//Prevents user from remapping two keys at the same time
@@ -148,6 +152,7 @@ public class KeyBinding : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
 	//updates dictionary on key bindings manager
 	public void UpdateKeyCode()
 	{		
+		keyDisplay.text = keyCode.ToString();	
 		KeyBindingManager.UpdateDictionary(this);
 	}
 
