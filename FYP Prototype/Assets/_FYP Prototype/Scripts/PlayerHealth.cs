@@ -225,7 +225,7 @@ public class PlayerHealth : NetworkBehaviour {
 		// only server side do, so the kena hit look won't trigger in client
 		impactGO =  (GameObject)Instantiate (impact,colliderHit, Quaternion.identity);
 		NetworkServer.Spawn (impactGO);
-		Destroy (impactGO, 0.5f);
+		Destroy (impactGO, 1.5f);
 		transform.root.LookAt (position);
 		Vector3 eulerFucker = euler;
 		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);

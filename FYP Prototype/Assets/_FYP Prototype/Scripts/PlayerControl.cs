@@ -103,6 +103,8 @@ public class PlayerControl : NetworkBehaviour
 
 	Rigidbody rb;
 	Vector3 velocity = Vector3.zero;
+	public ParticleSystem resurrection;
+	public ParticleSystem deathParticle;
 
 	protected void Awake()
 	{
@@ -172,7 +174,7 @@ public class PlayerControl : NetworkBehaviour
 
 		if (flying)
 		{
-			flySpeed = flyDistance / 2.5f;
+			flySpeed = flyDistance / 1.5f;
 			flyTargetPos = transform.position + (-transform.forward * flyDistance);
 			seriouslyFlying = true;
 			flying = false;
@@ -516,6 +518,11 @@ public class PlayerControl : NetworkBehaviour
 		soundEffect.PlaySFX(SFXAudioClipID.SFX_DEATH);
 	}
 
+	void DeathParticleActive()
+	{
+		deathParticle.Play();
+	}
+
 	[Command]
 	void CmdSetActive()
 	{
@@ -529,7 +536,7 @@ public class PlayerControl : NetworkBehaviour
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Idle") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Run") ||
 			this.animation.GetCurrentAnimatorStateInfo(0).IsName("Dash") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting02"))
 		{
-			particleGuard.SetActive(false);
+			//particleGuard.SetActive(false);
 			if (callOnce == false)
 			{
 				animation.ResetTrigger("Attack01");
@@ -539,9 +546,9 @@ public class PlayerControl : NetworkBehaviour
 			}
 		}
 		if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Guard")) {
-			particleGuard.SetActive (true);
+			//particleGuard.SetActive (true);
 		} else {
-			particleGuard.SetActive(false);
+			//particleGuard.SetActive(false);
 		}
 	}
 		
@@ -635,14 +642,17 @@ public class PlayerControl : NetworkBehaviour
 	public void respawnNow(){
 		RpcRespwan ();
 		CmdAnimation ("Idle");
+
 		CmdInvincible(true);
 	}
 
 	[ClientRpc]
-	public void RpcRespwan(){		
+	public void RpcRespwan(){
 		transform.root.position = new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z);
 		transform.root.TransformPoint(new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z));
 		isFalling = false;
+		resurrection.Play();
+		Debug.Log("rpcrespawn");
 	}
 
 	[Command]

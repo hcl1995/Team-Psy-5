@@ -60,21 +60,23 @@ public class HealthManager : NetworkBehaviour {
 		player2Protrait.sprite = CharacterProtrait [player2Character];
 	}
 
-	public bool takeDamage(int playerNumber,float damage, PlayerControl playerControl){
+	public void takeDamage(int playerNumber,float damage, PlayerControl playerControl){
+		if (playerDead)
+			return;
 		if (!isServer)
-			return false;
-		if (playerNumber == 1) {			
-			player1HealthCurrent -= damage*3;
-			checkDeath (player1HealthCurrent,player1Life,playerControl,playerNumber);
+			return;
+		if (playerNumber == 1) {	
 			if (player1HealthCurrent <= 0)
-				return true;
-		} else if (playerNumber == 2) {			
-			player2HealthCurrent -= damage*3;
-			checkDeath (player2HealthCurrent,player2Life,playerControl,playerNumber);
+				return;
+			player1HealthCurrent -= damage;
+			checkDeath (player1HealthCurrent,player1Life,playerControl,playerNumber);
+		} else if (playerNumber == 2) {
 			if (player2HealthCurrent <= 0)
-				return true;
+				return;
+			player2HealthCurrent -= damage;
+			checkDeath (player2HealthCurrent,player2Life,playerControl,playerNumber);
+
 		}
-		return false;
 	}
 
 	void OnChangeHealth1 (float health)
@@ -125,6 +127,7 @@ public class HealthManager : NetworkBehaviour {
 
 	[Command]
 	void CmdMatchGame(int playerNumber){
+		RpcPlayThis ();
 		LobbyController.s_Singleton.checkPlayerConditionNew (playerNumber);
 	}
 
@@ -193,5 +196,10 @@ public class HealthManager : NetworkBehaviour {
 		} else if (playerNumber == 2) {
 			player2LifeNode [Life].SetActive (false);
 		}
+	}
+
+	[ClientRpc]
+	void RpcPlayThis(){
+		SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
 	}
 }

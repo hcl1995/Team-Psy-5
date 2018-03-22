@@ -17,14 +17,10 @@ public class LobbyController : NetworkManager {
 	public RectTransform LobbyPanel;
 	public RectTransform MatchPanel;
 	public RectTransform FindMatchPanel;
-	public Transform uiPlayer1;
-	public Transform uiPlayer2;
 	public GameObject uiWaiting;
 	public GameObject lobbyCanvas;
-	public RectTransform playerHealth1;
-	public RectTransform playerHealth2;
-	public Transform playerWin01;
-	public Transform playerWin02;
+
+
 
 	[Space]
 	public GameObject player1;
@@ -225,12 +221,14 @@ public class LobbyController : NetworkManager {
 		//base.ServerChangeScene ("Lobby");
 	}
 
-	public void checkPlayerConditionNew(int playerNumber){		
-			
+	public void checkPlayerConditionNew(int playerNumber){
 		foreach (GameObject go2 in playerNetwork) {
-			if (go2.GetComponent<PlayerNetwork> ().playerNumber == playerNumber) {
-					go2.GetComponent<PlayerNetwork> ().WinCount++;
-				}
+			if (go2.GetComponent<PlayerNetwork> ().playerNumber != playerNumber) {
+				go2.GetComponent<PlayerNetwork> ().WinCount++;
+				go2.GetComponent<PlayerNetwork> ().textInt = 1;
+			} else {
+				go2.GetComponent<PlayerNetwork> ().textInt = 2;
+			}
 		}			
 
 		foreach(GameObject go in playerChara) {
@@ -269,8 +267,11 @@ public class LobbyController : NetworkManager {
 	public IEnumerator serverChangeScene()
 	{
 		yield return new WaitForSeconds(5f);
-		SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
+		//SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
 		base.ServerChangeScene ("Lobby");
+		foreach (GameObject go in playerNetwork) {
+			go.GetComponent<PlayerNetwork> ().textInt = 0;
+		}
 	}
 
 //	[ClientRpc]

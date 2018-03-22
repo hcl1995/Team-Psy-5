@@ -2,11 +2,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SceneManagement;
 
 public class LevelEditor : NetworkBehaviour
 {
 	public Texture2D[] texture;
 	public ColorToPrefab[] colorMappings;
+	public GameObject Load;
+	[SyncVar(hook = "GetLoaded")]
+	public int intLoad = 0;
 
 	void Awake(){
 		foreach(ColorToPrefab colorMapping in colorMappings){
@@ -15,10 +19,13 @@ public class LevelEditor : NetworkBehaviour
 	}
 
 	void Start ()
-	{			
-		if (!isServer)
-			return;
-		GenerateLevel();
+	{	
+		CmdLoad ();
+		Time.timeScale = 0;
+		if (isServer) {
+			GenerateLevel();
+		}
+
 
 //		foreach (ColorToPrefab colorMapping in colorMappings)
 //		{
@@ -35,6 +42,7 @@ public class LevelEditor : NetworkBehaviour
 				GenerateLevel(x, z);
 			}
 		}
+		CmdLoad ();
 	}
 
 	void GenerateLevel(int x, int z)
@@ -77,5 +85,13 @@ public class LevelEditor : NetworkBehaviour
 				}
 			}
 		}
+	}
+
+	void GetLoaded(int i){
+		intLoad = i;
+	}
+
+	void CmdLoad(){
+		intLoad++;
 	}
 }

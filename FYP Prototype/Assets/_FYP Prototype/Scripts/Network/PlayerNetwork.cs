@@ -14,9 +14,16 @@ public class PlayerNetwork : NetworkBehaviour {
 	public GameObject thisGO;
 	public GameObject playerCharacter;
 	public GameObject playerInfo;
+	public GameObject playerUI;
 	public Text winText;
-	public List<Transform> winLocation = new List<Transform>();
+	public GameObject player1win;
+	public GameObject player2win;
 
+	public Text endGameText;
+	public GameObject Canvas;
+
+	[SyncVar(hook = "GetEndGame")]
+	public int textInt = 0;
 	[SyncVar(hook = "GetPlayerWin")]
 	public int WinCount = 0;
 	[SyncVar(hook = "GetPlayerNumber")]
@@ -27,23 +34,24 @@ public class PlayerNetwork : NetworkBehaviour {
 	void Awake(){	
 		thisGO = gameObject;
 		DontDestroyOnLoad (gameObject);
-		winLocation.Add (LobbyController.s_Singleton.playerWin01);
-		winLocation.Add (LobbyController.s_Singleton.playerWin02);
 	}
 
 	void Start () {
+		if (isLocalPlayer) {
+			Canvas.SetActive (true);
+			CmdspawnPlayerInfo ();
+			SceneManager.activeSceneChanged += OnSceneChange;
+			startOnce++;
+		}
 		if (playerNumber == 1) {
-			transform.SetParent (winLocation [0]);
+			winText = player1win.GetComponent<Text> ();
 		} else {
-			transform.SetParent (winLocation [1]);
+			winText = player2win.GetComponent<Text> ();
 		}
 		transform.localPosition = Vector3.zero;
-		if (!isLocalPlayer)
-			return;
 		
-		CmdspawnPlayerInfo ();
-		SceneManager.activeSceneChanged += OnSceneChange;
-		startOnce++;
+
+
 	}
 	public void Initialize(NetworkConnection conn, short playerControllerId, int playerNumber){
 		this.conn = conn;
@@ -58,7 +66,9 @@ public class PlayerNetwork : NetworkBehaviour {
 		if (scene2.name == "LevelEditor") {
 			Debug.Log ("Is Me");
 			LobbyController.s_Singleton.lobbyCanvas.SetActive (false);
+
 			CmdSpawnCharacter ();
+		
 		}
 		if (scene2.name == "Lobby") {
 			LobbyController.s_Singleton.lobbyCanvas.SetActive (true);
@@ -66,19 +76,30 @@ public class PlayerNetwork : NetworkBehaviour {
 	}
 
 	void Update(){
-		transform.localPosition = Vector3.zero;
+		//transform.localPosition = Vector3.zero;
 		winText.text = "Win : " + WinCount;
+		switch (textInt) {
+		case 0:
+			endGameText.text = "";
+			break;
+		case 1:
+			endGameText.text = "You Win";
+			break;
+		case 2:
+			endGameText.text = "You Lose";
+			break;
+		}
 	}
 
 	[Command]
 	void CmdspawnPlayerInfo(){
 		GameObject go;
-		if (LobbyController.s_Singleton.uiPlayer1.GetComponentInChildren<NetworkIdentity> () == null) {
-			playerInfo = Instantiate (player1, Vector3.zero, Quaternion.identity);
+		if (playerNumber == 1) {
+			playerInfo = Instantiate (player1, LobbyController.s_Singleton.MatchPanel);
 			playerInfo.GetComponent<PlayerInfo> ().playerNetwork = thisGO;
 			NetworkServer.ReplacePlayerForConnection (conn, playerInfo,0);
 		} else {
-			playerInfo = Instantiate (player2, Vector3.zero, Quaternion.identity);
+			playerInfo = Instantiate (player2, LobbyController.s_Singleton.MatchPanel);
 			playerInfo.GetComponent<PlayerInfo> ().playerNetwork = thisGO;
 			NetworkServer.ReplacePlayerForConnection (conn, playerInfo,0);
 		}
@@ -104,5 +125,10 @@ public class PlayerNetwork : NetworkBehaviour {
 		print ("GetPlayerWin");
 		WinCount = i;
 		winText.text = "Win : " + i;
+	}
+
+	void GetEndGame(int i){
+		textInt = i;
+
 	}
 }
