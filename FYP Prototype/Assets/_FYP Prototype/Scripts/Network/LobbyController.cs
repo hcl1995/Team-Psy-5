@@ -19,8 +19,7 @@ public class LobbyController : NetworkManager {
 	public RectTransform FindMatchPanel;
 	public GameObject uiWaiting;
 	public GameObject lobbyCanvas;
-
-
+	public GameObject LoadingCanvas;
 
 	[Space]
 	public GameObject player1;
@@ -40,7 +39,7 @@ public class LobbyController : NetworkManager {
 	public List<Sprite> selectedCharacterSprite = new List<Sprite> ();
 
 	public CinemachineTargetGroup targetGroup;
-
+	public int isLoadScreenOn;
 	// Use this for initialization
 	void Start () {
 		s_Singleton = this;
@@ -137,6 +136,23 @@ public class LobbyController : NetworkManager {
 		base.StopClient ();
 	}
 
+	public void OnBackToMainMenu(){
+		base.ServerChangeScene ("Lobby");
+		changeTo (LobbyPanel);
+		base.StopHost();
+		base.StopClient ();
+		intPlayer = 0;
+	}
+
+	public void OnRematch(){
+		if (SceneManager.GetActiveScene().name == "LevelEditor") {
+			foreach (GameObject go in playerChara) {
+				NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerHealth>().pn.conn, go.GetComponent<PlayerHealth>().pn.playerInfo,0);
+			}
+			base.ServerChangeScene ("Lobby");
+			playerChara.Clear();
+		}
+	}
 
 	public override void OnServerAddPlayer(NetworkConnection conn, short playerControllerId, NetworkReader extraMessageReader)
 	{
@@ -170,12 +186,39 @@ public class LobbyController : NetworkManager {
 		readyPlayer++;
 		if (readyPlayer > 1) {
 			print ("All Ready");
+			PlayerInfo.singleton.RpcEnableLoading ();
+
+			readyPlayer = 0;
+		}
+	}
+	public void PlayerUnready(){
+		readyPlayer--;
+	}
+	public void allLoadScreenOn(){
+		isLoadScreenOn++;
+		if (isLoadScreenOn == 2) {
 			base.ServerChangeScene ("LevelEditor");
 			foreach (GameObject go in playerNetwork) {
 				NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerNetwork> ().conn, go, 0);
 			}
-			readyPlayer = 0;
+			isLoadScreenOn = 0;
 		}
+	}
+
+	public int loadReady;
+	public void allLoadEnterReady(){
+		loadReady++;
+		if (loadReady == 2) {
+			PlayerNetwork.singleton.RpcDisableLoad ();
+			loadReady = 0;
+			//StartCoroutine (StartMatchCountDown ());
+			SpawnCharacter ();
+		}
+	}
+
+	public IEnumerator StartMatchCountDown(){
+		yield return new WaitForSeconds(3.0f);
+		SpawnCharacter ();
 	}
 
 	public void SpawnCharacter(){
@@ -197,29 +240,9 @@ public class LobbyController : NetworkManager {
 
 	}
 
-	public void PlayerUnready(){
-		readyPlayer--;
-	}
 
-	public void checkPlayerCondition(){
-		foreach (GameObject go in playerChara) {
-			if (go.GetComponent<PlayerHealth> ().currentHealth > 0) {
-				foreach (GameObject go2 in playerNetwork) {
-					if (go2.GetComponent<PlayerNetwork> ().playerNumber == go.GetComponent<PlayerHealth> ().playerNumber) {
-						go2.GetComponent<PlayerNetwork> ().WinCount++;
-					}
-				}
-			} else {
 
-			}
-		}
-		foreach (GameObject go in playerChara) {
-			NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerHealth>().pn.conn, go.GetComponent<PlayerHealth>().pn.playerInfo,0);
-		}
-		playerChara = new List<GameObject> ();
-		StartCoroutine(serverChangeScene());
-		//base.ServerChangeScene ("Lobby");
-	}
+
 
 	public void checkPlayerConditionNew(int playerNumber){
 		foreach (GameObject go2 in playerNetwork) {
@@ -254,10 +277,12 @@ public class LobbyController : NetworkManager {
 		if (playerNumber == 1) {
 			player1Character = playerCharacterSelector[playerCharacter];
 			player1CharaterProtrait = playerCharacter;
+			LocalPlayerInfo.singleton.player1 = playerCharacter;
 
-		} else {
+		} else if(playerNumber==2){
 			player2Character = playerCharacterSelector[playerCharacter];
 			player2CharaterProtrait = playerCharacter;
+			LocalPlayerInfo.singleton.player2 = playerCharacter;
 		}
 
 		//RpcCharacterProtrait (playerCharacter, playerNumber);

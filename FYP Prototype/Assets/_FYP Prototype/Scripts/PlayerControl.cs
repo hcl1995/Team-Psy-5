@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 
 public class PlayerControl : NetworkBehaviour
 {
+	static public PlayerControl singleton;
 	Vector3 targetDirection;
 	float rotationSpeed = 30;
 
@@ -118,6 +119,7 @@ public class PlayerControl : NetworkBehaviour
 		dashCharge = maxDashChargeCount;
 		if (isLocalPlayer){
 			playerCanvas.SetActive (true);
+			singleton = this;
 		}
 		startSpawnPosition = gameObject.transform.root.position;
 	}
@@ -532,7 +534,7 @@ public class PlayerControl : NetworkBehaviour
 			particleGuard.SetActive(false);
 			if (callOnce == false)
 			{
-				animation.ResetTrigger("Attack01");
+				animation.ResetTrigger("Attack");
 				animation.ResetTrigger("Attack02");
 				animation.ResetTrigger("Attack03");
 				callOnce = true;
@@ -660,5 +662,10 @@ public class PlayerControl : NetworkBehaviour
 	[ClientRpc]
 	void RpcBlinkCharacter(bool b){
 		CharaterModel.SetActive (b);
+	}
+
+	[Command]
+	public void CmdRematch(){
+		LobbyController.s_Singleton.OnRematch ();
 	}
 }

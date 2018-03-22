@@ -261,10 +261,7 @@ public class PlayerHealth : NetworkBehaviour {
 	}
 
 
-	[Command]
-	public void CmdLose(){
-		LobbyController.s_Singleton.checkPlayerCondition ();
-	}
+
 
 	void OnDestroy(){
 		NetworkServer.Destroy (impactGO);

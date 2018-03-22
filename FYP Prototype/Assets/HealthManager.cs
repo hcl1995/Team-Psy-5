@@ -127,7 +127,6 @@ public class HealthManager : NetworkBehaviour {
 
 	[Command]
 	void CmdMatchGame(int playerNumber){
-		RpcPlayThis ();
 		LobbyController.s_Singleton.checkPlayerConditionNew (playerNumber);
 	}
 
