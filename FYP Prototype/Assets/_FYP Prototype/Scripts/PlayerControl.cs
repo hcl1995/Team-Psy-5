@@ -104,6 +104,8 @@ public class PlayerControl : NetworkBehaviour
 
 	Rigidbody rb;
 	Vector3 velocity = Vector3.zero;
+	public ParticleSystem resurrection;
+	public ParticleSystem deathParticle;
 
 	protected void Awake()
 	{
@@ -517,7 +519,10 @@ public class PlayerControl : NetworkBehaviour
 		CmdAnimation ("Death");
 		soundEffect.PlaySFX(SFXAudioClipID.SFX_DEATH);
 	}
-
+	void DeathParticleActive()
+	{
+		deathParticle.Play();
+	}
 	[Command]
 	void CmdSetActive()
 	{
@@ -645,6 +650,7 @@ public class PlayerControl : NetworkBehaviour
 		transform.root.position = new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z);
 		transform.root.TransformPoint(new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z));
 		isFalling = false;
+		resurrection.Play();
 	}
 
 	[Command]
