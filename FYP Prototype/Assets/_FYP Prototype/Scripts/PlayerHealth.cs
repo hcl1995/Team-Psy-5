@@ -15,6 +15,7 @@ public class PlayerHealth : NetworkBehaviour {
 	public PlayerNetwork pn;
 	public Animator anim;
 	GameObject impactGO;
+	public GameObject superGuard;
 	public hitIndicator hitIndicator;
 	float previousHealth = maxHealth;
 	public bool harzardDamageCD = false;
@@ -98,6 +99,7 @@ public class PlayerHealth : NetworkBehaviour {
 		}
 		if (playerControl.state == PlayerControl.playerState.Guarding) {
 			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
+			playerControl.soundEffect.PlaySFXClip(playerControl.soundEffect.selfServiceClip[1]);
 
 			impactGO =  (GameObject)Instantiate (guardImpact, position, Quaternion.identity);
 			NetworkServer.Spawn (impactGO);
@@ -168,6 +170,7 @@ public class PlayerHealth : NetworkBehaviour {
 		if (harzardDamageCD)
 			return;
 		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
+		playerControl.soundEffect.PlaySFXClip(playerControl.soundEffect.selfServiceClip[12]);
 //		harzardDamageCD = true;
 //		StartCoroutine(hazardCoolDown());
 		//CmdHit ();
@@ -182,6 +185,7 @@ public class PlayerHealth : NetworkBehaviour {
 		}
 		if (playerControl.state == PlayerControl.playerState.Guarding) {
 			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
+			playerControl.soundEffect.PlaySFXClip(playerControl.soundEffect.selfServiceClip[1]);
 
 			impactGO =  (GameObject)Instantiate (guardImpact, position, Quaternion.identity);
 			NetworkServer.Spawn (impactGO);
@@ -210,14 +214,15 @@ public class PlayerHealth : NetworkBehaviour {
 		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
 			return;
 		}
-		if (playerControl.state == PlayerControl.playerState.Guarding) {
-			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
-		}
-		else {
+//		if (playerControl.state == PlayerControl.playerState.Guarding) {
+//			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
+//			playerControl.soundEffect.PlaySFXClip(playerControl.soundEffect.selfServiceClip[1]);
+//		}
+//		else {
 			HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
 			//CmdKnockBack (KnockPos);
 			CmdAnimation (animation);
-		}
+		//}
 		//CmdHit ();
 
 		//isKnockback = true;
@@ -225,7 +230,7 @@ public class PlayerHealth : NetworkBehaviour {
 		// only server side do, so the kena hit look won't trigger in client
 		impactGO =  (GameObject)Instantiate (impact,colliderHit, Quaternion.identity);
 		NetworkServer.Spawn (impactGO);
-		Destroy (impactGO, 1.5f);
+		Destroy (impactGO, 0.5f);
 		transform.root.LookAt (position);
 		Vector3 eulerFucker = euler;
 		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
@@ -257,14 +262,12 @@ public class PlayerHealth : NetworkBehaviour {
 		if (other.gameObject.CompareTag("OutOfBoundDeathZone"))
 		{
 			HealthManager.singleton.takeDamage (playerNumber, 200,playerControl);
+			playerControl.soundEffect.PlaySFXClip(playerControl.soundEffect.selfServiceClip[5]);
 		}
 	}
 
 
-	[Command]
-	public void CmdLose(){
-		LobbyController.s_Singleton.checkPlayerCondition ();
-	}
+
 
 	void OnDestroy(){
 		NetworkServer.Destroy (impactGO);

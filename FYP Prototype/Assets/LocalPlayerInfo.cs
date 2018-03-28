@@ -1,18 +1,38 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class LocalPlayerInfo : MonoBehaviour {
 
 	static public LocalPlayerInfo singleton; 
 	public int playerNum = 0;
+	public int player1;
+	public int player2;
 	// Use this for initialization
 	void Start () {
-		singleton = this;
+		DontDestroyOnLoad (gameObject);
+		if (singleton == null) {
+			singleton = this;
+		} else {
+			DestroyObject (gameObject);
+		}
+
 		//DontDestroyOnLoad(transform.gameObject);
 	}
 
 	public void assginPlayerNumber(int playerNumber){
 		playerNum = playerNumber;
+	}
+
+	//[ClientRpc]
+	public void enableLoading(){
+		LobbyController.s_Singleton.LoadingCanvas.SetActive (true);
+		Time.timeScale = 0;
+	}
+
+	public void disableLoading(){
+		LobbyController.s_Singleton.LoadingCanvas.SetActive (false);
+		Time.timeScale = 1.0f;
 	}
 }

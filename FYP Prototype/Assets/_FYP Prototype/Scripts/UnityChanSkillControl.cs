@@ -9,6 +9,7 @@ public class UnityChanSkillControl : PlayerControl
 	[Header("Skill01")]
 	public GameObject projectile;
 	public Transform skill01SpawnPoint;
+	public ParticleSystem skill01ParticleEffect;
 
 
 	[Header("Skill02")]
@@ -52,7 +53,8 @@ public class UnityChanSkillControl : PlayerControl
 					skill01CD.fillAmount = 1;
 					skill01Cooldown = skill01CooldownDuration;
 
-					soundEffect.PlaySFX(SFXAudioClipID.SFX_U_SKILL01);
+					//soundEffect.PlaySFX(SFXAudioClipID.SFX_U_SKILL01);
+					soundEffect.PlaySFXClip(soundEffect.selfServiceClip[7]);
 				}
 			}
 			else if (KeyBindingManager.GetKeyDown(KeyAction.Skill02))
@@ -64,7 +66,8 @@ public class UnityChanSkillControl : PlayerControl
 					skill02CD.fillAmount = 1;
 					skill02Cooldown = skill02CooldownDuration;
 
-					soundEffect.PlaySFX(SFXAudioClipID.SFX_U_SKILL02);
+					//soundEffect.PlaySFX(SFXAudioClipID.SFX_U_SKILL02);
+					soundEffect.PlaySFXClip(soundEffect.selfServiceClip[9]);
 				}
 			}
 			else if (KeyBindingManager.GetKeyDown(KeyAction.Ultimate))
@@ -82,6 +85,7 @@ public class UnityChanSkillControl : PlayerControl
 
 					ultimateCD.fillAmount = 1;
 					ultimateCooldown = ultimateCooldownDuration;
+					soundEffect.PlaySFXClip(soundEffect.selfServiceClip[10]);
 				}
 			}
 		}
@@ -101,6 +105,23 @@ public class UnityChanSkillControl : PlayerControl
 //		}
 	}
 		
+	void Skill01Casting()
+	{
+		CmdSkill01PlayParticle();
+	}
+
+	[Command]
+	void CmdSkill01PlayParticle()
+	{
+		RpcSkill01PlayParticle();
+	}
+
+	[ClientRpc]
+	void RpcSkill01PlayParticle()
+	{
+		skill01ParticleEffect.Play();
+	}
+
 	void Skill02Active()
 	{
 		skill02Object.SetActive(true);
@@ -110,7 +131,8 @@ public class UnityChanSkillControl : PlayerControl
 	{
 		ultimateObject.SetActive(true);
 		drillKickParticle.SetActive(true);
-		soundEffect.PlaySFX(SFXAudioClipID.SFX_U_ULTIMATE);
+		//soundEffect.PlaySFX(SFXAudioClipID.SFX_U_ULTIMATE);
+		soundEffect.PlaySFXClip(soundEffect.selfServiceClip[10]);
 	}
 
 	void UltimateNotActive()

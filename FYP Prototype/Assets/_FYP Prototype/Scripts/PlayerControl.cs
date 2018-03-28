@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 
 public class PlayerControl : NetworkBehaviour
 {
+	static public PlayerControl singleton;
 	Vector3 targetDirection;
 	float rotationSpeed = 30;
 
@@ -61,7 +62,7 @@ public class PlayerControl : NetworkBehaviour
 	[Header("Drag & Drop")]
 	public GameObject playerCanvas;
 	public GameObject trailRendererObject;
-	public GameObject particleGuard;
+	//public GameObject particleGuard;
 	public GameObject CharaterModel;
 
 	[Header("Observer")]
@@ -99,7 +100,7 @@ public class PlayerControl : NetworkBehaviour
 	public bool seriouslyFlying;
 	public float flyDistance;
 
-	protected SoundEffect soundEffect;
+	public SoundEffect soundEffect;
 
 	Rigidbody rb;
 	Vector3 velocity = Vector3.zero;
@@ -120,6 +121,7 @@ public class PlayerControl : NetworkBehaviour
 		dashCharge = maxDashChargeCount;
 		if (isLocalPlayer){
 			playerCanvas.SetActive (true);
+			singleton = this;
 		}
 		startSpawnPosition = gameObject.transform.root.position;
 	}
@@ -174,7 +176,7 @@ public class PlayerControl : NetworkBehaviour
 
 		if (flying)
 		{
-			flySpeed = flyDistance / 1.5f;
+			flySpeed = flyDistance / 2.5f;
 			flyTargetPos = transform.position + (-transform.forward * flyDistance);
 			seriouslyFlying = true;
 			flying = false;
@@ -243,7 +245,8 @@ public class PlayerControl : NetworkBehaviour
 					dashCharge--;
 					dashChargeCooldown += dashChargeCooldownDuration;
 
-					soundEffect.PlaySFX(SFXAudioClipID.SFX_DASH);
+					//soundEffect.PlaySFX(SFXAudioClipID.SFX_DASH);
+					soundEffect.PlaySFXClip(soundEffect.selfServiceClip[3]);
 				}
 			}
 		}
@@ -330,6 +333,7 @@ public class PlayerControl : NetworkBehaviour
 //				toggleGuard = true;
 //				animation.SetBool("Guarding", true);
 //				CmdSetPlayerState (PlayerControl.playerState.Guarding);
+//				soundEffect.PlaySFXClip(soundEffect.selfServiceClip[6]);
 //			}				
 //		}else if (state == PlayerControl.playerState.Guarding){
 //			//			if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
@@ -354,6 +358,7 @@ public class PlayerControl : NetworkBehaviour
 				toggleGuard = true;
 				animation.SetBool("Guarding", true);
 				CmdSetPlayerState (PlayerControl.playerState.Guarding);
+				soundEffect.PlaySFXClip(soundEffect.selfServiceClip[6]);
 			}				
 		}else if (state == PlayerControl.playerState.Guarding){
 						if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
@@ -448,7 +453,8 @@ public class PlayerControl : NetworkBehaviour
 	void Atk01Active()
 	{
 		attack01.SetActive(true);
-		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
+		//soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
+		soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 	}
 
 	void Atk01NotActive()
@@ -459,7 +465,8 @@ public class PlayerControl : NetworkBehaviour
 	void Atk02Active()
 	{
 		attack02.SetActive(true);
-		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
+		//soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
+		soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 	}
 
 	void Atk02NotActive()
@@ -470,7 +477,8 @@ public class PlayerControl : NetworkBehaviour
 	void Atk03Active()
 	{
 		attack03.SetActive(true);
-		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
+		//soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
+		soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 	}
 
 	void Atk03NotActive()
@@ -515,14 +523,16 @@ public class PlayerControl : NetworkBehaviour
 
 	public void playDeathAnim(){
 		CmdAnimation ("Death");
-		soundEffect.PlaySFX(SFXAudioClipID.SFX_DEATH);
+		//soundEffect.PlaySFX(SFXAudioClipID.SFX_DEATH);
+		if (isFalling == false)
+		{
+			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[4]);
+		}
 	}
-
 	void DeathParticleActive()
 	{
 		deathParticle.Play();
 	}
-
 	[Command]
 	void CmdSetActive()
 	{
@@ -539,17 +549,17 @@ public class PlayerControl : NetworkBehaviour
 			//particleGuard.SetActive(false);
 			if (callOnce == false)
 			{
-				animation.ResetTrigger("Attack01");
+				animation.ResetTrigger("Attack");
 				animation.ResetTrigger("Attack02");
 				animation.ResetTrigger("Attack03");
 				callOnce = true;
 			}
 		}
-		if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Guard")) {
-			//particleGuard.SetActive (true);
-		} else {
-			//particleGuard.SetActive(false);
-		}
+//		if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Guard")) {
+//			particleGuard.SetActive (true);
+//		} else {
+//			particleGuard.SetActive(false);
+//		}
 	}
 		
 	[Command]
@@ -642,17 +652,15 @@ public class PlayerControl : NetworkBehaviour
 	public void respawnNow(){
 		RpcRespwan ();
 		CmdAnimation ("Idle");
-
 		CmdInvincible(true);
 	}
 
 	[ClientRpc]
-	public void RpcRespwan(){
+	public void RpcRespwan(){		
 		transform.root.position = new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z);
 		transform.root.TransformPoint(new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z));
 		isFalling = false;
 		resurrection.Play();
-		Debug.Log("rpcrespawn");
 	}
 
 	[Command]
@@ -670,5 +678,10 @@ public class PlayerControl : NetworkBehaviour
 	[ClientRpc]
 	void RpcBlinkCharacter(bool b){
 		CharaterModel.SetActive (b);
+	}
+
+	[Command]
+	public void CmdRematch(){
+		LobbyController.s_Singleton.OnRematch ();
 	}
 }

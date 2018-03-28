@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 
 public class PlayerNetwork : NetworkBehaviour {
 
+	static public PlayerNetwork singleton; 
 	public NetworkConnection conn;
 	public short playerControllerId;
 	public GameObject player1;
@@ -38,6 +39,7 @@ public class PlayerNetwork : NetworkBehaviour {
 
 	void Start () {
 		if (isLocalPlayer) {
+			singleton = this;
 			Canvas.SetActive (true);
 			CmdspawnPlayerInfo ();
 			SceneManager.activeSceneChanged += OnSceneChange;
@@ -67,7 +69,7 @@ public class PlayerNetwork : NetworkBehaviour {
 			Debug.Log ("Is Me");
 			LobbyController.s_Singleton.lobbyCanvas.SetActive (false);
 
-			CmdSpawnCharacter ();
+			//CmdSpawnCharacter ();
 		
 		}
 		if (scene2.name == "Lobby") {
@@ -130,5 +132,15 @@ public class PlayerNetwork : NetworkBehaviour {
 	void GetEndGame(int i){
 		textInt = i;
 
+	}
+
+	[Command]
+	public void CmdloadingOnEnterReady(){
+		LobbyController.s_Singleton.allLoadEnterReady ();
+	}
+
+	[ClientRpc]
+	public void RpcDisableLoad(){
+		LocalPlayerInfo.singleton.disableLoading ();
 	}
 }

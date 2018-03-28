@@ -17,10 +17,13 @@ public class UnityChanSkill01 : NetworkBehaviour
 
 	public float damage = 10;
 
-	GameObject impact;
+	public GameObject impact;
+
+	SoundEffect soundEffect;
 
 	void OnEnable()
 	{
+		soundEffect = GetComponent<SoundEffect>();
 		rb = GetComponent<Rigidbody>();
 		rb.velocity = transform.forward * projectileSpeed;
 
@@ -56,7 +59,8 @@ public class UnityChanSkill01 : NetworkBehaviour
 		{
 			//other.gameObject.GetComponent<Animator>().SetTrigger("Death");
 			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (damage, "DamageDown", impact, other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position));
-			AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+			//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 		}
 		NetworkServer.Destroy (transform.root.gameObject);
 		Destroy(transform.root.gameObject);

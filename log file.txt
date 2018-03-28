@@ -1,3 +1,13 @@
+Commit 30 (Mar 27, 2018)
+------------------------
+-Character collider fixed. (Merged)
+-Game input manager reset fixed. (Merged)
+-OngBak 1st skill removed bounce. (Merged)
+-KhaiLun breaking prop proposal (2nd hit break 3rd hit disappear) (Merged)
+-Unity Particles (Haven't test due to damage error)
+-Updated Sounds & Environment (Sound should be no problem)
+
+
 Commit 29 (Mar 27, 2018)
 ------------------------
 -Expanded size of level editor & assigned the props respectively

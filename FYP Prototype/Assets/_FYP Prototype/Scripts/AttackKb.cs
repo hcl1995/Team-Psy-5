@@ -45,12 +45,14 @@ public class AttackKb : MonoBehaviour
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flying = true;
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flyDistance = distance;
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeKnockbackDamage (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position), other, gImpact);
-					AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+					//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+					AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[2], other.transform.position);
 				}
 				else
 				{
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeKnockbackDamage (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position), other, gImpact);
-					AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+					//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+					AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[2], other.transform.position);
 				}
 				//other.transform.root.position += (transform.root.forward * distance);
 

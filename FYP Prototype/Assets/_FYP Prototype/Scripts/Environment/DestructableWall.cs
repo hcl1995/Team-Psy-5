@@ -31,7 +31,7 @@ public class DestructableWall : NetworkBehaviour
 
 	void PropChuiDiao()
 	{
-		if (health <= 0 && callOnce == false)
+		if (health <= 1 && callOnce == false)
 		{
 			//gameObject.GetComponent<MeshFilter>().mesh = destroyMesh;
 			RpcSetAnimation("Break");
@@ -41,6 +41,13 @@ public class DestructableWall : NetworkBehaviour
 			//			}
 			//m_Collider.enabled = !m_Collider.enabled;
 			callOnce = true;
+		}
+		if (health <= 0)
+		{
+			AudioSource.PlayClipAtPoint(soundEffect.selfServiceClip[1], transform.position);
+			//soundEffect.PlaySFXClip(soundEffect.selfServiceClip[1]);
+			Destroy(gameObject);
+			//Network.Destroy(gameObject);
 		}
 	}
 
@@ -67,7 +74,8 @@ public class DestructableWall : NetworkBehaviour
 			if (other.gameObject.CompareTag("Attack"))
 			{
 				health -= 1;
-				soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACK);
+				//soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACK);
+				soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 				RpcShowMeParticle();
 				//if(health<=0)
 				//Destroy(gameObject);		
@@ -80,7 +88,8 @@ public class DestructableWall : NetworkBehaviour
 			if (other.gameObject.CompareTag("Attack"))
 			{
 				health -= 1;
-				soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACK);
+				//soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACK);
+				soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 				RpcShowMeParticle();
 				//if(health<=0)
 				//Destroy(gameObject);

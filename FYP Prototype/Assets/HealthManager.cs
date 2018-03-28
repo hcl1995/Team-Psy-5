@@ -45,6 +45,7 @@ public class HealthManager : NetworkBehaviour {
 	// Use this for initialization
 	void Start () {
 		SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_INGAME);
+		SoundManager.instance.PlaySpecialBGM(BGMAudioClipID.BGM_AMBIENCE);
 
 		player1HealthCurrent = player1HealthMax;
 		player2HealthCurrent = player2HealthMax;
@@ -127,7 +128,6 @@ public class HealthManager : NetworkBehaviour {
 
 	[Command]
 	void CmdMatchGame(int playerNumber){
-		RpcPlayThis ();
 		LobbyController.s_Singleton.checkPlayerConditionNew (playerNumber);
 	}
 

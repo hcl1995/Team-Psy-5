@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class PlayerInfo : NetworkBehaviour {
+	static public PlayerInfo singleton; 
 	public List<Transform> infoLoction = new List<Transform>();
 	[SyncVar(hook="Ready")]
 	public bool ready = false;
@@ -14,6 +15,7 @@ public class PlayerInfo : NetworkBehaviour {
 	public GameObject playerNetwork;
 	public GameObject localPlayerIndicator;
 	public GameObject readyIndicator;
+	[SyncVar]
 	public int playerCharacter;
 	public GameObject CharaterSelector;
 	[SyncVar(hook="SelectedCharacter")]
@@ -26,23 +28,17 @@ public class PlayerInfo : NetworkBehaviour {
 	void OnEnable(){
 		ready = false;
 		buttonImage.color = Color.red;
+		SoundManager.instance.PlayBGM (BGMAudioClipID.BGM_IMMORTALSELECTION);
 	}
 	void Awake(){
 		rt = (RectTransform)transform;
 	}
 	void Start () {
-		//		infoLoction.Add(LobbyController.s_Singleton.uiPlayer1);
-		//		infoLoction.Add(LobbyController.s_Singleton.uiPlayer2);
-		//		if (LobbyController.s_Singleton.uiPlayer1.GetComponentInChildren<NetworkIdentity> () == null) {
 		rt.SetParent (LobbyController.s_Singleton.MatchPanel.transform,false);
-		//			transform.localPosition = Vector3.zero;
-		//		} else {
-		//			transform.SetParent (infoLoction [1]);
-		//			transform.localPosition = Vector3.zero;
-		//		}
+
 		if (isLocalPlayer) {
 			SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
-
+			singleton = this;
 			localPlayerIndicator.SetActive (true);
 			CharaterSelector.SetActive (true);
 			readyButton.SetActive (true);
@@ -118,6 +114,7 @@ public class PlayerInfo : NetworkBehaviour {
 	void CmdSetSelectCharacter(int character,int playerNumber){
 		selectedCharacterInt = LobbyController.s_Singleton.SetPlayerCharacter (character, playerNumber);
 		//selectedCharacterInt = character;
+		playerCharacter = character;
 	}
 	[Command]
 	void CmdSetPlayerNumber(int i){
@@ -147,5 +144,29 @@ public class PlayerInfo : NetworkBehaviour {
 		if (scene2.name == "Main02") {
 			//NetworkServer.ReplacePlayerForConnection (playerNetwork.GetComponent<PlayerNetwork> ().conn, playerNetwork, 0);
 		}
+	}
+
+	[ClientRpc]
+	public void RpcEnableLoading(){
+		LocalPlayerInfo.singleton.enableLoading ();
+	}
+
+	[Command]
+	public void CmdLoadScreenOn(){
+		LobbyController.s_Singleton.allLoadScreenOn ();
+	}
+	[ClientRpc]
+	public void RpcPlayThisBGM(BGMAudioClipID bgm){
+		SoundManager.instance.PlayBGM (bgm);
+	}
+
+	[Command]
+	public void CmdPlayhisBGM(BGMAudioClipID bgm){
+		RpcPlayThisBGM(bgm);
+	}
+
+	public void PlayhisBGM(BGMAudioClipID bgm){
+		if(isServer)
+			CmdPlayhisBGM(bgm);
 	}
 }

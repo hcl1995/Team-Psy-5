@@ -27,17 +27,14 @@ public class BulletSkill : NetworkBehaviour
 
 	public GameObject impact;
 
-	//PlayerSkillControl playerSkillControl;
-
-//	void Awake()
-//	{
-//		playerSkillControl = GetComponent<PlayerSkillControl>();
-//	}
+	SoundEffect soundEffect;
+	
 
 	void OnEnable()
 	{
 		//playerSkillControl = transform.parent.GetComponent<PlayerSkillControl>();
 
+		soundEffect = GetComponent<SoundEffect>();
 		rb = GetComponent<Rigidbody>();
 		initialVelocity = transform.forward * projectileSpeed;
 		rb.velocity = initialVelocity;
@@ -64,29 +61,61 @@ public class BulletSkill : NetworkBehaviour
 		}
 	}
 
-	void OnCollisionEnter(Collision other)
+//	void OnCollisionEnter(Collision other)
+//	{
+//		bounceLimit++;
+//
+//		// OnCollision way to look.
+//		Vector3 dir = other.contacts[0].point - transform.position;
+//		dir = dir.normalized;
+//		//dir = -dir.normalized;
+//
+//		if (other.gameObject.CompareTag("Player"))
+//		{
+//			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (damage,"DamageDown", impact, other.transform.position);
+//			//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+//			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
+//
+//			if (maxCharge)
+//			{
+//				other.gameObject.transform.root.position += (gameObject.transform.root.forward * distance);
+//			}
+//			// For Bounce
+////			NetworkServer.Destroy (gameObject);
+////			Destroy(gameObject);
+//		}
+//		NetworkServer.Destroy (gameObject);
+//		Destroy(gameObject);
+//		//Bounce(other.contacts[0].normal);
+//	}
+
+	void OnTriggerEnter(Collider other)
 	{
 		bounceLimit++;
 
 		// OnCollision way to look.
-		Vector3 dir = other.contacts[0].point - transform.position;
-		dir = dir.normalized;
+		//Vector3 dir = other.contacts[0].point - transform.position;
+		//Vector3 dir = other.ClosestPointOnBounds(transform.position);
+		//dir = dir.normalized;
 		//dir = -dir.normalized;
 
 		if (other.gameObject.CompareTag("Player"))
 		{
 			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (damage,"DamageDown", impact, other.transform.position);
-			AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+			//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 
 			if (maxCharge)
 			{
 				other.gameObject.transform.root.position += (gameObject.transform.root.forward * distance);
 			}
-
-			NetworkServer.Destroy (gameObject);
-			Destroy(gameObject);
+			// For Bounce
+			//			NetworkServer.Destroy (gameObject);
+			//			Destroy(gameObject);
 		}
-		Bounce(other.contacts[0].normal);
+		//NetworkServer.Destroy (gameObject);
+		Destroy(gameObject);
+		//Bounce(other.contacts[0].normal);
 	}
 
 	void Bounce(Vector3 collisionNormal)
@@ -97,10 +126,8 @@ public class BulletSkill : NetworkBehaviour
 		var speed = initialVelocity.magnitude;
 		var direction = Vector3.Reflect(initialVelocity.normalized, collisionNormal);
 
-		//transform.rotation = Quaternion.LookRotation(direction);
-		rb.velocity = direction * Mathf.Max(speed, minVelocity);
 		transform.rotation = Quaternion.LookRotation(direction);
-		Debug.Log("Bounced"); // GG Bounce Liek Crazy
+		rb.velocity = direction * Mathf.Max(speed, minVelocity);
 	}
 
 	public void setMaxCharge(bool max){

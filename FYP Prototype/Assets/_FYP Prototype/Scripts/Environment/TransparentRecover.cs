@@ -29,23 +29,33 @@ public class TransparentRecover : NetworkBehaviour
 
 	void Update()
 	{
-		if (playerControl[0].inBetweenObjects.Contains(this.gameObject) || playerControl[1].inBetweenObjects.Contains(this.gameObject))
-		{
-			return;
-		}
-		else //if (!playerControl[0].inBetweenObjects.Contains(this.gameObject) && !playerControl[1].inBetweenObjects.Contains(this.gameObject))
-		{
-//			if(isServer)
-//				RpcRestoreAlpha();
-//			if(isLocalPlayer)
-//				CmdRestoreAlpha();
-			Color tempColor = rend.material.color;
-			if (tempColor.a < 1)
+		if (playerControl [0] == null || playerControl [1] == null) {
+			m_Players = GameObject.FindGameObjectsWithTag("Player");
+			// set the size beforehand WTF..
+			for (int i = 0; i < m_Players.Length; i++)
 			{
-				tempColor.a += fadeSpeed * Time.deltaTime;
-				rend.material.color = tempColor;
+				playerControl[i] = m_Players[i].GetComponent<PlayerControl>();
+			}
+		} else {
+			if (playerControl[0].inBetweenObjects.Contains(this.gameObject) || playerControl[1].inBetweenObjects.Contains(this.gameObject))
+			{
+				return;
+			}
+			else //if (!playerControl[0].inBetweenObjects.Contains(this.gameObject) && !playerControl[1].inBetweenObjects.Contains(this.gameObject))
+			{
+				//			if(isServer)
+				//				RpcRestoreAlpha();
+				//			if(isLocalPlayer)
+				//				CmdRestoreAlpha();
+				Color tempColor = rend.material.color;
+				if (tempColor.a < 1)
+				{
+					tempColor.a += fadeSpeed * Time.deltaTime;
+					rend.material.color = tempColor;
+				}
 			}
 		}
+
 	}
 
 	[Command]
