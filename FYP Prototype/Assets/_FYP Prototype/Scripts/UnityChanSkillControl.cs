@@ -46,6 +46,7 @@ public class UnityChanSkillControl : PlayerControl
 			{
 				if (skill01Cooldown <= 0)
 				{
+					CmdSkill01PlayParticle();
 					CmdAnimation("Bullet");
 					RotateTowardMouseDuringAction();
 					CmdSkill01 (skill01SpawnPoint.position, skill01SpawnPoint.rotation);
@@ -105,10 +106,10 @@ public class UnityChanSkillControl : PlayerControl
 //		}
 	}
 		
-	void Skill01Casting()
-	{
-		CmdSkill01PlayParticle();
-	}
+//	void Skill01Casting()
+//	{
+//		CmdSkill01PlayParticle();
+//	}
 
 	[Command]
 	void CmdSkill01PlayParticle()

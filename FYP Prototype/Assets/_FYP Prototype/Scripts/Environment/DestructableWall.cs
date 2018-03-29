@@ -11,7 +11,7 @@ public class DestructableWall : NetworkBehaviour
 	public float health = 3;
 
 	Animator animation;
-	SoundEffect soundEffect;
+	protected SoundEffect soundEffect;
 
 	public Collider[] m_Collider;
 
@@ -68,20 +68,20 @@ public class DestructableWall : NetworkBehaviour
 	//		}
 	//	}
 
-	void OnCollisionEnter(Collision other)
-	{
-		if (isServer) {
-			if (other.gameObject.CompareTag("Attack"))
-			{
-				health -= 1;
-				//soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACK);
-				soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
-				RpcShowMeParticle();
-				//if(health<=0)
-				//Destroy(gameObject);		
-			}
-		}
-	}
+//	void OnCollisionEnter(Collision other)
+//	{
+//		if (isServer) {
+//			if (other.gameObject.CompareTag("Attack"))
+//			{
+//				health -= 1;
+//				//soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACK);
+//				soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
+//				RpcShowMeParticle();
+//				//if(health<=0)
+//				//Destroy(gameObject);		
+//			}
+//		}
+//	}
 
 	void OnTriggerEnter(Collider other){
 		if (isServer) {

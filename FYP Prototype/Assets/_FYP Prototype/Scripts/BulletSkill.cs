@@ -102,8 +102,8 @@ public class BulletSkill : NetworkBehaviour
 		if (other.gameObject.CompareTag("Player"))
 		{
 			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (damage,"DamageDown", impact, other.transform.position);
-			//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
-			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
+			AudioSource.PlayClipAtPoint(soundEffect.selfServiceClip[0], other.transform.position);
+			//soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 
 			if (maxCharge)
 			{

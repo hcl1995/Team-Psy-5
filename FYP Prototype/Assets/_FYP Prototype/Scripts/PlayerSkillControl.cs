@@ -146,24 +146,24 @@ public class PlayerSkillControl : PlayerControl
 		fillCharge.fillAmount = 0;
 	}
 
-	void Skill01ShootEffect()
-	{
-		CmdSkill01PlayParticle();
-	}
+//	void Skill01ShootEffect()
+//	{
+//		CmdSkill01PlayParticle();
+//	}
 
 	void Skill01NotCasting()
 	{
 		CmdSkill01StopParticle();
 	}
 
-	void UltiAcitve()
+	void UltiActive()
 	{
 		ultiAttack.SetActive(true);
 		//soundEffect.PlaySFX(SFXAudioClipID.SFX_ULTIMATE);
 		soundEffect.PlaySFXClip(soundEffect.selfServiceClip[10]);
 	}
 
-	void UltiNotAcitve()
+	void UltiNotActive()
 	{
 		ultiAttack.SetActive(false);
 	}

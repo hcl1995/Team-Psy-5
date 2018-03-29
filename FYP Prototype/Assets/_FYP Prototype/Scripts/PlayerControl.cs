@@ -18,6 +18,7 @@ public class PlayerControl : NetworkBehaviour
 	public float gravity;
 	Vector3 moveDirection = Vector3.zero;
 	public float dashDistance;
+	public bool dashThrough = true;
 
 	int dashCount;
 	int dashCharge;
@@ -106,6 +107,7 @@ public class PlayerControl : NetworkBehaviour
 	Vector3 velocity = Vector3.zero;
 	public ParticleSystem resurrection;
 	public ParticleSystem deathParticle;
+
 
 	protected void Awake()
 	{
@@ -235,6 +237,14 @@ public class PlayerControl : NetworkBehaviour
 			{
 				if (dashCharge > 0)
 				{
+					if (dashThrough)
+					{
+						dashDistance = 1.75f;	
+					}
+					else{
+						dashDistance = 0;
+					}
+
 					dashStartPos = transform.position;
 					dashEndPos = transform.position += (transform.forward * dashDistance);
 
@@ -593,12 +603,28 @@ public class PlayerControl : NetworkBehaviour
 		{
 			isFalling = true;
 		}
+
+		if (other.gameObject.CompareTag("NoDashThrough") || other.gameObject.CompareTag("Player"))
+		{
+			dashThrough = false;
+		}
 	}
 
-	void OnControllerColliderHit(ControllerColliderHit hit)
+	void OnTriggerExit(Collider other)
 	{
-		
+		if (other.gameObject.CompareTag("NoDashThrough") || other.gameObject.CompareTag("Player"))
+		{
+			dashThrough = true;
+		}
 	}
+
+//	void OnControllerColliderHit(ControllerColliderHit hit)
+//	{
+//		if (hit.gameObject.CompareTag("NoDashThrough") || hit.gameObject.CompareTag("Player"))
+//		{
+//			dashThrough = false;
+//		}
+//	}
 
 	[Command]
 	void CmdTransparentObjects()

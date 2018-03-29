@@ -5,6 +5,8 @@ using UnityEngine.Networking;
 
 public class UnityChanSkill01 : NetworkBehaviour
 {
+	Vector3 initialVelocity;
+
 	Rigidbody rb;
 
 	float travelingDistance;
@@ -23,9 +25,11 @@ public class UnityChanSkill01 : NetworkBehaviour
 
 	void OnEnable()
 	{
-		soundEffect = GetComponent<SoundEffect>();
 		rb = GetComponent<Rigidbody>();
-		rb.velocity = transform.forward * projectileSpeed;
+		soundEffect = GetComponent<SoundEffect>();
+
+		initialVelocity = transform.forward * projectileSpeed;
+		rb.velocity = initialVelocity;
 
 		startPos = transform.position;
 	}
@@ -38,7 +42,7 @@ public class UnityChanSkill01 : NetworkBehaviour
 
 		if (travelingDistance >= travelingThreshold)
 		{
-			Destroy(transform.root.gameObject);
+			Destroy(gameObject);
 		}
 	}
 
@@ -62,7 +66,8 @@ public class UnityChanSkill01 : NetworkBehaviour
 			//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
 			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 		}
-		NetworkServer.Destroy (transform.root.gameObject);
-		Destroy(transform.root.gameObject);
+		//NetworkServer.Destroy (transform.root.gameObject);
+		//Destroy(transform.root.gameObject);
+		Destroy(gameObject);
 	}
 }

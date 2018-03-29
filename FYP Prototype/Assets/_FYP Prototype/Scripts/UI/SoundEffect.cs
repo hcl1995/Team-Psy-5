@@ -14,13 +14,10 @@ public class SoundEffect : MonoBehaviour {
 	void Awake () {
 		//sfxAudioSource = GetComponent<AudioSource> ();
 		audioSourceList = GetComponents<AudioSource>();
-
 		sfxAudioSource = audioSourceList[0];
-		//environmentSfxAudioSource = audioSourceList[1];
 
 		if(audioSourceList.Length > 1)
 		{
-			sfxAudioSource = audioSourceList[0];
 			environmentSfxAudioSource = audioSourceList[1];
 		}
 	}

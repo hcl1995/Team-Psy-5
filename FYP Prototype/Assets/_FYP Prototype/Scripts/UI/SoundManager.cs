@@ -68,7 +68,7 @@ public class SoundManager : MonoBehaviour {
 	public List<BGMAudioClipInfo> bgmAudioClipInfoList = new List<BGMAudioClipInfo>();
 	public List<SFXAudioClipInfo> sfxAudioClipInfoList = new List<SFXAudioClipInfo>();
 
-	AudioSource[] audioSourceList;
+	public AudioSource[] audioSourceList;
 
 	void Awake () {
 		if (_instance == null) {
@@ -79,10 +79,12 @@ public class SoundManager : MonoBehaviour {
 		}
 
 		audioSourceList = GetComponents<AudioSource>();
-
-
 		bgmAudioSource = audioSourceList[0];
-		specialBgmAudioSource = audioSourceList[1];
+
+		if(audioSourceList.Length > 1)
+		{
+			specialBgmAudioSource = audioSourceList[1];
+		}
 
 		//Application.runInBackground = true;
 
@@ -90,7 +92,7 @@ public class SoundManager : MonoBehaviour {
 		bgmAudioSource.volume = GetMusicVolume () * GetMasterVolume ();
 
 		specialBgmAudioSource.ignoreListenerPause = true;
-		specialBgmAudioSource.volume = GetMusicVolume () * GetMasterVolume ();
+		specialBgmAudioSource.volume = 1;
 	}
 
 	void Start()
@@ -127,7 +129,7 @@ public class SoundManager : MonoBehaviour {
 	public void SetMasterVolume (float value) {
 		PlayerPrefs.SetFloat (masterVolumeSetting, value);
 		bgmAudioSource.volume = GetMusicVolume () * GetMasterVolume ();
-		specialBgmAudioSource.volume = GetMusicVolume () * GetMasterVolume ();
+		//specialBgmAudioSource.volume = GetMusicVolume () * GetMasterVolume ();
 	}
 
 	public void SetSoundVolume (float value) {
@@ -137,6 +139,6 @@ public class SoundManager : MonoBehaviour {
 	public void SetMusicVolume (float value) {
 		PlayerPrefs.SetFloat (musicVolumeSetting, value);
 		bgmAudioSource.volume = GetMusicVolume () * GetMasterVolume ();
-		specialBgmAudioSource.volume = GetMusicVolume () * GetMasterVolume ();
+		//specialBgmAudioSource.volume = GetMusicVolume () * GetMasterVolume ();
 	}
 }

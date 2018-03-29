@@ -1,4 +1,11 @@
-Commit 30 (Mar 27, 2018)
+Commit 31 (Mar 29, 2018)
+------------------------
+-See bug list for details.
+-Change dash a bit, not fully working yet.
+-Muay thai ulti animation & lava texture masuked
+
+
+Commit 30 (Mar 28, 2018)
 ------------------------
 -Character collider fixed. (Merged)
 -Game input manager reset fixed. (Merged)
