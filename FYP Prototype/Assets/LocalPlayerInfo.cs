@@ -28,11 +28,11 @@ public class LocalPlayerInfo : MonoBehaviour {
 	//[ClientRpc]
 	public void enableLoading(){
 		LobbyController.s_Singleton.LoadingCanvas.SetActive (true);
-		Time.timeScale = 0;
+		//Time.timeScale = 0;
 	}
 
 	public void disableLoading(){
 		LobbyController.s_Singleton.LoadingCanvas.SetActive (false);
-		Time.timeScale = 1.0f;
+		StartTimer.singleton.StartMatchTimer ();
 	}
 }

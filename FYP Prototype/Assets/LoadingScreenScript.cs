@@ -13,6 +13,7 @@ public class LoadingScreenScript : MonoBehaviour {
 	public Text Loading;
 	public PlayerInfo[] playerSelectCharacter;
 	public bool loadReady = false;
+	public bool isReady = false;
 
 	void OnEnable(){
 		Loading.text = "LOADING";
@@ -26,6 +27,7 @@ public class LoadingScreenScript : MonoBehaviour {
 		}
 		tutorial.text = strTutorialText (PlayerInfo.singleton.playerCharacter);
 		PlayerInfo.singleton.CmdLoadScreenOn ();
+		isReady = false;
 	}
 	// Use this for initialization
 	void Start () {
@@ -35,9 +37,10 @@ public class LoadingScreenScript : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 		if (loadReady) {
-			if (Input.GetKeyUp (KeyCode.Return)) {
+			if (Input.GetKeyUp (KeyCode.Return) && !isReady) {
 				PlayerNetwork.singleton.CmdloadingOnEnterReady ();
 				Loading.text = "WAITING FOR YOUR OPPONENT";
+				isReady = true;
 			}
 		}
 	}
