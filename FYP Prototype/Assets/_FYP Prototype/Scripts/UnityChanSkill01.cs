@@ -5,6 +5,8 @@ using UnityEngine.Networking;
 
 public class UnityChanSkill01 : NetworkBehaviour
 {
+	Vector3 initialVelocity;
+
 	Rigidbody rb;
 
 	float travelingDistance;
@@ -17,12 +19,17 @@ public class UnityChanSkill01 : NetworkBehaviour
 
 	public float damage = 10;
 
-	GameObject impact;
+	public GameObject impact;
+
+	SoundEffect soundEffect;
 
 	void OnEnable()
 	{
 		rb = GetComponent<Rigidbody>();
-		rb.velocity = transform.forward * projectileSpeed;
+		soundEffect = GetComponent<SoundEffect>();
+
+		initialVelocity = transform.forward * projectileSpeed;
+		rb.velocity = initialVelocity;
 
 		startPos = transform.position;
 	}
@@ -35,7 +42,7 @@ public class UnityChanSkill01 : NetworkBehaviour
 
 		if (travelingDistance >= travelingThreshold)
 		{
-			Destroy(transform.root.gameObject);
+			Destroy(gameObject);
 		}
 	}
 
@@ -56,9 +63,11 @@ public class UnityChanSkill01 : NetworkBehaviour
 		{
 			//other.gameObject.GetComponent<Animator>().SetTrigger("Death");
 			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (damage, "DamageDown", impact, other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position));
-			AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+			//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 		}
-		NetworkServer.Destroy (transform.root.gameObject);
-		Destroy(transform.root.gameObject);
+		//NetworkServer.Destroy (transform.root.gameObject);
+		//Destroy(transform.root.gameObject);
+		Destroy(gameObject);
 	}
 }

@@ -61,7 +61,8 @@ public class UnityChanUltimate : MonoBehaviour
 					if (i < 5)
 					{
 						other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown02",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(randPos),other);
-						AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+						//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+						AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[11], other.transform.position);
 					}
 					else if (i == 5)
 					{
@@ -70,7 +71,8 @@ public class UnityChanUltimate : MonoBehaviour
 
 						UltKnockPos = gameObject.transform.root.forward * distance;
 						other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position),other);
-						AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+						//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+						AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[11], other.transform.position);
 					}
 				}
 				isHit = true;

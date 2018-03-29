@@ -18,6 +18,7 @@ public class PlayerControl : NetworkBehaviour
 	public float gravity;
 	Vector3 moveDirection = Vector3.zero;
 	public float dashDistance;
+	public bool dashThrough = true;
 
 	int dashCount;
 	int dashCharge;
@@ -62,7 +63,7 @@ public class PlayerControl : NetworkBehaviour
 	[Header("Drag & Drop")]
 	public GameObject playerCanvas;
 	public GameObject trailRendererObject;
-	public GameObject particleGuard;
+	//public GameObject particleGuard;
 	public GameObject CharaterModel;
 
 	[Header("Observer")]
@@ -100,12 +101,13 @@ public class PlayerControl : NetworkBehaviour
 	public bool seriouslyFlying;
 	public float flyDistance;
 
-	protected SoundEffect soundEffect;
+	public SoundEffect soundEffect;
 
 	Rigidbody rb;
 	Vector3 velocity = Vector3.zero;
 	public ParticleSystem resurrection;
 	public ParticleSystem deathParticle;
+
 
 	protected void Awake()
 	{
@@ -235,6 +237,14 @@ public class PlayerControl : NetworkBehaviour
 			{
 				if (dashCharge > 0)
 				{
+					if (dashThrough)
+					{
+						dashDistance = 1.75f;	
+					}
+					else{
+						dashDistance = 0;
+					}
+
 					dashStartPos = transform.position;
 					dashEndPos = transform.position += (transform.forward * dashDistance);
 
@@ -245,7 +255,8 @@ public class PlayerControl : NetworkBehaviour
 					dashCharge--;
 					dashChargeCooldown += dashChargeCooldownDuration;
 
-					soundEffect.PlaySFX(SFXAudioClipID.SFX_DASH);
+					//soundEffect.PlaySFX(SFXAudioClipID.SFX_DASH);
+					soundEffect.PlaySFXClip(soundEffect.selfServiceClip[3]);
 				}
 			}
 		}
@@ -332,6 +343,7 @@ public class PlayerControl : NetworkBehaviour
 //				toggleGuard = true;
 //				animation.SetBool("Guarding", true);
 //				CmdSetPlayerState (PlayerControl.playerState.Guarding);
+//				soundEffect.PlaySFXClip(soundEffect.selfServiceClip[6]);
 //			}				
 //		}else if (state == PlayerControl.playerState.Guarding){
 //			//			if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
@@ -356,6 +368,7 @@ public class PlayerControl : NetworkBehaviour
 				toggleGuard = true;
 				animation.SetBool("Guarding", true);
 				CmdSetPlayerState (PlayerControl.playerState.Guarding);
+				soundEffect.PlaySFXClip(soundEffect.selfServiceClip[6]);
 			}				
 		}else if (state == PlayerControl.playerState.Guarding){
 						if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
@@ -450,7 +463,8 @@ public class PlayerControl : NetworkBehaviour
 	void Atk01Active()
 	{
 		attack01.SetActive(true);
-		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
+		//soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
+		soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 	}
 
 	void Atk01NotActive()
@@ -461,7 +475,8 @@ public class PlayerControl : NetworkBehaviour
 	void Atk02Active()
 	{
 		attack02.SetActive(true);
-		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
+		//soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
+		soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 	}
 
 	void Atk02NotActive()
@@ -472,7 +487,8 @@ public class PlayerControl : NetworkBehaviour
 	void Atk03Active()
 	{
 		attack03.SetActive(true);
-		soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
+		//soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
+		soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 	}
 
 	void Atk03NotActive()
@@ -517,7 +533,11 @@ public class PlayerControl : NetworkBehaviour
 
 	public void playDeathAnim(){
 		CmdAnimation ("Death");
-		soundEffect.PlaySFX(SFXAudioClipID.SFX_DEATH);
+		//soundEffect.PlaySFX(SFXAudioClipID.SFX_DEATH);
+		if (isFalling == false)
+		{
+			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[4]);
+		}
 	}
 	void DeathParticleActive()
 	{
@@ -536,7 +556,7 @@ public class PlayerControl : NetworkBehaviour
 		if (this.animation.GetCurrentAnimatorStateInfo(0).IsName("Idle") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("Run") ||
 			this.animation.GetCurrentAnimatorStateInfo(0).IsName("Dash") || this.animation.GetCurrentAnimatorStateInfo(0).IsName("ShootCasting02"))
 		{
-			particleGuard.SetActive(false);
+			//particleGuard.SetActive(false);
 			if (callOnce == false)
 			{
 				animation.ResetTrigger("Attack");
@@ -545,11 +565,11 @@ public class PlayerControl : NetworkBehaviour
 				callOnce = true;
 			}
 		}
-		if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Guard")) {
-			particleGuard.SetActive (true);
-		} else {
-			particleGuard.SetActive(false);
-		}
+//		if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Guard")) {
+//			particleGuard.SetActive (true);
+//		} else {
+//			particleGuard.SetActive(false);
+//		}
 	}
 		
 	[Command]
@@ -583,12 +603,28 @@ public class PlayerControl : NetworkBehaviour
 		{
 			isFalling = true;
 		}
+
+		if (other.gameObject.CompareTag("NoDashThrough") || other.gameObject.CompareTag("Player"))
+		{
+			dashThrough = false;
+		}
 	}
 
-	void OnControllerColliderHit(ControllerColliderHit hit)
+	void OnTriggerExit(Collider other)
 	{
-		
+		if (other.gameObject.CompareTag("NoDashThrough") || other.gameObject.CompareTag("Player"))
+		{
+			dashThrough = true;
+		}
 	}
+
+//	void OnControllerColliderHit(ControllerColliderHit hit)
+//	{
+//		if (hit.gameObject.CompareTag("NoDashThrough") || hit.gameObject.CompareTag("Player"))
+//		{
+//			dashThrough = false;
+//		}
+//	}
 
 	[Command]
 	void CmdTransparentObjects()

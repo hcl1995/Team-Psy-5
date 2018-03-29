@@ -25,7 +25,7 @@ public class UnityChanSkill02 : MonoBehaviour
 		{
 			if (other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> () != selfHealth) {
 				other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeSkill02 (damage,"DamageDown");
-				AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
+				//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
 				isHit = true;
 			}
 		}

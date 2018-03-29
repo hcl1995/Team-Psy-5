@@ -16,7 +16,16 @@ public class LavaScript : NetworkBehaviour {
 		
 	}
 
-	void OnCollisionStay(Collision other){
+//	void OnCollisionStay(Collision other){
+//		if (!isServer)
+//			return;
+//		if (other.gameObject.CompareTag("Player"))
+//		{
+//			other.gameObject.GetComponent<PlayerHealth> ().takeDamageHazard (damage);
+//		}
+//	}
+
+	void OnTriggerStay(Collider other){
 		if (!isServer)
 			return;
 		if (other.gameObject.CompareTag("Player"))

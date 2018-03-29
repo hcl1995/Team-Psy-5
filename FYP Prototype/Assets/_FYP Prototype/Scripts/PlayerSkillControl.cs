@@ -74,7 +74,8 @@ public class PlayerSkillControl : PlayerControl
 					skill02CD.fillAmount = 1;
 					skill02Cooldown = skill02CooldownDuration;
 
-					soundEffect.PlaySFX(SFXAudioClipID.SFX_SKILL02);
+					//soundEffect.PlaySFX(SFXAudioClipID.SFX_SKILL02);
+					soundEffect.PlaySFXClip(soundEffect.selfServiceClip[9]);
 				}
 			}
 			else if (KeyBindingManager.GetKeyDown(KeyAction.Ultimate))
@@ -87,6 +88,7 @@ public class PlayerSkillControl : PlayerControl
 
 					ultimateCD.fillAmount = 1;
 					ultimateCooldown = ultimateCooldownDuration;
+					soundEffect.PlaySFXClip(soundEffect.selfServiceClip[10]);
 				}
 			}
 		}
@@ -106,7 +108,8 @@ public class PlayerSkillControl : PlayerControl
 					StartCoroutine(ResetDelay());
 					skill01Cooldown = skill01CooldownDuration;
 
-					soundEffect.PlaySFX(SFXAudioClipID.SFX_SKILL01);
+					//soundEffect.PlaySFX(SFXAudioClipID.SFX_SKILL01);
+					soundEffect.PlaySFXClip(soundEffect.selfServiceClip[7]);
 				}
 				else if (skill01Cooldown <= 0 && maxCharge)
 				{
@@ -120,7 +123,8 @@ public class PlayerSkillControl : PlayerControl
 					StartCoroutine(ResetDelay());
 					skill01Cooldown = skill01CooldownDuration;
 
-					soundEffect.PlaySFX(SFXAudioClipID.SFX_SKILL01);
+					//soundEffect.PlaySFX(SFXAudioClipID.SFX_SKILL01);
+					soundEffect.PlaySFXClip(soundEffect.selfServiceClip[7]);
 				}
 			}
 		}
@@ -142,23 +146,24 @@ public class PlayerSkillControl : PlayerControl
 		fillCharge.fillAmount = 0;
 	}
 
-	void Skill01Casting()
-	{
-		CmdSkill01PlayParticle();
-	}
+//	void Skill01ShootEffect()
+//	{
+//		CmdSkill01PlayParticle();
+//	}
 
 	void Skill01NotCasting()
 	{
 		CmdSkill01StopParticle();
 	}
 
-	void UltiAcitve()
+	void UltiActive()
 	{
 		ultiAttack.SetActive(true);
-		soundEffect.PlaySFX(SFXAudioClipID.SFX_ULTIMATE);
+		//soundEffect.PlaySFX(SFXAudioClipID.SFX_ULTIMATE);
+		soundEffect.PlaySFXClip(soundEffect.selfServiceClip[10]);
 	}
 
-	void UltiNotAcitve()
+	void UltiNotActive()
 	{
 		ultiAttack.SetActive(false);
 	}
