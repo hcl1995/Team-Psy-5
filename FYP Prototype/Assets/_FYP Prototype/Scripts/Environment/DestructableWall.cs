@@ -8,7 +8,8 @@ public class DestructableWall : NetworkBehaviour
 	//public Mesh destroyMesh;
 
 	protected bool callOnce = false;
-	public float health = 3;
+	public float health;
+	public float breakHP;
 
 	Animator animation;
 	protected SoundEffect soundEffect;
@@ -31,7 +32,7 @@ public class DestructableWall : NetworkBehaviour
 
 	void PropChuiDiao()
 	{
-		if (health <= 1 && callOnce == false)
+		if (health <= breakHP && callOnce == false)
 		{
 			//gameObject.GetComponent<MeshFilter>().mesh = destroyMesh;
 			RpcSetAnimation("Break");
@@ -45,9 +46,7 @@ public class DestructableWall : NetworkBehaviour
 		if (health <= 0)
 		{
 			AudioSource.PlayClipAtPoint(soundEffect.selfServiceClip[1], transform.position);
-			//soundEffect.PlaySFXClip(soundEffect.selfServiceClip[1]);
 			Destroy(gameObject);
-			//Network.Destroy(gameObject);
 		}
 	}
 
@@ -68,39 +67,20 @@ public class DestructableWall : NetworkBehaviour
 	//		}
 	//	}
 
-//	void OnCollisionEnter(Collision other)
-//	{
-//		if (isServer) {
-//			if (other.gameObject.CompareTag("Attack"))
-//			{
-//				health -= 1;
-//				//soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACK);
-//				soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
-//				RpcShowMeParticle();
-//				//if(health<=0)
-//				//Destroy(gameObject);		
-//			}
-//		}
-//	}
-
 	void OnTriggerEnter(Collider other){
 		if (isServer) {
-			if (other.gameObject.CompareTag("Attack"))
+			if (other.gameObject.CompareTag("Attack") && health > 0)
 			{
 				health -= 1;
-				//soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACK);
-				soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
-				RpcShowMeParticle();
-				//if(health<=0)
-				//Destroy(gameObject);
+				RpcHitParticlePLUSSound();
 			}
 		}
-
 	}
 
 	[ClientRpc]
-	void RpcShowMeParticle()
+	void RpcHitParticlePLUSSound()
 	{
 		hitParticle.Play();
+		soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 	}
 }

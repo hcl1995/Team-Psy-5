@@ -1,3 +1,9 @@
+Commit 32 (Apr 1, 2018)
+------------------------
+-Fix some sound issue. (Good enough for playtest not yet perfect)
+-Change knockback method.
+
+
 Commit 31 (Mar 29, 2018)
 ------------------------
 -See bug list for details.

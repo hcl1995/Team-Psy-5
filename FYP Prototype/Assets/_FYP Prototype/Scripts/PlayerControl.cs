@@ -14,11 +14,11 @@ public class PlayerControl : NetworkBehaviour
 	public Vector3 startSpawnPosition;
 
 	[Header("Movement")]
+	public PlayerControl selfControl;
 	public float speed;
 	public float gravity;
 	Vector3 moveDirection = Vector3.zero;
 	public float dashDistance;
-	public bool dashThrough = true;
 
 	int dashCount;
 	int dashCharge;
@@ -30,7 +30,15 @@ public class PlayerControl : NetworkBehaviour
 	Vector3 dashStartPos;
 	bool isDash = false;
 	float completeDashTime;
-	float dashLerpSpeed = 10;
+	public float dashLerpSpeed;
+
+	Vector3 flyStartPos;
+	Vector3 flyTargetPos;
+	public Vector3 getOtherPos;
+	public bool flying;
+	bool seriouslyFlying;
+	float completeFlyTime;
+	public float flyLerpSpeed;
 
 
 	[Header("Attack")]
@@ -65,19 +73,11 @@ public class PlayerControl : NetworkBehaviour
 	public GameObject trailRendererObject;
 	//public GameObject particleGuard;
 	public GameObject CharaterModel;
+	public ParticleSystem resurrection;
+	public ParticleSystem deathParticle;
 
 	[Header("Observer")]
-	public bool isFalling = false;
-
 	public List <GameObject> inBetweenObjects = new List<GameObject>();
-	public float materialAlpha;
-	GameObject damnCamera;
-
-	[SyncVar]
-	public bool invincible = false;
-	public float blinkTime = 0.3f;
-	public float invincibleDuration = 3.0f;
-	public float invincibleElapsed = 0;
 
 	public enum playerState
 	{
@@ -91,27 +91,27 @@ public class PlayerControl : NetworkBehaviour
 
 	[SyncVar]
 	public playerState state = playerState.Normal;
+
+	GameObject damnCamera;
+	bool isFalling = false;
+	float materialAlpha = 0.2f;
+
+	[SyncVar]
+	public bool invincible = false;
+	public float blinkTime = 0.3f;
+	public float invincibleDuration = 3.0f;
+	public float invincibleElapsed = 0;
+
 	[SyncVar]
 	bool callOnce;
 	bool toggleGuard = false;
 
-	Vector3 flyTargetPos;
-	float flySpeed;
-	public bool flying;
-	public bool seriouslyFlying;
-	public float flyDistance;
-
+	[HideInInspector]
 	public SoundEffect soundEffect;
-
-	Rigidbody rb;
-	Vector3 velocity = Vector3.zero;
-	public ParticleSystem resurrection;
-	public ParticleSystem deathParticle;
 
 
 	protected void Awake()
 	{
-		rb = GetComponent<Rigidbody>();
 		soundEffect = GetComponent<SoundEffect>();
 		animation = GetComponent<Animator>();
 		trailRendererObject.transform.parent = null;
@@ -178,22 +178,30 @@ public class PlayerControl : NetworkBehaviour
 
 		if (flying)
 		{
-			flySpeed = flyDistance / 2.5f;
-			flyTargetPos = transform.position + (-transform.forward * flyDistance);
+			flyStartPos = transform.position;
+			flyTargetPos = transform.position += getOtherPos;
+			//dashEndPos = transform.position += (transform.forward * dashDistance);
+
 			seriouslyFlying = true;
 			flying = false;
+//			flySpeed = flyDistance;
+//			flyTargetPos = transform.position + (-transform.forward * flyDistance);
+//			seriouslyFlying = true;
+//			flying = false;
 		}
 
 		if (seriouslyFlying)
 		{
-			Vector3 direction = (flyTargetPos - transform.position).normalized;
-			controller.Move(direction * flySpeed * Time.deltaTime);
-			//rb.MovePosition(direction * flyLerpSpeed * Time.deltaTime);
-			//rb.MovePosition (Vector3.MoveTowards(transform.position, direction, flyLerpSpeed * Time.deltaTime));
+			completeFlyTime += flyLerpSpeed * Time.deltaTime;
+			transform.position = Vector3.Lerp (flyStartPos, flyTargetPos, completeFlyTime);
+//			Vector3 direction = (flyTargetPos - transform.position).normalized;
+//			controller.Move(direction * flySpeed * Time.deltaTime);
+		}
 
-			// Doesn't Do Shit
-			//transform.position = Vector3.SmoothDamp (flyStartPos, flyEndPos, ref velocity, 0.3f);
-			// add force don't do shit also with no constraint
+		if (completeFlyTime >= 1)
+		{
+			seriouslyFlying = false;
+			completeFlyTime = 0;
 		}
 
 		if (state == playerState.Normal)
@@ -206,7 +214,27 @@ public class PlayerControl : NetworkBehaviour
 			moveDirection = new Vector3(0, 0, 0);
 
 			// Fucking Game Input Manager..
-			if (KeyBindingManager.GetKey(KeyAction.Up))
+			if (KeyBindingManager.GetKey(KeyAction.Up) && KeyBindingManager.GetKey(KeyAction.Left))
+			{
+				moveDirection = new Vector3(-1, 0, 1);
+				controller.Move(moveDirection * speed * Time.deltaTime);
+			}
+			else if (KeyBindingManager.GetKey(KeyAction.Up) && KeyBindingManager.GetKey(KeyAction.Right))
+			{
+				moveDirection = new Vector3(1, 0, 1);
+				controller.Move(moveDirection * speed * Time.deltaTime);
+			}
+			else if (KeyBindingManager.GetKey(KeyAction.Down) && KeyBindingManager.GetKey(KeyAction.Right))
+			{
+				moveDirection = new Vector3(1, 0, -1);
+				controller.Move(moveDirection * speed * Time.deltaTime);
+			}
+			else if (KeyBindingManager.GetKey(KeyAction.Down) && KeyBindingManager.GetKey(KeyAction.Left))
+			{
+				moveDirection = new Vector3(-1, 0, -1);
+				controller.Move(moveDirection * speed * Time.deltaTime);
+			}
+			else if (KeyBindingManager.GetKey(KeyAction.Up))
 			{
 				moveDirection = new Vector3(0, 0, 1);
 				controller.Move(moveDirection * speed * Time.deltaTime);
@@ -216,8 +244,7 @@ public class PlayerControl : NetworkBehaviour
 				moveDirection = new Vector3(0, 0, -1);
 				controller.Move(moveDirection * speed * Time.deltaTime);
 			}
-
-			if (KeyBindingManager.GetKey(KeyAction.Left))
+			else if (KeyBindingManager.GetKey(KeyAction.Left))
 			{
 				moveDirection = new Vector3(-1, 0, 0);
 				controller.Move(moveDirection * speed * Time.deltaTime);
@@ -235,35 +262,25 @@ public class PlayerControl : NetworkBehaviour
 
 			if (KeyBindingManager.GetKeyDown(KeyAction.Dash))
 			{
-				if (dashCharge > 0)
+				if (dashCharge > 0 && completeDashTime == 0)
 				{
-					if (dashThrough)
-					{
-						dashDistance = 1.75f;	
-					}
-					else{
-						dashDistance = 0;
-					}
-
 					dashStartPos = transform.position;
 					dashEndPos = transform.position += (transform.forward * dashDistance);
 
 					isDash = true;
 					CmdAnimation("Dash");
+					CmdPlaySFXClip(1);
 
 					dashCount++;
 					dashCharge--;
 					dashChargeCooldown += dashChargeCooldownDuration;
-
-					//soundEffect.PlaySFX(SFXAudioClipID.SFX_DASH);
-					soundEffect.PlaySFXClip(soundEffect.selfServiceClip[3]);
 				}
 			}
 		}
 
 		if (isDash)
 		{
-			completeDashTime += (Time.deltaTime * dashLerpSpeed);
+			completeDashTime += dashLerpSpeed * Time.deltaTime;
 			transform.position = Vector3.Lerp (dashStartPos, dashEndPos, completeDashTime);
 			//trailRendererObject.transform.position = gameObject.transform.position;
 			CmdDashTrail();
@@ -332,54 +349,59 @@ public class PlayerControl : NetworkBehaviour
 
 	void Guard()
 	{
-//		if (KeyBindingManager.GetKey(KeyAction.Guard))
-//		{
-//			if (state == PlayerControl.playerState.Normal) {
-//				//animation.SetBool("isMoving", false);
-//				RotateTowardMouseDuringAction();
-//				//animation.SetTrigger("Guard");
-//				if(!toggleGuard)
-//					CmdAnimation ("Guard");
-//				toggleGuard = true;
-//				animation.SetBool("Guarding", true);
-//				CmdSetPlayerState (PlayerControl.playerState.Guarding);
-//				soundEffect.PlaySFXClip(soundEffect.selfServiceClip[6]);
-//			}				
-//		}else if (state == PlayerControl.playerState.Guarding){
-//			//			if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
-//			//			{
-//			//animation.SetBool("isMoving", false);
-//			animation.SetBool("Guarding", false);
-//			CmdSetPlayerState (PlayerControl.playerState.Normal);
-//			toggleGuard = false;
-//			//}
-//		}
-
-
-		if (state == PlayerControl.playerState.Normal)
+		if (KeyBindingManager.GetKey(KeyAction.Guard))
 		{
-			if (KeyBindingManager.GetKey(KeyAction.Guard))
-			{
+			if (state == PlayerControl.playerState.Normal) {
 				//animation.SetBool("isMoving", false);
 				RotateTowardMouseDuringAction();
 				//animation.SetTrigger("Guard");
 				if(!toggleGuard)
+				{
 					CmdAnimation ("Guard");
+					CmdPlaySFXClip(2);
+				}
 				toggleGuard = true;
 				animation.SetBool("Guarding", true);
 				CmdSetPlayerState (PlayerControl.playerState.Guarding);
 				soundEffect.PlaySFXClip(soundEffect.selfServiceClip[6]);
 			}				
-		}else if (state == PlayerControl.playerState.Guarding){
-						if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
-						{
+		}
+		else if (state == PlayerControl.playerState.Guarding){
+			//			if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
+			//			{
 			//animation.SetBool("isMoving", false);
 			animation.SetBool("Guarding", false);
 			CmdSetPlayerState (PlayerControl.playerState.Normal);
 			toggleGuard = false;
 			//}
 		}
-		}
+
+//		if (state == PlayerControl.playerState.Normal)
+//		{
+//			if (KeyBindingManager.GetKey(KeyAction.Guard))
+//			{
+//				//animation.SetBool("isMoving", false);
+//				RotateTowardMouseDuringAction();
+//				//animation.SetTrigger("Guard");
+//				if(!toggleGuard)
+//				{
+//					CmdAnimation ("Guard");
+//					CmdPlaySFXClip(2);
+//				}
+//				toggleGuard = true;
+//				animation.SetBool("Guarding", true);
+//				CmdSetPlayerState (PlayerControl.playerState.Guarding);
+//			}				
+//		}else if (state == PlayerControl.playerState.Guarding){
+//						if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
+//						{
+//			//animation.SetBool("isMoving", false);
+//			animation.SetBool("Guarding", false);
+//			CmdSetPlayerState (PlayerControl.playerState.Normal);
+//			toggleGuard = false;
+//			//}
+//		}
+//		}
 	}
 
 	void Attack()
@@ -460,45 +482,31 @@ public class PlayerControl : NetworkBehaviour
 		}
 	}
 
-	void Atk01Active()
-	{
+	void Atk01Active(){
 		attack01.SetActive(true);
-		//soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
 		soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 	}
 
-	void Atk01NotActive()
-	{
+	void Atk01NotActive(){
 		attack01.SetActive(false);
 	}
 
-	void Atk02Active()
-	{
+	void Atk02Active(){
 		attack02.SetActive(true);
-		//soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
 		soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 	}
 
-	void Atk02NotActive()
-	{
+	void Atk02NotActive(){
 		attack02.SetActive(false);
 	}
 
-	void Atk03Active()
-	{
+	void Atk03Active(){
 		attack03.SetActive(true);
-		//soundEffect.PlaySFX(SFXAudioClipID.SFX_ATTACKLAUNCH);
 		soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 	}
 
-	void Atk03NotActive()
-	{
+	void Atk03NotActive(){
 		attack03.SetActive(false);
-	}
-
-	void SeriouslyFlyingNotActive()
-	{
-		seriouslyFlying = false;
 	}
 
 	void RestrictInput()
@@ -531,21 +539,116 @@ public class PlayerControl : NetworkBehaviour
 		CmdSetActive();
 	}
 
-	public void playDeathAnim(){
-		CmdAnimation ("Death");
-		//soundEffect.PlaySFX(SFXAudioClipID.SFX_DEATH);
-		if (isFalling == false)
+	void OnTriggerEnter(Collider other){
+		if (other.gameObject.CompareTag("OutofBound")){
+			isFalling = true;
+		}
+
+		if (other.gameObject.CompareTag("NoDashThrough") || other.gameObject.CompareTag("Player") && other.gameObject.GetComponent<PlayerControl>() != selfControl)
 		{
-			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[4]);
+			isDash = false;
+			completeDashTime = 0;
+		}
+
+		if (other.gameObject.layer == LayerMask.NameToLayer("AboveGround")){
+			seriouslyFlying = false;
+			completeFlyTime = 0;
 		}
 	}
-	void DeathParticleActive()
+
+//	void SeriouslyFlyingNotActive(){
+//		seriouslyFlying = false;
+//	}
+
+	public void playDeathAnim(){
+		CmdAnimation ("Death");
+
+		if (isFalling == false)
+		{
+			CmdPlaySFXClip(0);
+		}
+	}
+
+	[Command]
+	public void CmdStopSFXClip()
 	{
+		RpcStopSFXClip();
+	}
+
+	[ClientRpc]
+	public void RpcStopSFXClip()
+	{
+		soundEffect.StopSFXClip();
+	}
+
+	[Command]
+	public void CmdPlaySFXClip(int i)
+	{
+		RpcPlaySFXClip(i);
+	}
+
+	[ClientRpc]
+	public void RpcPlaySFXClip(int i)
+	{
+		switch(i){
+
+		case 0:			
+			// Death
+			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[4]);
+			break;
+
+		case 1:
+			// Dash
+			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[3]);
+			break;
+
+		case 2:
+			// Guard
+			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[6]);
+			break;
+
+		case 3:
+			// Skill01
+			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[7]);
+			break;
+
+		case 4:
+			// Skill02
+			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[9]);
+			break;
+
+		case 5:
+			// Ultimate
+			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[10]);
+			break;
+
+		case 6:
+			// Guarding Hits
+			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[1]);
+			break;
+
+		case 7:
+			// Fall Death
+			soundEffect.PlaySFXClip(soundEffect.selfServiceClip[5]);
+			break;
+
+		case 8:
+			// Lava Damage
+			soundEffect.PlayEnvironmentSFXClip(soundEffect.selfServiceClip[12]);
+			break;
+
+		default:
+			Debug.Log("SFX Not Found.");
+			break;
+		}
+	}
+
+	void DeathParticleActive(){
 		deathParticle.Play();
 	}
+
 	[Command]
-	void CmdSetActive()
-	{
+	void CmdSetActive(){
 		callOnce = false;
 		RpcSetActive();
 	}
@@ -583,58 +686,27 @@ public class PlayerControl : NetworkBehaviour
 	}
 
 	[Command]
-	public void CmdSetPlayerState(playerState playerState){
+	void CmdSetPlayerState(playerState playerState){
 		state = playerState;
 	}
 
 	[Command]
-	public void CmdDashTrail(){
+	void CmdDashTrail(){
 		RpcDashTrail();
 	}
 
 	[ClientRpc]
-	public void RpcDashTrail(){
+	void RpcDashTrail(){
 		trailRendererObject.transform.position = gameObject.transform.position;
 	}
 		
-	void OnTriggerEnter(Collider other)
-	{
-		if (other.gameObject.CompareTag("OutofBound"))
-		{
-			isFalling = true;
-		}
-
-		if (other.gameObject.CompareTag("NoDashThrough") || other.gameObject.CompareTag("Player"))
-		{
-			dashThrough = false;
-		}
-	}
-
-	void OnTriggerExit(Collider other)
-	{
-		if (other.gameObject.CompareTag("NoDashThrough") || other.gameObject.CompareTag("Player"))
-		{
-			dashThrough = true;
-		}
-	}
-
-//	void OnControllerColliderHit(ControllerColliderHit hit)
-//	{
-//		if (hit.gameObject.CompareTag("NoDashThrough") || hit.gameObject.CompareTag("Player"))
-//		{
-//			dashThrough = false;
-//		}
-//	}
-
 	[Command]
-	void CmdTransparentObjects()
-	{
+	void CmdTransparentObjects(){
 		RpcTransparentObjects();
 	}
 
 	[ClientRpc]
-	void RpcTransparentObjects()
-	{
+	void RpcTransparentObjects(){
 		//Vector3 playerOffset = new Vector3(transform.position.x, transform.position.y, transform.position.z);
 
 		RaycastHit[] hits;
@@ -682,7 +754,7 @@ public class PlayerControl : NetworkBehaviour
 	}
 
 	[ClientRpc]
-	public void RpcRespwan(){		
+	void RpcRespwan(){		
 		transform.root.position = new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z);
 		transform.root.TransformPoint(new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z));
 		isFalling = false;

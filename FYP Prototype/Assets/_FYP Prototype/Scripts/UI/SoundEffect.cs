@@ -9,10 +9,9 @@ public class SoundEffect : MonoBehaviour {
 	AudioSource environmentSfxAudioSource;
 
 	public List<AudioClip> selfServiceClip = new List<AudioClip>();
-	AudioSource[] audioSourceList;
+	public AudioSource[] audioSourceList;
 
 	void Awake () {
-		//sfxAudioSource = GetComponent<AudioSource> ();
 		audioSourceList = GetComponents<AudioSource>();
 		sfxAudioSource = audioSourceList[0];
 
@@ -37,5 +36,10 @@ public class SoundEffect : MonoBehaviour {
 	public void PlayEnvironmentSFXClip (AudioClip audioClipID)
 	{
 		environmentSfxAudioSource.PlayOneShot(audioClipID, SoundManager.instance.GetSoundVolume() * SoundManager.instance.GetMasterVolume ());
+	}
+
+	public void StopSFXClip ()
+	{
+		environmentSfxAudioSource.Stop();
 	}
 }

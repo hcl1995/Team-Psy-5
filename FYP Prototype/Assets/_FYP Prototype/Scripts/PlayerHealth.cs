@@ -84,7 +84,8 @@ public class PlayerHealth : NetworkBehaviour {
 		}
 		if (playerControl.state == PlayerControl.playerState.Guarding) {
 			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
-			playerControl.soundEffect.PlaySFXClip(playerControl.soundEffect.selfServiceClip[1]);
+			//playerControl.soundEffect.PlaySFXClip(playerControl.soundEffect.selfServiceClip[1]);
+			playerControl.CmdPlaySFXClip(6);
 
 			impactGO =  (GameObject)Instantiate (superGuard, position, Quaternion.identity);
 			NetworkServer.Spawn (impactGO);
@@ -155,7 +156,12 @@ public class PlayerHealth : NetworkBehaviour {
 		if (harzardDamageCD)
 			return;
 		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
-		playerControl.soundEffect.PlayEnvironmentSFXClip(playerControl.soundEffect.selfServiceClip[12]);
+		//playerControl.soundEffect.PlayEnvironmentSFXClip(playerControl.soundEffect.selfServiceClip[12]);
+//		if (playerControl.soundEffect.audioSourceList[1].isPlaying == false)
+//		{
+//			Debug.Log("NOT PLAYING BABE, START BURN!");
+//			playerControl.CmdPlaySFXClip(8);
+//		}
 //		harzardDamageCD = true;
 //		StartCoroutine(hazardCoolDown());
 		//CmdHit ();
@@ -170,7 +176,8 @@ public class PlayerHealth : NetworkBehaviour {
 		}
 		if (playerControl.state == PlayerControl.playerState.Guarding) {
 			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
-			playerControl.soundEffect.PlaySFXClip(playerControl.soundEffect.selfServiceClip[1]);
+			//playerControl.soundEffect.PlaySFXClip(playerControl.soundEffect.selfServiceClip[1]);
+			playerControl.CmdPlaySFXClip(6);
 
 			impactGO =  (GameObject)Instantiate (superGuard, position, Quaternion.identity);
 			NetworkServer.Spawn (impactGO);
@@ -244,10 +251,12 @@ public class PlayerHealth : NetworkBehaviour {
 	{
 		if (!isServer)
 			return;
+		
 		if (other.gameObject.CompareTag("OutOfBoundDeathZone"))
 		{
-			HealthManager.singleton.takeDamage (playerNumber, 200,playerControl);
-			playerControl.soundEffect.PlaySFXClip(playerControl.soundEffect.selfServiceClip[5]);
+			HealthManager.singleton.takeDamage (playerNumber, 200, playerControl);
+			//playerControl.soundEffect.PlaySFXClip(playerControl.soundEffect.selfServiceClip[5]);
+			playerControl.CmdPlaySFXClip(7);
 		}
 	}
 
