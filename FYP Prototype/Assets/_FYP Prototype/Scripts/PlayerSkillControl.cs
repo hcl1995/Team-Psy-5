@@ -6,14 +6,13 @@ using UnityEngine.Networking;
 
 public class PlayerSkillControl : PlayerControl
 {
-
 	[Header("Skill01")]
 	public GameObject projectile;
 	public GameObject projectileMax;
-	//public Transform playerParented;
 	public Transform skill01SpawnPoint;
 	public ParticleSystem skill01ParticleEffect;
 	public ParticleSystem _skill01ParticleEffect;
+	public ParticleSystem _preSkill01ParticleEffect;
 
 	public Image fillCharge;
 	public GameObject chargeBar;
@@ -30,6 +29,7 @@ public class PlayerSkillControl : PlayerControl
 	[Header("Ultimate")]
 	public GameObject ultiAttack;
 	public ParticleSystem ultiParticleEffect;
+
 
 	void Update()
 	{
@@ -73,9 +73,7 @@ public class PlayerSkillControl : PlayerControl
 
 					skill02CD.fillAmount = 1;
 					skill02Cooldown = skill02CooldownDuration;
-
-					//soundEffect.PlaySFX(SFXAudioClipID.SFX_SKILL02);
-					soundEffect.PlaySFXClip(soundEffect.selfServiceClip[9]);
+					RpcPlaySFXClip(4);
 				}
 			}
 			else if (KeyBindingManager.GetKeyDown(KeyAction.Ultimate))
@@ -88,7 +86,7 @@ public class PlayerSkillControl : PlayerControl
 
 					ultimateCD.fillAmount = 1;
 					ultimateCooldown = ultimateCooldownDuration;
-					soundEffect.PlaySFXClip(soundEffect.selfServiceClip[10]);
+					RpcPlaySFXClip(5);
 				}
 			}
 		}
@@ -98,33 +96,27 @@ public class PlayerSkillControl : PlayerControl
 			{
 				if (skill01Cooldown <= 0 && !maxCharge)
 				{
-					CmdSkill01StopParticle();
 					animation.SetBool("ReleaseShot", true);
 
 					RotateTowardMouseDuringAction();
-					CmdFire (skill01SpawnPoint.position, skill01SpawnPoint.rotation, maxCharge);
+					CmdFire (projectile, skill01SpawnPoint.position, skill01SpawnPoint.rotation, maxCharge);
 					chargeBar.SetActive(false);
 
 					StartCoroutine(ResetDelay());
 					skill01Cooldown = skill01CooldownDuration;
-
-					//soundEffect.PlaySFX(SFXAudioClipID.SFX_SKILL01);
-					soundEffect.PlaySFXClip(soundEffect.selfServiceClip[7]);
+					RpcPlaySFXClip(3);
 				}
 				else if (skill01Cooldown <= 0 && maxCharge)
 				{
-					CmdSkill01StopParticle();
 					animation.SetBool("ReleaseShot", true);
 
 					RotateTowardMouseDuringAction();
-					CmdFire02 (skill01SpawnPoint.position, skill01SpawnPoint.rotation, maxCharge);
+					CmdFire (projectileMax, skill01SpawnPoint.position, skill01SpawnPoint.rotation, maxCharge);
 					chargeBar.SetActive(false);
 
 					StartCoroutine(ResetDelay());
 					skill01Cooldown = skill01CooldownDuration;
-
-					//soundEffect.PlaySFX(SFXAudioClipID.SFX_SKILL01);
-					soundEffect.PlaySFXClip(soundEffect.selfServiceClip[7]);
+					RpcPlaySFXClip(3);
 				}
 			}
 		}
@@ -140,96 +132,60 @@ public class PlayerSkillControl : PlayerControl
 		}
 	}
 
-	IEnumerator ResetDelay()
-	{
+	IEnumerator ResetDelay(){
 		yield return new WaitForSeconds(skill01CooldownDuration - 1);
 		fillCharge.fillAmount = 0;
 	}
 
-//	void Skill01ShootEffect()
-//	{
-//		CmdSkill01PlayParticle();
-//	}
-
-	void Skill01NotCasting()
-	{
-		CmdSkill01StopParticle();
-	}
-
-	void UltiActive()
-	{
-		ultiAttack.SetActive(true);
-		//soundEffect.PlaySFX(SFXAudioClipID.SFX_ULTIMATE);
-		soundEffect.PlaySFXClip(soundEffect.selfServiceClip[10]);
-	}
-
-	void UltiNotActive()
-	{
-		ultiAttack.SetActive(false);
-	}
-
 	[Command]
-	public void CmdFire(Vector3 position, Quaternion rotation, bool max){
-		var bullet = Instantiate(projectile, position, rotation);
+	void CmdFire(GameObject rangeSkill, Vector3 position, Quaternion rotation, bool max){
+		_skill01ParticleEffect.Stop();
+		skill01ParticleEffect.Stop();
+
+		_preSkill01ParticleEffect.Play();
+
+		var bullet = Instantiate(rangeSkill, position, rotation);
 		bullet.GetComponent<BulletSkill> ().setMaxCharge (max);
 		NetworkServer.Spawn (bullet);
 	}
 
 	[Command]
-	public void CmdFire02(Vector3 position, Quaternion rotation, bool max){
-		var bullet = Instantiate(projectileMax, position, rotation);
-		bullet.GetComponent<BulletSkill> ().setMaxCharge (max);
-		NetworkServer.Spawn (bullet);
-	}
-
-	[Command]
-	void CmdSkill02PlayParticle()
-	{
-		RpcSkill02PlayParticle();
-		skill02Buffed = true;
-	}
-
-	[ClientRpc]
-	void RpcSkill02PlayParticle()
-	{
-		skill02ParticleEffect.Play();
-	}
-
-	[Command]
-	void CmdSkill01PlayParticle()
-	{
+	void CmdSkill01PlayParticle(){
 		RpcSkill01PlayParticle();
 	}
 
 	[ClientRpc]
-	void RpcSkill01PlayParticle()
-	{
+	void RpcSkill01PlayParticle(){
 		_skill01ParticleEffect.Play();
 		skill01ParticleEffect.Play();
 	}
 
 	[Command]
-	void CmdSkill01StopParticle()
-	{
-		RpcSkill01StopParticle();
+	void CmdSkill02PlayParticle(){
+		RpcSkill02PlayParticle();
+		skill02Buffed = true;
 	}
 
 	[ClientRpc]
-	void RpcSkill01StopParticle()
-	{
-		_skill01ParticleEffect.Stop();
-		skill01ParticleEffect.Stop();
+	void RpcSkill02PlayParticle(){
+		skill02ParticleEffect.Play();
 	}
 
 	[Command]
-	void CmdUltiPlayParticle()
-	{
+	void CmdUltiPlayParticle(){
 		RpcUltiPlayParticle();
 	}
 
 	[ClientRpc]
-	void RpcUltiPlayParticle()
-	{
+	void RpcUltiPlayParticle(){
 		ultiParticleEffect.Play();
+	}
+
+	void UltiActive(){
+		ultiAttack.SetActive(true);
+	}
+
+	void UltiNotActive(){
+		ultiAttack.SetActive(false);
 	}
 }

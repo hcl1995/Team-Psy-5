@@ -20,10 +20,8 @@ public class LavaPit : DestructableWall
 
 	void LavaPitChuiDiao()
 	{
-		if (health <= 0 && callOnce == false)
+		if (health <= breakHP && callOnce == false)
 		{
-			//gameObject.GetComponent<MeshFilter>().mesh = destroyMesh;
-			RpcSetAnimation("Break");
 			AudioSource.PlayClipAtPoint(soundEffect.selfServiceClip[1], transform.position);
 
 			int repeat = Random.Range(5, 20);
@@ -31,15 +29,10 @@ public class LavaPit : DestructableWall
 			{
 				int randomX = Random.Range(1, 23);
 				int randomZ = Random.Range(1, 23);
-				CmdSpawnMeteor (GetMeteorPosition(randomX, randomZ), Quaternion.identity);
+				CmdSpawnMe (meteorRock, GetMeteorPosition(randomX, randomZ), Quaternion.identity);
 			}
-			//			foreach (Collider c in m_Collider)
-			//			{
-			//				c.enabled = !c.enabled;
-			//			}
-			//m_Collider.enabled = !m_Collider.enabled;
 
-			CmdSpawnStupidDoubleMeshRock (transform.position, transform.rotation);
+			CmdSpawnMe (wtfDoubleMeshRock, transform.position, transform.rotation);
 			Destroy(gameObject);
 
 			callOnce = true;
@@ -47,16 +40,9 @@ public class LavaPit : DestructableWall
 	}
 
 	[Command]
-	void CmdSpawnMeteor(Vector3 position, Quaternion rotation)
+	void CmdSpawnMe(GameObject meteorNrock, Vector3 position, Quaternion rotation)
 	{
-		var lavaRock = Instantiate(meteorRock, position, rotation);
-		NetworkServer.Spawn (lavaRock);
-	}
-
-	[Command]
-	void CmdSpawnStupidDoubleMeshRock(Vector3 position, Quaternion rotation)
-	{
-		var doubleMeshRock = Instantiate(wtfDoubleMeshRock, position, rotation);
-		NetworkServer.Spawn (doubleMeshRock);
+		var meteorOrock = Instantiate(meteorNrock, position, rotation);
+		NetworkServer.Spawn (meteorOrock);
 	}
 }

@@ -17,6 +17,7 @@ public class LevelEditor : NetworkBehaviour
 
 	void Start ()
 	{	
+		Time.timeScale = 0;
 		if (isServer) {
 			GenerateLevel();
 		}

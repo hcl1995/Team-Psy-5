@@ -11,8 +11,8 @@ public class AttackUlti : MonoBehaviour
 	public PlayerSkillControl selfPlayerSkill;
 	public float distance;
 	public bool isHit = false;
-	float timeElapsed = 0;
-	float disableAfter = 1.0f;
+//	float timeElapsed = 0;
+//	float disableAfter = 1.0f;
 	public float damage;
 
 	GameObject impactGO;
@@ -39,12 +39,12 @@ public class AttackUlti : MonoBehaviour
 		{
 			if (other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> () != selfHealth && selfControl.animation.GetCurrentAnimatorStateInfo (0).IsName ("Ultimate")) {
 				//other.gameObject.GetComponentInParent<Animator> ().SetTrigger ("DamageDown03");
-				Vector3 UltKnockPos = gameObject.transform.root.forward * distance;
+				//Vector3 UltKnockPos = gameObject.transform.root.forward * distance;
 
 				if (selfPlayerSkill.skill02Buffed == false)
 				{
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flying = true;
-					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flyDistance = distance;
+					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().getOtherPos = transform.root.forward * distance;
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position),other);
 					//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
 					AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[11], other.transform.position);
@@ -52,7 +52,7 @@ public class AttackUlti : MonoBehaviour
 				else if (selfPlayerSkill.skill02Buffed == true)
 				{
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flying = true;
-					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flyDistance = distance;
+					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().getOtherPos = transform.root.forward * distance;
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage * 1.5f,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position),other);
 					//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
 					AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[11], other.transform.position);

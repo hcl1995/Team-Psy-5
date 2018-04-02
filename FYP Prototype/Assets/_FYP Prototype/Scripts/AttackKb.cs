@@ -11,8 +11,8 @@ public class AttackKb : MonoBehaviour
 	public PlayerControl selfControl;
 	public float distance;
 	public bool isHit = false;
-	float timeElapsed = 0;
-	float disableAfter = 1.0f;
+//	float timeElapsed = 0;
+//	float disableAfter = 1.0f;
 	public float damage;
 
 	GameObject impactGO;
@@ -43,7 +43,7 @@ public class AttackKb : MonoBehaviour
 				if (other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().state != PlayerControl.playerState.Guarding)
 				{
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flying = true;
-					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flyDistance = distance;
+					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().getOtherPos = transform.root.forward * distance;
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeKnockbackDamage (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position), other, gImpact);
 					//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
 					AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[2], other.transform.position);

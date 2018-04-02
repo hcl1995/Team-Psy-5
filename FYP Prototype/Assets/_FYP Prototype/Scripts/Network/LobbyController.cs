@@ -32,7 +32,6 @@ public class LobbyController : NetworkManager {
 	public int player1CharaterProtrait;
 	public int player2CharaterProtrait;
 	int matchCount = 1;
-	public int loadReady;
 
 	public List<GameObject> playerNetwork = new List<GameObject> ();
 	public List<GameObject> playerChara = new List<GameObject> ();
@@ -123,10 +122,6 @@ public class LobbyController : NetworkManager {
 		networkDiscovery.StartAsServer ();
 		playerNetwork.RemoveAt (1);
 		playerChara.Clear ();
-		foreach (GameObject go in playerNetwork) {
-			go.GetComponent<PlayerNetwork> ().textInt = 0;
-		}
-		intPlayer--;
 	}
 
 	public override void OnClientDisconnect(NetworkConnection conn){
@@ -187,8 +182,6 @@ public class LobbyController : NetworkManager {
 		NetworkServer.AddPlayerForConnection (conn, playerObject, playerControllerId);
 	}
 
-	//----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-
 	public void PlayerReady(){
 		readyPlayer++;
 		if (readyPlayer > 1) {
@@ -212,14 +205,14 @@ public class LobbyController : NetworkManager {
 		}
 	}
 
-
+	public int loadReady;
 	public void allLoadEnterReady(){
 		loadReady++;
 		if (loadReady == 2) {
 			PlayerNetwork.singleton.RpcDisableLoad ();
 			loadReady = 0;
 			//StartCoroutine (StartMatchCountDown ());
-			//SpawnCharacter ();
+			SpawnCharacter ();
 		}
 	}
 
@@ -247,6 +240,10 @@ public class LobbyController : NetworkManager {
 
 	}
 
+
+
+
+
 	public void checkPlayerConditionNew(int playerNumber){
 		foreach (GameObject go2 in playerNetwork) {
 			if (go2.GetComponent<PlayerNetwork> ().playerNumber != playerNumber) {
@@ -258,10 +255,11 @@ public class LobbyController : NetworkManager {
 		}			
 
 		foreach(GameObject go in playerChara) {
-			NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerHealth>().pn.conn, go.GetComponent<PlayerHealth>().pn.transform.gameObject,0);
+			NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerHealth>().pn.conn, go.GetComponent<PlayerHealth>().pn.playerInfo,0);
 		}
+		playerChara = new List<GameObject> ();
 		matchCount++;
-		//StartCoroutine(serverChangeScene());
+		StartCoroutine(serverChangeScene());
 		//base.ServerChangeScene ("Lobby");
 	}
 
@@ -291,28 +289,22 @@ public class LobbyController : NetworkManager {
 		return playerCharacter;
 	}
 
-	public int allReadyEnd;
-	public void EndMatchAllReady(){
-		allReadyEnd++;
-		if (allReadyEnd == 2) {
-			base.ServerChangeScene ("Lobby");
-			foreach(GameObject go in playerChara) {
-				NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerHealth>().pn.conn, go.GetComponent<PlayerHealth>().pn.playerInfo,0);
-			}
-			foreach (GameObject go in playerNetwork) {
-				go.GetComponent<PlayerNetwork> ().textInt = 0;
-			}
-			allReadyEnd = 0;
-			playerChara.Clear();
-		}
-	}
-
 	public IEnumerator serverChangeScene()
 	{
 		yield return new WaitForSeconds(5f);
+		//SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
 		base.ServerChangeScene ("Lobby");
 		foreach (GameObject go in playerNetwork) {
 			go.GetComponent<PlayerNetwork> ().textInt = 0;
 		}
 	}
+
+//	[ClientRpc]
+//	void RpcCharacterProtrait(int playerCharacter, int playerNumber){
+//		if (playerNumber == 1) {
+//			player1CharaterProtrait = playerCharacter;
+//		} else {
+//			player2CharaterProtrait = playerCharacter;
+//		}
+//	}
 }

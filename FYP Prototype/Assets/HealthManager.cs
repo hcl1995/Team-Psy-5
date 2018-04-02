@@ -22,9 +22,6 @@ public class HealthManager : NetworkBehaviour {
 	public int player1Life = 3;
 	public int player2Life = 3;
 
-	[SyncVar]
-	public int WinPlayerInt = 0;
-
 	public RectTransform healthBar1;
 	public RectTransform healthBar2;
 
@@ -120,12 +117,6 @@ public class HealthManager : NetworkBehaviour {
 			if (player2Life <= 0 || player1Life <=0) {
 				playerDead = true;
 				CmdMatchGame (playerNumber);
-				if (playerNumber == 1) {
-					WinPlayerInt = 2;
-				} else if (playerNumber == 2) {
-					WinPlayerInt = 1;
-				}
-				RpcEndGame ();
 				return;
 			}
 
@@ -210,10 +201,5 @@ public class HealthManager : NetworkBehaviour {
 	[ClientRpc]
 	void RpcPlayThis(){
 		SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
-	}
-
-	[ClientRpc]
-	void RpcEndGame(){
-		MatchController.singleton.EndMatch.SetActive (true);
 	}
 }

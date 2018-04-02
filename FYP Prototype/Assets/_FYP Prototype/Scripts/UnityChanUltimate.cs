@@ -38,7 +38,7 @@ public class UnityChanUltimate : MonoBehaviour
 //				{
 //					curInterval += Time.deltaTime;
 //				}
-				Vector3 UltKnockPos = new Vector3(0, 0, 0);
+				//Vector3 UltKnockPos = new Vector3(0, 0, 0);
 
 				//if (curInterval >= hitInterval && hitCount >= 0)
 				//{
@@ -61,20 +61,18 @@ public class UnityChanUltimate : MonoBehaviour
 					if (i < 5)
 					{
 						other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown02",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(randPos),other);
-						//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
-						AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[11], other.transform.position);
 					}
 					else if (i == 5)
 					{
 						other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flying = true;
-						other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flyDistance = distance;
+						other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().getOtherPos = transform.root.forward * distance;
 
-						UltKnockPos = gameObject.transform.root.forward * distance;
+						//UltKnockPos = gameObject.transform.root.forward * distance;
 						other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider>().ClosestPointOnBounds(transform.position),other);
-						//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
-						AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[11], other.transform.position);
+
 					}
 				}
+				AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[11], other.transform.position);
 				isHit = true;
 			}
 		}

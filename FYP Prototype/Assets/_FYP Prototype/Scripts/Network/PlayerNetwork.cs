@@ -143,16 +143,4 @@ public class PlayerNetwork : NetworkBehaviour {
 	public void RpcDisableLoad(){
 		LocalPlayerInfo.singleton.disableLoading ();
 	}
-
-	[Command]
-	public void CmdStartMatchSpawnNow(){
-		if (isServer) {
-			LobbyController.s_Singleton.SpawnCharacter ();
-		}
-	}
-
-	[Command]
-	public void CmdOnEndMatchReady(){
-		LobbyController.s_Singleton.EndMatchAllReady ();
-	}
 }
