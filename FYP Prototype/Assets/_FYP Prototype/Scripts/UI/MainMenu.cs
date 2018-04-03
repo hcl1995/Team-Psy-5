@@ -14,6 +14,7 @@ public class MainMenu : MonoBehaviour
 	public GameObject settings;
 	public GameObject audioSetting;
 	public GameObject controlSetting;
+	public GameObject credit;
 
 
 	[Header ("Volume Sliders")]
@@ -24,12 +25,12 @@ public class MainMenu : MonoBehaviour
 
 	public void GameStart()
 	{
-		SceneManager.LoadScene(1);
+		SceneManager.LoadScene(2);
 	}
 
 	public void Training()
 	{
-		
+
 	}
 
 	public void Setting()
@@ -85,7 +86,7 @@ public class MainMenu : MonoBehaviour
 
 	public void ControlSettingReset()
 	{
-		
+
 	}
 
 	public void SettingBack()
@@ -97,5 +98,17 @@ public class MainMenu : MonoBehaviour
 	public void Exit()
 	{
 		Application.Quit();	
+	}
+
+	public void Credit(){
+		credit.SetActive (true);
+	}
+
+	void Update(){
+		if (credit.activeSelf) {
+			if (Input.anyKeyDown) {
+				credit.SetActive (false);
+			}
+		}
 	}
 }
