@@ -1,3 +1,12 @@
+Commit 32 (Apr 3, 2018)
+------------------------
+-Main Menu & (Main menu script)
+-Player attributes (Dash, cd, damages...)
+-Pillar secondary texture (last time i put wrong)
+-Imported UI sprites + font
+[other than this 4, all can ignore]
+
+
 Commit 32 (Apr 1, 2018)
 ------------------------
 -Fix some sound issue. (Good enough for playtest not yet perfect)

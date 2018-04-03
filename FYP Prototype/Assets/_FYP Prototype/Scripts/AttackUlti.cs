@@ -53,7 +53,7 @@ public class AttackUlti : MonoBehaviour
 				{
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flying = true;
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().getOtherPos = transform.root.forward * distance;
-					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage * 1.5f,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position),other);
+					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage * 2,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position),other);
 					//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
 					AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[11], other.transform.position);
 					selfPlayerSkill.skill02Buffed = false;

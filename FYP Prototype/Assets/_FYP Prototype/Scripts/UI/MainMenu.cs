@@ -14,6 +14,7 @@ public class MainMenu : MonoBehaviour
 	public GameObject settings;
 	public GameObject audioSetting;
 	public GameObject controlSetting;
+	public GameObject credit;
 
 
 	[Header ("Volume Sliders")]
@@ -24,12 +25,12 @@ public class MainMenu : MonoBehaviour
 
 	public void GameStart()
 	{
-		SceneManager.LoadScene(1);
+		SceneManager.LoadScene(2);
 	}
 
 	public void Training()
 	{
-		
+		// fuck training delete!
 	}
 
 	public void Setting()
@@ -75,17 +76,14 @@ public class MainMenu : MonoBehaviour
 
 	public void ControlSetting()
 	{
+		settings.SetActive(false);
 		controlSetting.SetActive(true);
 	}
 
 	public void ControlSettingBack()
 	{
 		controlSetting.SetActive(false);
-	}
-
-	public void ControlSettingReset()
-	{
-		
+		settings.SetActive(true);
 	}
 
 	public void SettingBack()
@@ -98,4 +96,28 @@ public class MainMenu : MonoBehaviour
 	{
 		Application.Quit();	
 	}
+
+	public void Credit(){
+		mainMenu.SetActive(false);
+		credit.SetActive (true);
+	}
+
+	public void CreditBack()
+	{
+		credit.SetActive (false);
+		mainMenu.SetActive(true);
+	}
+
+	public void OpenPDF()
+	{
+		Application.OpenURL("http://unity-chan.com/contents/license_en/");
+	}
+
+//	void Update(){
+//		if (credit.activeSelf) {
+//			if (Input.anyKeyDown) {
+//				credit.SetActive (false);
+//			}
+//		}
+//	}
 }
