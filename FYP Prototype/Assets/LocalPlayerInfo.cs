@@ -9,6 +9,7 @@ public class LocalPlayerInfo : MonoBehaviour {
 	public int playerNum = 0;
 	public int player1;
 	public int player2;
+	public hitIndicator hit;
 	// Use this for initialization
 	void Start () {
 		DontDestroyOnLoad (gameObject);
@@ -34,5 +35,9 @@ public class LocalPlayerInfo : MonoBehaviour {
 	public void disableLoading(){
 		LobbyController.s_Singleton.LoadingCanvas.SetActive (false);
 		StartTimer.singleton.StartMatchTimer ();
+	}
+
+	public void OnHit(){
+		hit.OnHit ();
 	}
 }

@@ -73,6 +73,7 @@ public class PlayerControl : NetworkBehaviour
 
 	[Header("Drag & Drop")]
 	public GameObject playerCanvas;
+	public GameObject playerAimDirection;
 	public GameObject trailRendererObject;
 	//public GameObject particleGuard;
 	public GameObject CharaterModel;
@@ -126,6 +127,7 @@ public class PlayerControl : NetworkBehaviour
 		dashCharge = maxDashChargeCount;
 		if (isLocalPlayer){
 			playerCanvas.SetActive (true);
+			playerAimDirection.SetActive (true);
 			singleton = this;
 		}
 		startSpawnPosition = gameObject.transform.root.position;

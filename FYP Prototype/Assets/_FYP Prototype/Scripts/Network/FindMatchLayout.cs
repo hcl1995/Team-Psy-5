@@ -52,5 +52,8 @@ public class FindMatchLayout : MonoBehaviour {
 		}
 
 	}
-		
+
+	public void Cancel(){
+		LobbyController.s_Singleton.CancelFromMatchFinding ();
+	}
 }
