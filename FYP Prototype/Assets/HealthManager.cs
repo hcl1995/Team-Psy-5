@@ -10,16 +10,14 @@ public class HealthManager : NetworkBehaviour {
 	float player1HealthMax = 200;
 	float player2HealthMax = 200;
 	[SyncVar(hook = "OnChangeHealth1")]
-	public float player1HealthCurrent;
+	float player1HealthCurrent;
 	[SyncVar(hook = "OnChangeHealth2")]
-	public float player2HealthCurrent;
+	float player2HealthCurrent;
 	[SyncVar(hook = "OnPlayer1Character")]
 	public int player1Character;
 	[SyncVar(hook = "OnPlayer2Character")]
 	public int player2Character;
 
-	public float a;
-	public float b;
 
 	public int player1Life = 3;
 	public int player2Life = 3;
@@ -27,8 +25,8 @@ public class HealthManager : NetworkBehaviour {
 	[SyncVar]
 	public int WinPlayerInt = 0;
 
-	public Image healthBar1;
-	public Image healthBar2;
+	public RectTransform healthBar1;
+	public RectTransform healthBar2;
 
 	public List<GameObject> player1LifeNode = new List<GameObject> ();
 	public List<GameObject> player2LifeNode = new List<GameObject> ();
@@ -36,12 +34,7 @@ public class HealthManager : NetworkBehaviour {
 
 	public Image player1Protrait;
 	public Image player2Protrait;
-	public Image Player1Name;
-	public Image Player2Name;
 	public List<Sprite> CharacterProtrait = new List<Sprite> ();
-	public List<Sprite> CharacterName = new List<Sprite> ();
-	public Sprite lifeGone1;
-	public Sprite lifeGone2;
 
 	static public HealthManager singleton;
 
@@ -62,17 +55,13 @@ public class HealthManager : NetworkBehaviour {
 		singleton = this;
 		if (isServer)
 			CmdGetProtrait ();
+		player1Protrait.sprite = CharacterProtrait [player1Character];
+		player2Protrait.sprite = CharacterProtrait [player2Character];
 	}
 
 	void Update(){
 		player1Protrait.sprite = CharacterProtrait [player1Character];
-		Player1Name.sprite = CharacterName [player1Character];
 		player2Protrait.sprite = CharacterProtrait [player2Character];
-		Player2Name.sprite = CharacterName [player2Character+2];
-		healthBar1.fillAmount = player1HealthCurrent / player1HealthMax;
-		healthBar2.fillAmount = player2HealthCurrent / player2HealthMax;
-		a =  player1HealthCurrent / player1HealthMax;
-		b =  player2HealthCurrent / player2HealthMax;
 	}
 
 	public void takeDamage(int playerNumber,float damage, PlayerControl playerControl){
@@ -97,13 +86,13 @@ public class HealthManager : NetworkBehaviour {
 	void OnChangeHealth1 (float health)
 	{
 		player1HealthCurrent = health;
-
+		healthBar1.sizeDelta = new Vector2(health, healthBar1.sizeDelta.y);
 	}
 
 	void OnChangeHealth2 (float health)
 	{
 		player2HealthCurrent = health;
-
+		healthBar2.sizeDelta = new Vector2(health, healthBar2.sizeDelta.y);
 	}
 
 	public void checkDeath(float health,int life,PlayerControl playerControl,int playerNumber)
@@ -173,15 +162,15 @@ public class HealthManager : NetworkBehaviour {
 
 	public IEnumerator respawn(int playerNumber, PlayerControl playerControl){
 		yield return new WaitForSeconds(3f);
+		if (playerNumber == 1) {
+			player1HealthCurrent = player1HealthMax;
+			player1Dead = false;
+		} else if (playerNumber == 2) {
+			player2HealthCurrent = player2HealthMax;
+			player2Dead = false;
+		}
 		if(!playerDead)
 		{
-			if (playerNumber == 1) {
-				player1HealthCurrent = player1HealthMax;
-				player1Dead = false;
-			} else if (playerNumber == 2) {
-				player2HealthCurrent = player2HealthMax;
-				player2Dead = false;
-			}
 			playerControl.respawnNow ();
 			if (player1Dead == false && player2Dead == false)
 				RpcBrainAlive();
@@ -212,9 +201,9 @@ public class HealthManager : NetworkBehaviour {
 	[ClientRpc]
 	void RpcLifeDecrease(int playerNumber, int Life){
 		if (playerNumber == 1) {
-			player1LifeNode [Life].GetComponent<Image>().sprite = lifeGone1;
+			player1LifeNode [Life].SetActive (false);
 		} else if (playerNumber == 2) {
-			player2LifeNode [Life].GetComponent<Image>().sprite = lifeGone2;
+			player2LifeNode [Life].SetActive (false);
 		}
 	}
 

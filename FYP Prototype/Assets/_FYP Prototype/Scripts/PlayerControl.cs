@@ -16,6 +16,7 @@ public class PlayerControl : NetworkBehaviour
 	[Header("Movement")]
 	public PlayerControl selfControl;
 	public float speed;
+	[HideInInspector]
 	public float gravity;
 	Vector3 moveDirection = Vector3.zero;
 	public float dashDistance;
@@ -34,7 +35,9 @@ public class PlayerControl : NetworkBehaviour
 
 	Vector3 flyStartPos;
 	Vector3 flyTargetPos;
+	[HideInInspector]
 	public Vector3 getOtherPos;
+	[HideInInspector]
 	public bool flying;
 	bool seriouslyFlying;
 	float completeFlyTime;

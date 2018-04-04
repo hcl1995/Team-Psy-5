@@ -30,7 +30,7 @@ public class MainMenu : MonoBehaviour
 
 	public void Training()
 	{
-
+		// fuck training delete!
 	}
 
 	public void Setting()
@@ -76,17 +76,14 @@ public class MainMenu : MonoBehaviour
 
 	public void ControlSetting()
 	{
+		settings.SetActive(false);
 		controlSetting.SetActive(true);
 	}
 
 	public void ControlSettingBack()
 	{
 		controlSetting.SetActive(false);
-	}
-
-	public void ControlSettingReset()
-	{
-
+		settings.SetActive(true);
 	}
 
 	public void SettingBack()
@@ -101,14 +98,26 @@ public class MainMenu : MonoBehaviour
 	}
 
 	public void Credit(){
+		mainMenu.SetActive(false);
 		credit.SetActive (true);
 	}
 
-	void Update(){
-		if (credit.activeSelf) {
-			if (Input.anyKeyDown) {
-				credit.SetActive (false);
-			}
-		}
+	public void CreditBack()
+	{
+		credit.SetActive (false);
+		mainMenu.SetActive(true);
 	}
+
+	public void OpenPDF()
+	{
+		Application.OpenURL("http://unity-chan.com/contents/license_en/");
+	}
+
+//	void Update(){
+//		if (credit.activeSelf) {
+//			if (Input.anyKeyDown) {
+//				credit.SetActive (false);
+//			}
+//		}
+//	}
 }

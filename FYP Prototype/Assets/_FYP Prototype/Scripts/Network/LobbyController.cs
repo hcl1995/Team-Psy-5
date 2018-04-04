@@ -270,13 +270,13 @@ public class LobbyController : NetworkManager {
 	public int SetPlayerCharacter(int playerCharacter, int playerNumber){
 		int selectedCharacterInt = playerCharacter;
 
-//		if (matchCount % 3 == 0) {
-//			if (playerCharacter == 1) {
-//				playerCharacter = 3;
-//			}else if(playerCharacter == 2){
-//				playerCharacter = 4;
-//			}
-//		}
+		if (matchCount % 3 == 0) {
+			if (playerCharacter == 1) {
+				playerCharacter = 3;
+			}else if(playerCharacter == 2){
+				playerCharacter = 4;
+			}
+		}
 
 		if (playerNumber == 1) {
 			player1Character = playerCharacterSelector[playerCharacter];
