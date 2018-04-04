@@ -52,6 +52,4 @@ public class LoadingScreenScript : MonoBehaviour {
 			return "Character not found";
 		}
 	}
-
-
 }

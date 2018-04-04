@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class LobbyCanvas : MonoBehaviour {
-	public static LobbyCanvas instance;
+public class LoadingScreenCanvas : MonoBehaviour {
+	public static LoadingScreenCanvas instance;
 	// Use this for initialization
 	void Start () {
 		DontDestroyOnLoad (gameObject);

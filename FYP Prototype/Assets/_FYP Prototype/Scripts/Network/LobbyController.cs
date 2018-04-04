@@ -59,6 +59,14 @@ public class LobbyController : NetworkManager {
 		networkDiscovery.Initialize ();
 	}
 
+	public void OnBackToMain(){
+		SceneManager.LoadScene(1);
+		LocalPlayerInfo.singleton.SelfDestroy ();
+		LoadingScreenCanvas.instance.SelfDestroy ();
+		LobbyCanvas.instance.SelfDestroy ();
+		Destroy (gameObject);
+	}
+
 	public override void OnStartHost()
 	{
 		networkDiscovery.StartAsServer ();
