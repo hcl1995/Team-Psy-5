@@ -40,4 +40,8 @@ public class LocalPlayerInfo : MonoBehaviour {
 	public void OnHit(){
 		hit.OnHit ();
 	}
+
+	public void SelfDestroy(){
+		Destroy (gameObject);
+	}
 }

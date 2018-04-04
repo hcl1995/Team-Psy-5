@@ -59,6 +59,14 @@ public class LobbyController : NetworkManager {
 		networkDiscovery.Initialize ();
 	}
 
+	public void OnBackToMain(){
+		SceneManager.LoadScene(1);
+		LocalPlayerInfo.singleton.SelfDestroy ();
+		LoadingScreenCanvas.instance.SelfDestroy ();
+		LobbyCanvas.instance.SelfDestroy ();
+		Destroy (gameObject);
+	}
+
 	public override void OnStartHost()
 	{
 		networkDiscovery.StartAsServer ();
@@ -111,7 +119,8 @@ public class LobbyController : NetworkManager {
 	public override void OnServerDisconnect(NetworkConnection conn){		
 		networkDiscovery.Initialize ();
 
-		if (SceneManager.GetActiveScene().name == "LevelEditor") {
+		if (SceneManager.GetActiveScene().name == "LevelEditor")
+		{
 			foreach (GameObject go in playerChara) {
 				NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerHealth>().pn.conn, go.GetComponent<PlayerHealth>().pn.playerInfo,0);
 			}
@@ -208,7 +217,8 @@ public class LobbyController : NetworkManager {
 	public void allLoadScreenOn(){
 		isLoadScreenOn++;
 		if (isLoadScreenOn == 2) {
-			base.ServerChangeScene ("LevelEditor");
+			//base.ServerChangeScene ("LevelEditor");
+			base.ServerChangeScene ("DragonBallLevel");
 			foreach (GameObject go in playerNetwork) {
 				NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerNetwork> ().conn, go, 0);
 			}

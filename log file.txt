@@ -1,5 +1,16 @@
-Commit 32 (Apr 3, 2018)
-------------------------
+Commit 34 (Apr 5, 2018)
+-----------------------
+-Added Dragon Ball Level
+-Created The 2nd OngBak Prefab w/ Texture
+-LobbyController & PlayerNetwork (Scene DragonBallLevel)
+-Added Animation Event For Pillar PlayParticle (Destructible Wall Script)
+-Fixed Characters In Game Skill UI Colour (Just now say hard to see in lab one)
+-Added Animation Event For OnHits (To SetFalse Attacks)
+-Fixed Dash Image Bug & Commented OnGround AnimationBool (PlayerControl)
+
+
+Commit 33 (Apr 3, 2018)
+-----------------------
 -Main Menu & (Main menu script)
 -Player attributes (Dash, cd, damages...)
 -Pillar secondary texture (last time i put wrong)
@@ -8,7 +19,7 @@ Commit 32 (Apr 3, 2018)
 
 
 Commit 32 (Apr 1, 2018)
-------------------------
+-----------------------
 -Fix some sound issue. (Good enough for playtest not yet perfect)
 -Change knockback method.
 

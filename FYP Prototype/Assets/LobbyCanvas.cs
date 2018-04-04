@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class LobbyCanvas : MonoBehaviour {
-	private static LobbyCanvas instance;
+	public static LobbyCanvas instance;
 	// Use this for initialization
 	void Start () {
 		DontDestroyOnLoad (gameObject);
@@ -12,5 +12,9 @@ public class LobbyCanvas : MonoBehaviour {
 		} else {
 			DestroyObject (gameObject);
 		}
+	}
+
+	public void SelfDestroy(){
+		Destroy (gameObject);
 	}
 }
