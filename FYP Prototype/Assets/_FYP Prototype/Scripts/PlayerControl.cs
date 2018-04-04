@@ -26,6 +26,8 @@ public class PlayerControl : NetworkBehaviour
 	float dashChargeCooldown;
 	public int maxDashChargeCount;
 	public float dashChargeCooldownDuration;
+	public Image dashCD;
+	public Text dashChargeValue;
 
 	Vector3 dashEndPos;
 	Vector3 dashStartPos;
@@ -73,6 +75,7 @@ public class PlayerControl : NetworkBehaviour
 
 	[Header("Drag & Drop")]
 	public GameObject playerCanvas;
+	public GameObject playerAimDirection;
 	public GameObject trailRendererObject;
 	//public GameObject particleGuard;
 	public GameObject CharaterModel;
@@ -126,6 +129,7 @@ public class PlayerControl : NetworkBehaviour
 		dashCharge = maxDashChargeCount;
 		if (isLocalPlayer){
 			playerCanvas.SetActive (true);
+			playerAimDirection.SetActive (true);
 			singleton = this;
 		}
 		startSpawnPosition = gameObject.transform.root.position;
@@ -274,6 +278,11 @@ public class PlayerControl : NetworkBehaviour
 					CmdAnimation("Dash");
 					CmdPlaySFXClip(1);
 
+					if (dashCharge == maxDashChargeCount)
+					{
+						dashCD.fillAmount = 1;
+					}
+
 					dashCount++;
 					dashCharge--;
 					dashChargeCooldown += dashChargeCooldownDuration;
@@ -294,16 +303,31 @@ public class PlayerControl : NetworkBehaviour
 			isDash = false;
 			completeDashTime = 0;
 		}
-			
+
+		dashChargeValue.text = "x" + dashCharge.ToString();
+
 		if (dashChargeCooldown > 0)
 		{
+			dashCD.fillAmount -= 1.0f / dashChargeCooldownDuration * Time.deltaTime;
 			dashChargeCooldown -= Time.deltaTime;
+
+			if (dashCD.fillAmount == 0)
+			{
+				if (dashCharge < maxDashChargeCount)
+				{
+					dashCD.fillAmount = 1;
+				}
+				else
+				{
+					dashCD.fillAmount = 0;
+				}
+			}
 		}
 		else
 		{
 			dashChargeCooldown = 0;
 		}
-			
+
 		if (maxDashChargeCount - dashCharge == dashCount && dashChargeCooldown <= ((dashChargeCooldownDuration * dashCount) - dashChargeCooldownDuration))
 		{
 			dashCount--;

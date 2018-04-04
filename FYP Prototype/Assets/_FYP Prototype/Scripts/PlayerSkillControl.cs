@@ -73,7 +73,7 @@ public class PlayerSkillControl : PlayerControl
 
 					skill02CD.fillAmount = 1;
 					skill02Cooldown = skill02CooldownDuration;
-					RpcPlaySFXClip(4);
+					CmdPlaySFXClip(4);
 				}
 			}
 			else if (KeyBindingManager.GetKeyDown(KeyAction.Ultimate))
@@ -86,7 +86,7 @@ public class PlayerSkillControl : PlayerControl
 
 					ultimateCD.fillAmount = 1;
 					ultimateCooldown = ultimateCooldownDuration;
-					RpcPlaySFXClip(5);
+					CmdPlaySFXClip(5);
 				}
 			}
 		}
@@ -99,24 +99,24 @@ public class PlayerSkillControl : PlayerControl
 					animation.SetBool("ReleaseShot", true);
 
 					RotateTowardMouseDuringAction();
-					CmdFire (projectile, skill01SpawnPoint.position, skill01SpawnPoint.rotation, maxCharge);
+					CmdFire (1, skill01SpawnPoint.position, skill01SpawnPoint.rotation, maxCharge);
 					chargeBar.SetActive(false);
 
 					StartCoroutine(ResetDelay());
 					skill01Cooldown = skill01CooldownDuration;
-					RpcPlaySFXClip(3);
+					CmdPlaySFXClip(3);
 				}
 				else if (skill01Cooldown <= 0 && maxCharge)
 				{
 					animation.SetBool("ReleaseShot", true);
 
 					RotateTowardMouseDuringAction();
-					CmdFire (projectileMax, skill01SpawnPoint.position, skill01SpawnPoint.rotation, maxCharge);
+					CmdFire (2, skill01SpawnPoint.position, skill01SpawnPoint.rotation, maxCharge);
 					chargeBar.SetActive(false);
 
 					StartCoroutine(ResetDelay());
 					skill01Cooldown = skill01CooldownDuration;
-					RpcPlaySFXClip(3);
+					CmdPlaySFXClip(3);
 				}
 			}
 		}
@@ -138,13 +138,20 @@ public class PlayerSkillControl : PlayerControl
 	}
 
 	[Command]
-	void CmdFire(GameObject rangeSkill, Vector3 position, Quaternion rotation, bool max){
-		_skill01ParticleEffect.Stop();
-		skill01ParticleEffect.Stop();
+	void CmdFire(int rangeSkill, Vector3 position, Quaternion rotation, bool max){
+		GameObject cprojectile = projectile;
+		switch (rangeSkill) {
+		case 1:
+			cprojectile = projectile;
+			break;
+		case 2:
+			cprojectile = projectileMax;
+			break;
+		}
+		RpcSkill01StopParticle ();
+		RpcPreSkill01ParticleEffect ();
 
-		_preSkill01ParticleEffect.Play();
-
-		var bullet = Instantiate(rangeSkill, position, rotation);
+		var bullet = Instantiate(cprojectile, position, rotation);
 		bullet.GetComponent<BulletSkill> ().setMaxCharge (max);
 		NetworkServer.Spawn (bullet);
 	}
@@ -158,6 +165,17 @@ public class PlayerSkillControl : PlayerControl
 	void RpcSkill01PlayParticle(){
 		_skill01ParticleEffect.Play();
 		skill01ParticleEffect.Play();
+	}
+
+	[ClientRpc]
+	void RpcSkill01StopParticle(){
+		_skill01ParticleEffect.Stop();
+		skill01ParticleEffect.Stop();
+	}
+
+	[ClientRpc]
+	void RpcPreSkill01ParticleEffect(){
+		_preSkill01ParticleEffect.Play();
 	}
 
 	[Command]
