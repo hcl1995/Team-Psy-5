@@ -383,7 +383,7 @@ public class PlayerControl : NetworkBehaviour
 				CmdSetPlayerState (PlayerControl.playerState.Guarding);
 				soundEffect.PlaySFXClip (soundEffect.selfServiceClip [6]);
 			}				
-		} else if (isNotAlwaysGuard) {
+		} else if (state == PlayerControl.playerState.Guarding && isNotAlwaysGuard) {
 			//			if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
 			//			{
 			//animation.SetBool("isMoving", false);
@@ -391,6 +391,8 @@ public class PlayerControl : NetworkBehaviour
 			CmdSetPlayerState (PlayerControl.playerState.Normal);
 			toggleGuard = false;
 			//}
+		} else if (state == PlayerControl.playerState.Normal) {
+			toggleGuard = false;
 		}
 		if (Input.GetKeyUp (KeyCode.K)) {
 			if (isNotAlwaysGuard)
@@ -534,10 +536,10 @@ public class PlayerControl : NetworkBehaviour
 	void RestrictInput()
 	{
 		if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Idle") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Run") ||
-		    this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Dash") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("ShootCasting02")) {
+			this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Dash") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("ShootCasting02")) {
 			state = playerState.Normal;
 		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack02") ||
-		           this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack03")) {
+			this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack03")) {
 			callOnce = false;
 			state = playerState.Attacking;
 			animation.SetBool("isMoving", false);
@@ -548,9 +550,9 @@ public class PlayerControl : NetworkBehaviour
 			state = playerState.SkillCharging;
 			animation.SetBool("isMoving", false);
 		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Wall") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Ultimate") ||
-		           this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown") ||
-		           this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown02") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown03") ||
-		           this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Recover")) {
+			this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown") ||
+			this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown02") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown03") ||
+			this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Recover")) {
 			state = playerState.OnAnimation;
 			animation.SetBool("isMoving", false);
 		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Death")) {

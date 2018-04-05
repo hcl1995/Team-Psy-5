@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement;
 
 public class PlayerInfo : NetworkBehaviour {
 	static public PlayerInfo singleton; 
@@ -128,10 +127,6 @@ public class PlayerInfo : NetworkBehaviour {
 	public void SelectedCharacter(int i){
 		selectedCharacterInt = i;
 		characterSprite.sprite = LobbyController.s_Singleton.selectedCharacterSprite [i];
-	}
-
-	public void OnSceneChange(Scene scene1, Scene scene2){
-
 	}
 	[Command]
 	public void CmdSelectLevel(int level){
