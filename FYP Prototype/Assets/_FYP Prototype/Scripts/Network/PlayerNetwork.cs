@@ -65,7 +65,9 @@ public class PlayerNetwork : NetworkBehaviour {
 	}
 
 	void OnSceneChange(Scene scene1, Scene scene2){
-		if (scene2.name == "LevelEditor") {
+		if //(scene2.name == "LevelEditor")
+			(scene2.name == "DragonBallLevel")
+		{
 			Debug.Log ("Is Me");
 			LobbyController.s_Singleton.lobbyCanvas.SetActive (false);
 

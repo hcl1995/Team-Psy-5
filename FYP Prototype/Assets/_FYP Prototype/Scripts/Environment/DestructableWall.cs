@@ -83,4 +83,9 @@ public class DestructableWall : NetworkBehaviour
 		hitParticle.Play();
 		soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 	}
+
+	void AnimEventPlayParticle()
+	{
+		hitParticle.Play();
+	}
 }

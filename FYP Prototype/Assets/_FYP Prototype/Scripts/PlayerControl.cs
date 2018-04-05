@@ -172,37 +172,30 @@ public class PlayerControl : NetworkBehaviour
 
 		controller.Move(Vector3.down * gravity * Time.deltaTime);
 
-		if (isFalling)
-		{
-			// add fall animation --> OnAnim
-			//state = playerState.OnAnimation;
-			animation.SetBool("OnGround", false);
-		}
-		else
-		{
-			animation.SetBool("OnGround", true);
-		}
+//		if (isFalling)
+//		{
+//			// add fall animation --> OnAnim
+//			//state = playerState.OnAnimation;
+//			animation.SetBool("OnGround", false);
+//		}
+//		else
+//		{
+//			animation.SetBool("OnGround", true);
+//		}
 
 		if (flying)
 		{
 			flyStartPos = transform.position;
 			flyTargetPos = transform.position += getOtherPos;
-			//dashEndPos = transform.position += (transform.forward * dashDistance);
 
 			seriouslyFlying = true;
 			flying = false;
-//			flySpeed = flyDistance;
-//			flyTargetPos = transform.position + (-transform.forward * flyDistance);
-//			seriouslyFlying = true;
-//			flying = false;
 		}
 
 		if (seriouslyFlying)
 		{
 			completeFlyTime += flyLerpSpeed * Time.deltaTime;
 			transform.position = Vector3.Lerp (flyStartPos, flyTargetPos, completeFlyTime);
-//			Vector3 direction = (flyTargetPos - transform.position).normalized;
-//			controller.Move(direction * flySpeed * Time.deltaTime);
 		}
 
 		if (completeFlyTime >= 1)
@@ -278,10 +271,10 @@ public class PlayerControl : NetworkBehaviour
 					CmdAnimation("Dash");
 					CmdPlaySFXClip(1);
 
-					if (dashCharge == maxDashChargeCount)
-					{
-						dashCD.fillAmount = 1;
-					}
+//					if (dashCharge == maxDashChargeCount)
+//					{
+//						dashCD.fillAmount = 1;
+//					}
 
 					dashCount++;
 					dashCharge--;
@@ -306,6 +299,12 @@ public class PlayerControl : NetworkBehaviour
 
 		dashChargeValue.text = "x" + dashCharge.ToString();
 
+		if (maxDashChargeCount - dashCharge == dashCount && dashChargeCooldown <= ((dashChargeCooldownDuration * dashCount) - dashChargeCooldownDuration))
+		{
+			dashCount--;
+			dashCharge++;
+		}
+
 		if (dashChargeCooldown > 0)
 		{
 			dashCD.fillAmount -= 1.0f / dashChargeCooldownDuration * Time.deltaTime;
@@ -326,12 +325,6 @@ public class PlayerControl : NetworkBehaviour
 		else
 		{
 			dashChargeCooldown = 0;
-		}
-
-		if (maxDashChargeCount - dashCharge == dashCount && dashChargeCooldown <= ((dashChargeCooldownDuration * dashCount) - dashChargeCooldownDuration))
-		{
-			dashCount--;
-			dashCharge++;
 		}
 	}
 
