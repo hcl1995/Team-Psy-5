@@ -1,3 +1,13 @@
+Commit 35 (Apr 6, 2018)
+-----------------------
+-Fixed Pillar Fall VFX (Destructable Wall)
+-Lava Script & PlayerHealth (Burn Leg Animation - fixed hopefully)
+-Added New ANimations & VFX
+-New Tile new skybox..
+-Fix guard sound (forgot comment a line, playercontrol)
+-Hope i didn't miss anything
+
+
 Commit 34 (Apr 5, 2018)
 -----------------------
 -Added Dragon Ball Level

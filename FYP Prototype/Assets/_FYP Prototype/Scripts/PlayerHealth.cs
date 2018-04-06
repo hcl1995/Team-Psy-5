@@ -84,7 +84,6 @@ public class PlayerHealth : NetworkBehaviour {
 		}
 		if (playerControl.state == PlayerControl.playerState.Guarding) {
 			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
-			//playerControl.soundEffect.PlaySFXClip(playerControl.soundEffect.selfServiceClip[1]);
 			playerControl.CmdPlaySFXClip(6);
 
 			impactGO =  (GameObject)Instantiate (superGuard, position, Quaternion.identity);
@@ -147,7 +146,7 @@ public class PlayerHealth : NetworkBehaviour {
 		checkDeath();
 	}
 
-	public void takeDamageHazard(float damage){
+	public void takeDamageHazard(float damage){//, string animation){
 		if (!isServer)
 			return;
 		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
@@ -156,16 +155,24 @@ public class PlayerHealth : NetworkBehaviour {
 		if (harzardDamageCD)
 			return;
 		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
-		//playerControl.soundEffect.PlayEnvironmentSFXClip(playerControl.soundEffect.selfServiceClip[12]);
-//		if (playerControl.soundEffect.audioSourceList[1].isPlaying == false)
-//		{
-//			Debug.Log("NOT PLAYING BABE, START BURN!");
-//			playerControl.CmdPlaySFXClip(8);
-//		}
+		//CmdAnimation (animation);
 //		harzardDamageCD = true;
 //		StartCoroutine(hazardCoolDown());
 		//CmdHit ();
 		checkDeath();
+	}
+
+	public void legPainAnimation(string animation)
+	{
+		if (!isServer)
+			return;
+		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
+			return;
+		}
+		if (harzardDamageCD)
+			return;
+
+		CmdAnimation (animation);
 	}
 
 	public void takeKnockbackDamage(float damage, string animation, GameObject impact, Vector3 position, Vector3 euler,Vector3 colliderHit,Collider other, GameObject guardImpact){
@@ -176,7 +183,6 @@ public class PlayerHealth : NetworkBehaviour {
 		}
 		if (playerControl.state == PlayerControl.playerState.Guarding) {
 			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
-			//playerControl.soundEffect.PlaySFXClip(playerControl.soundEffect.selfServiceClip[1]);
 			playerControl.CmdPlaySFXClip(6);
 
 			impactGO =  (GameObject)Instantiate (superGuard, position, Quaternion.identity);
@@ -206,18 +212,10 @@ public class PlayerHealth : NetworkBehaviour {
 		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
 			return;
 		}
-//		if (playerControl.state == PlayerControl.playerState.Guarding) {
-//			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
-//			playerControl.soundEffect.PlaySFXClip(playerControl.soundEffect.selfServiceClip[1]);
-//		}
-//		else {
 			HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
-			//CmdKnockBack (KnockPos);
 			CmdAnimation (animation);
 		//}
 		//CmdHit ();
-
-		//isKnockback = true;
 
 		// only server side do, so the kena hit look won't trigger in client
 		impactGO =  (GameObject)Instantiate (impact,colliderHit, Quaternion.identity);
@@ -227,8 +225,6 @@ public class PlayerHealth : NetworkBehaviour {
 		Vector3 eulerFucker = euler;
 		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
 		transform.root.rotation = Quaternion.Euler (eulerFucker);
-		//currPosition += (transform.root.forward * distance);
-		//other.transform.root.position = Vector3.Lerp (other.transform.root.position, KnockPos, completeKnockback);
 
 		checkDeath();
 	}
@@ -255,7 +251,6 @@ public class PlayerHealth : NetworkBehaviour {
 		if (other.gameObject.CompareTag("OutOfBoundDeathZone"))
 		{
 			HealthManager.singleton.takeDamage (playerNumber, 200, playerControl);
-			//playerControl.soundEffect.PlaySFXClip(playerControl.soundEffect.selfServiceClip[5]);
 			playerControl.CmdPlaySFXClip(7);
 		}
 	}
@@ -276,14 +271,7 @@ public class PlayerHealth : NetworkBehaviour {
 	public void RpcAmintion(string animation){
 		anim.SetTrigger (animation);
 	}
-	[Command]
-	void CmdKnockBack(Vector3 pos){
-		RpcKnockBack (pos);
-	}
-	[ClientRpc]
-	void RpcKnockBack(Vector3 pos){
-		gameObject.transform.root.position += pos;
-	}
+
 	//	[Command]
 	//	public void CmdHit(){
 	//		RpcShowHitIndicator ();

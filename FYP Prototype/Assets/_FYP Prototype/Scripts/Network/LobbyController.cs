@@ -217,8 +217,8 @@ public class LobbyController : NetworkManager {
 	public void allLoadScreenOn(){
 		isLoadScreenOn++;
 		if (isLoadScreenOn == 2) {
-			//base.ServerChangeScene ("LevelEditor");
-			base.ServerChangeScene ("DragonBallLevel");
+			base.ServerChangeScene ("LevelEditor");
+			//base.ServerChangeScene ("DragonBallLevel");
 			foreach (GameObject go in playerNetwork) {
 				NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerNetwork> ().conn, go, 0);
 			}

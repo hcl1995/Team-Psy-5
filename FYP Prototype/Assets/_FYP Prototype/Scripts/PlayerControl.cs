@@ -92,6 +92,7 @@ public class PlayerControl : NetworkBehaviour
 		Attacking,
 		SkillCharging,
 		OnAnimation,
+		OnAnimationMove,
 		Death
 	}
 
@@ -204,7 +205,7 @@ public class PlayerControl : NetworkBehaviour
 			completeFlyTime = 0;
 		}
 
-		if (state == playerState.Normal)
+		if (state == playerState.Normal || state == playerState.OnAnimationMove)
 		{
 			//GetAxis will be smoothed.
 			//moveDirection = new Vector3(Input.GetAxisRaw("Horizontal"), 0, Input.GetAxisRaw("Vertical"));
@@ -270,11 +271,6 @@ public class PlayerControl : NetworkBehaviour
 					isDash = true;
 					CmdAnimation("Dash");
 					CmdPlaySFXClip(1);
-
-//					if (dashCharge == maxDashChargeCount)
-//					{
-//						dashCD.fillAmount = 1;
-//					}
 
 					dashCount++;
 					dashCharge--;
@@ -383,7 +379,6 @@ public class PlayerControl : NetworkBehaviour
 				toggleGuard = true;
 				animation.SetBool("Guarding", true);
 				CmdSetPlayerState (PlayerControl.playerState.Guarding);
-				soundEffect.PlaySFXClip(soundEffect.selfServiceClip[6]);
 			}				
 		}
 		else if (state == PlayerControl.playerState.Guarding){
@@ -529,29 +524,49 @@ public class PlayerControl : NetworkBehaviour
 		attack03.SetActive(false);
 	}
 
+	void LegNotPain()
+	{
+		animation.SetBool("LegPainBool", false);
+	}
+		
 	void RestrictInput()
 	{
+		// it's bad due to the delay
 		if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Idle") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Run") ||
-		    this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Dash") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("ShootCasting02")) {
+		    this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Dash") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("ShootCasting02"))
+		{
 			state = playerState.Normal;
-		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack02") ||
-		           this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack03")) {
-			callOnce = false;
+		}
+		else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack02") ||
+				 this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Attack03"))
+		{
+			//callOnce = false;
 			state = playerState.Attacking;
 			animation.SetBool("isMoving", false);
-		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Guard")) {
+		}
+		else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Guard"))
+		{
 			state = playerState.Guarding;
 			animation.SetBool("isMoving", false);
-		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("ShootCasting01")) {
+		}
+		else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("ShootCasting01"))
+		{
 			state = playerState.SkillCharging;
 			animation.SetBool("isMoving", false);
-		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Wall") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Ultimate") ||
-		           this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown") ||
-		           this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown02") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown03") ||
-		           this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Recover")) {
+		}
+		else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Wall") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Ultimate") ||
+		         this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown02") || 
+				 this.animation.GetCurrentAnimatorStateInfo (0).IsName ("DamageDown03") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Recover")) 
+		{
 			state = playerState.OnAnimation;
 			animation.SetBool("isMoving", false);
-		} else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Death")) {
+		} 
+		else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("LegPain"))
+		{
+			state = playerState.OnAnimationMove;
+		}
+		else if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Death"))
+		{
 			state = playerState.Death;
 			animation.SetBool("isMoving", false);
 		}
@@ -575,10 +590,6 @@ public class PlayerControl : NetworkBehaviour
 			completeFlyTime = 0;
 		}
 	}
-
-//	void SeriouslyFlyingNotActive(){
-//		seriouslyFlying = false;
-//	}
 
 	public void playDeathAnim(){
 		CmdAnimation ("Death");
