@@ -81,7 +81,7 @@ public class EndMatch : MonoBehaviour {
 	}
 
 	public void OnNoPlayAgain(){
-		LobbyController.s_Singleton.OnBackToLobbyMenu ();
+		LobbyController.s_Singleton.OnBackToMainMenu ();
 		playerAgain.SetActive(false);
 	}
 }

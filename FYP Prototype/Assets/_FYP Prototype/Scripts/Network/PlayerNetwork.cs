@@ -16,6 +16,9 @@ public class PlayerNetwork : NetworkBehaviour {
 	public GameObject playerCharacter;
 	public GameObject playerInfo;
 	public GameObject playerUI;
+	public Text winText;
+	public GameObject player1win;
+	public GameObject player2win;
 
 	public Text endGameText;
 	public GameObject Canvas;
@@ -42,6 +45,11 @@ public class PlayerNetwork : NetworkBehaviour {
 			SceneManager.activeSceneChanged += OnSceneChange;
 			startOnce++;
 		}
+		if (playerNumber == 1) {
+			winText = player1win.GetComponent<Text> ();
+		} else {
+			winText = player2win.GetComponent<Text> ();
+		}
 		transform.localPosition = Vector3.zero;
 		
 
@@ -57,8 +65,10 @@ public class PlayerNetwork : NetworkBehaviour {
 	}
 
 	void OnSceneChange(Scene scene1, Scene scene2){
-		if (scene2.name == "DragonBallLevel" || scene2.name == "LevelEditor")
+		if (scene2.name == "LevelEditor")
+			//(scene2.name == "DragonBallLevel")
 		{
+			Debug.Log ("Is Me");
 			LobbyController.s_Singleton.lobbyCanvas.SetActive (false);
 
 			//CmdSpawnCharacter ();
@@ -71,6 +81,7 @@ public class PlayerNetwork : NetworkBehaviour {
 
 	void Update(){
 		//transform.localPosition = Vector3.zero;
+		winText.text = "Win : " + WinCount;
 		switch (textInt) {
 		case 0:
 			endGameText.text = "";
@@ -117,6 +128,7 @@ public class PlayerNetwork : NetworkBehaviour {
 	void GetPlayerWin(int i){
 		print ("GetPlayerWin");
 		WinCount = i;
+		winText.text = "Win : " + i;
 	}
 
 	void GetEndGame(int i){

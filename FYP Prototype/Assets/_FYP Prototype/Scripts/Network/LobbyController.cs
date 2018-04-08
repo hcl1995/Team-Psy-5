@@ -59,7 +59,7 @@ public class LobbyController : NetworkManager {
 		networkDiscovery.Initialize ();
 	}
 
-	public void OnBackToMainMenu(){
+	public void OnBackToMain(){
 		SceneManager.LoadScene(1);
 		LocalPlayerInfo.singleton.SelfDestroy ();
 		LoadingScreenCanvas.instance.SelfDestroy ();
@@ -81,7 +81,6 @@ public class LobbyController : NetworkManager {
 	}
 
 	public void changeTo(RectTransform newPanel){
-		LevelSelector.instance.OffLevelSelect ();
 		if (currentPanel != null)
 		{
 			currentPanel.gameObject.SetActive(false);
@@ -102,6 +101,7 @@ public class LobbyController : NetworkManager {
 		if (numPlayers > 1) {
 			uiWaiting.SetActive (false);
 		}
+		Debug.Log (base.numPlayers);
 	}
 
 	public override void OnServerConnect(NetworkConnection conn){
@@ -127,8 +127,6 @@ public class LobbyController : NetworkManager {
 			base.ServerChangeScene ("Lobby");
 			SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
 		}
-		LevelSelector.instance.OffLevelSelect ();
-		PlayerInfo.singleton.EnableCharacterSelector ();
 		NetworkServer.DestroyPlayersForConnection (conn);
 		uiWaiting.SetActive (true);
 		networkDiscovery.StartAsServer ();
@@ -153,7 +151,7 @@ public class LobbyController : NetworkManager {
 		networkDiscovery.Initialize ();
 	}
 
-	public void OnBackToLobbyMenu(){
+	public void OnBackToMainMenu(){
 		base.ServerChangeScene ("Lobby");
 		changeTo (LobbyPanel);
 		base.StopHost();
@@ -208,7 +206,7 @@ public class LobbyController : NetworkManager {
 		readyPlayer++;
 		if (readyPlayer > 1) {
 			print ("All Ready");
-			PlayerInfo.singleton.RpcLevelSelect ();
+			PlayerInfo.singleton.RpcEnableLoading ();
 
 			readyPlayer = 0;
 		}
@@ -219,25 +217,15 @@ public class LobbyController : NetworkManager {
 	public void allLoadScreenOn(){
 		isLoadScreenOn++;
 		if (isLoadScreenOn == 2) {
-			//base.ServerChangeScene ("LevelEditor");
-			base.ServerChangeScene (levelSelectString);
+			base.ServerChangeScene ("LevelEditor");
+			//base.ServerChangeScene ("DragonBallLevel");
 			foreach (GameObject go in playerNetwork) {
 				NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerNetwork> ().conn, go, 0);
 			}
 			isLoadScreenOn = 0;
 		}
 	}
-	public string levelSelectString = "DragonBallLevel";
-	public void SelectLevel(int level){
-		switch (level) {
-		case 1:
-			levelSelectString = "DragonBallLevel";
-			break;
-		case 2:
-			levelSelectString = "LevelEditor";
-			break;
-		}
-	}
+
 
 	public void allLoadEnterReady(){
 		loadReady++;
@@ -312,9 +300,7 @@ public class LobbyController : NetworkManager {
 			player2CharaterProtrait = playerCharacter;
 			LocalPlayerInfo.singleton.player2 = playerCharacter;
 		}
-		if (player1Character == player2Character) {
-			player2Character = playerCharacterSelector [playerCharacter+2];
-		}
+
 		//RpcCharacterProtrait (playerCharacter, playerNumber);
 		return playerCharacter;
 	}

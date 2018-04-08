@@ -11,12 +11,17 @@ public class LavaScript : NetworkBehaviour {
 			return;
 		if (other.gameObject.CompareTag("Player"))
 		{
-			other.gameObject.GetComponent<PlayerHealth> ().takeDamageHazard (damage);
+			other.gameObject.GetComponent<PlayerHealth> ().takeDamageHazard (damage); // Trigger doesn't looks that bad
+			other.gameObject.GetComponent<Animator>().SetBool("LegPainBool", true);
+
+			if (other.gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName ("LegPain") == false)
+			{
+				other.gameObject.GetComponent<PlayerHealth>().legPainAnimation("LegPain");
+			}
 
 			if (other.gameObject.GetComponent<SoundEffect>().audioSourceList[1].isPlaying == false)
 			{
 				other.gameObject.GetComponent<PlayerControl>().CmdPlaySFXClip(8);
-				//(other.gameObject.GetComponent<SoundEffect>().selfServiceClip[12]);
 			}
 		}
 	}

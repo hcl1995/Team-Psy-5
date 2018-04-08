@@ -27,7 +27,7 @@ public class StandAloneCanvas : MonoBehaviour {
 	}
 
 	public void OnLeaveButton(){
-		LobbyController.s_Singleton.OnBackToLobbyMenu ();
+		LobbyController.s_Singleton.OnBackToMainMenu ();
 		Leave.SetActive (false);
 	}
 

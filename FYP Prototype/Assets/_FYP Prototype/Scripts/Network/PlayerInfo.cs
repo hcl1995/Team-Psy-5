@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class PlayerInfo : NetworkBehaviour {
 	static public PlayerInfo singleton; 
@@ -14,7 +15,6 @@ public class PlayerInfo : NetworkBehaviour {
 	public GameObject playerNetwork;
 	public GameObject localPlayerIndicator;
 	public GameObject readyIndicator;
-	public GameObject canvas;
 	[SyncVar]
 	public int playerCharacter;
 	public GameObject CharaterSelector;
@@ -26,7 +26,6 @@ public class PlayerInfo : NetworkBehaviour {
 	public int playerNumber = 0;
 	// Use this for initialization
 	void OnEnable(){
-		canvas.SetActive (true);
 		ready = false;
 		buttonImage.color = Color.red;
 		SoundManager.instance.PlayBGM (BGMAudioClipID.BGM_IMMORTALSELECTION);
@@ -75,14 +74,16 @@ public class PlayerInfo : NetworkBehaviour {
 		if (selectedCharacterInt == 0)
 			return;
 
-		if (!ready) {	
+		if (!ready) {
 			CmdReadyState (true);
-
+			CmdPlayerReady ();
+			//RpcReady ();
 			buttonImage.color = Color.green;
 
-		} else if (ready) {	
+		} else if (ready) {
 			CmdReadyState (false);
-
+			CmdPlayerUnready ();
+			//RpcReady ();
 			buttonImage.color = Color.red;
 		}
 	}
@@ -94,13 +95,19 @@ public class PlayerInfo : NetworkBehaviour {
 	}
 
 	[Command]
+	void CmdPlayerReady(){
+		LobbyController.s_Singleton.PlayerReady ();
+
+	}
+
+	[Command]
+	void CmdPlayerUnready(){
+		LobbyController.s_Singleton.PlayerUnready ();
+	}
+
+	[Command]
 	void CmdReadyState(bool r){		
 		ready = r;
-		if (ready) {
-			LobbyController.s_Singleton.PlayerReady ();
-		} else if (!ready) {
-			LobbyController.s_Singleton.PlayerUnready ();
-		}
 	}
 
 	[Command]
@@ -128,20 +135,19 @@ public class PlayerInfo : NetworkBehaviour {
 		selectedCharacterInt = i;
 		characterSprite.sprite = LobbyController.s_Singleton.selectedCharacterSprite [i];
 	}
-	[Command]
-	public void CmdSelectLevel(int level){
-		LobbyController.s_Singleton.SelectLevel (level);
-		RpcSelectLevel (level);
-	}
 
-	[ClientRpc]
-	public void RpcSelectLevel(int level){
-		LevelSelector.instance.ChangeSelectedLevelImage (level);
+	public void OnSceneChange(Scene scene1, Scene scene2){
+		if (!isLocalPlayer)
+			return;
+		Debug.Log (scene1.name);
+		Debug.Log (scene2.name);
+		if (scene2.name == "Main02") {
+			//NetworkServer.ReplacePlayerForConnection (playerNetwork.GetComponent<PlayerNetwork> ().conn, playerNetwork, 0);
+		}
 	}
 
 	[ClientRpc]
 	public void RpcEnableLoading(){
-		LevelSelector.instance.OffLevelSelect ();
 		LocalPlayerInfo.singleton.enableLoading ();
 	}
 
@@ -162,20 +168,5 @@ public class PlayerInfo : NetworkBehaviour {
 	public void PlayhisBGM(BGMAudioClipID bgm){
 		if(isServer)
 			CmdPlayhisBGM(bgm);
-	}
-
-	[ClientRpc]
-	public void RpcLevelSelect(){
-		LevelSelector.instance.OnReadyLevelSelect ();
-	}
-
-	public void DisableCharacterSelector(){
-		canvas.SetActive (false);
-	}
-
-	public void EnableCharacterSelector(){
-		canvas.SetActive (true);
-		ready = false;
-		buttonImage.color = Color.red;
 	}
 }

@@ -17,6 +17,7 @@ public class DestructableWall : NetworkBehaviour
 	public Collider[] m_Collider;
 
 	public ParticleSystem hitParticle;
+	public ParticleSystem FallParticle;
 	public ParticleSystem breakParticle;
 
 	void Awake()
@@ -86,6 +87,6 @@ public class DestructableWall : NetworkBehaviour
 
 	void AnimEventPlayParticle()
 	{
-		hitParticle.Play();
+		FallParticle.Play();
 	}
 }
