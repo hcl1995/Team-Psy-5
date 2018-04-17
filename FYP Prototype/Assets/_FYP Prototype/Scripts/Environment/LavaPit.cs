@@ -25,10 +25,11 @@ public class LavaPit : DestructableWall
 			AudioSource.PlayClipAtPoint(soundEffect.selfServiceClip[1], transform.position);
 
 			int repeat = Random.Range(5, 20);
+			Debug.Log("meteor number: " + repeat);
 			for (int i = 0; i < repeat; i++)
 			{
-				int randomX = Random.Range(1, 23);
-				int randomZ = Random.Range(1, 23);
+				int randomX = Random.Range(2, 22);
+				int randomZ = Random.Range(2, 22);
 				CmdSpawnMe (meteorRock, GetMeteorPosition(randomX, randomZ), Quaternion.identity);
 			}
 

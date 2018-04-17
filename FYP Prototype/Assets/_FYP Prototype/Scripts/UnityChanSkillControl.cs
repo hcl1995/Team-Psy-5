@@ -74,7 +74,7 @@ public class UnityChanSkillControl : PlayerControl
 
 					isUltimating = true;
 
-					RotateTowardMouseDuringAction();
+					//RotateTowardMouseDuringAction();
 					CmdAnimation("Ultimate");
 
 					ultimateCD.fillAmount = 1;

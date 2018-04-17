@@ -10,6 +10,8 @@ public class PlayerControl : NetworkBehaviour
 	Vector3 targetDirection;
 	float rotationSpeed = 30;
 
+	Vector3 colYOffset;
+	BoxCollider colCollider;
 	public Animator animation;
 	public Vector3 startSpawnPosition;
 
@@ -119,6 +121,7 @@ public class PlayerControl : NetworkBehaviour
 
 	protected void Awake()
 	{
+		colCollider = GetComponent<BoxCollider>();
 		soundEffect = GetComponent<SoundEffect>();
 		animation = GetComponent<Animator>();
 		trailRendererObject.transform.parent = null;
@@ -127,6 +130,7 @@ public class PlayerControl : NetworkBehaviour
 
 	protected void Start()
 	{
+		colYOffset = colCollider.center;
 		dashCharge = maxDashChargeCount;
 		if (isLocalPlayer){
 			playerCanvas.SetActive (true);
@@ -195,8 +199,13 @@ public class PlayerControl : NetworkBehaviour
 
 		if (seriouslyFlying)
 		{
+			CmdOffsetCollider(1.4f);
 			completeFlyTime += flyLerpSpeed * Time.deltaTime;
 			transform.position = Vector3.Lerp (flyStartPos, flyTargetPos, completeFlyTime);
+		}
+		else
+		{
+			CmdOffsetCollider(0.9f);
 		}
 
 		if (completeFlyTime >= 1)
@@ -281,10 +290,15 @@ public class PlayerControl : NetworkBehaviour
 
 		if (isDash)
 		{
+			CmdOffsetCollider(1.4f);
 			completeDashTime += dashLerpSpeed * Time.deltaTime;
 			transform.position = Vector3.Lerp (dashStartPos, dashEndPos, completeDashTime);
 			//trailRendererObject.transform.position = gameObject.transform.position;
 			CmdDashTrail();
+		}
+		else
+		{
+			CmdOffsetCollider(0.9f);
 		}
 
 		if (completeDashTime >= 1)
@@ -363,34 +377,40 @@ public class PlayerControl : NetworkBehaviour
 		}
 	}
 
+	bool isNotAlwaysGuard = true;
 	void Guard()
 	{
-		if (KeyBindingManager.GetKey(KeyAction.Guard))
-		{
+		if (KeyBindingManager.GetKey (KeyAction.Guard)) {
 			if (state == PlayerControl.playerState.Normal) {
 				//animation.SetBool("isMoving", false);
-				RotateTowardMouseDuringAction();
+				RotateTowardMouseDuringAction ();
 				//animation.SetTrigger("Guard");
-				if(!toggleGuard)
-				{
+				if (!toggleGuard) {
 					CmdAnimation ("Guard");
-					CmdPlaySFXClip(2);
+					CmdPlaySFXClip (2);
 				}
 				toggleGuard = true;
-				animation.SetBool("Guarding", true);
+				animation.SetBool ("Guarding", true);
 				CmdSetPlayerState (PlayerControl.playerState.Guarding);
+				soundEffect.PlaySFXClip (soundEffect.selfServiceClip [6]);
 			}				
-		}
-		else if (state == PlayerControl.playerState.Guarding){
+		} else if (state == PlayerControl.playerState.Guarding && isNotAlwaysGuard) {
 			//			if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
 			//			{
 			//animation.SetBool("isMoving", false);
-			animation.SetBool("Guarding", false);
+			animation.SetBool ("Guarding", false);
 			CmdSetPlayerState (PlayerControl.playerState.Normal);
 			toggleGuard = false;
 			//}
+		} else if (state == PlayerControl.playerState.Normal) {
+			toggleGuard = false;
 		}
-
+		if (Input.GetKeyUp (KeyCode.K)) {
+			if (isNotAlwaysGuard)
+				isNotAlwaysGuard = false;
+			else if (!isNotAlwaysGuard)
+				isNotAlwaysGuard = true;
+		}
 //		if (state == PlayerControl.playerState.Normal)
 //		{
 //			if (KeyBindingManager.GetKey(KeyAction.Guard))
@@ -601,6 +621,13 @@ public class PlayerControl : NetworkBehaviour
 	}
 
 	[Command]
+	public void CmdOffsetCollider(float yOffset)
+	{
+		colYOffset.y = yOffset;
+		colCollider.center = colYOffset;
+	}
+
+	[Command]
 	public void CmdStopSFXClip()
 	{
 		RpcStopSFXClip();
@@ -785,9 +812,12 @@ public class PlayerControl : NetworkBehaviour
 	}
 
 	[ClientRpc]
-	void RpcRespwan(){		
-		transform.root.position = new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z);
-		transform.root.TransformPoint(new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z));
+	void RpcRespwan(){	
+		if (isLocalPlayer) {
+			transform.root.position = new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z);
+			transform.root.TransformPoint(new Vector3(startSpawnPosition.x,startSpawnPosition.y,startSpawnPosition.z));
+		}
+
 		isFalling = false;
 		resurrection.Play();
 	}

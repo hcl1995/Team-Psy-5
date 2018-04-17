@@ -59,7 +59,7 @@ public class LobbyController : NetworkManager {
 		networkDiscovery.Initialize ();
 	}
 
-	public void OnBackToMain(){
+	public void OnBackToMainMenu(){
 		SceneManager.LoadScene(1);
 		LocalPlayerInfo.singleton.SelfDestroy ();
 		LoadingScreenCanvas.instance.SelfDestroy ();
@@ -81,6 +81,7 @@ public class LobbyController : NetworkManager {
 	}
 
 	public void changeTo(RectTransform newPanel){
+		LevelSelector.instance.OffLevelSelect ();
 		if (currentPanel != null)
 		{
 			currentPanel.gameObject.SetActive(false);
@@ -101,7 +102,6 @@ public class LobbyController : NetworkManager {
 		if (numPlayers > 1) {
 			uiWaiting.SetActive (false);
 		}
-		Debug.Log (base.numPlayers);
 	}
 
 	public override void OnServerConnect(NetworkConnection conn){
@@ -119,7 +119,7 @@ public class LobbyController : NetworkManager {
 	public override void OnServerDisconnect(NetworkConnection conn){		
 		networkDiscovery.Initialize ();
 
-		if (SceneManager.GetActiveScene().name == "LevelEditor")
+		if (SceneManager.GetActiveScene().name != "Lobby")
 		{
 			foreach (GameObject go in playerChara) {
 				NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerHealth>().pn.conn, go.GetComponent<PlayerHealth>().pn.playerInfo,0);
@@ -127,6 +127,8 @@ public class LobbyController : NetworkManager {
 			base.ServerChangeScene ("Lobby");
 			SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
 		}
+		LevelSelector.instance.OffLevelSelect ();
+		PlayerInfo.singleton.EnableCharacterSelector ();
 		NetworkServer.DestroyPlayersForConnection (conn);
 		uiWaiting.SetActive (true);
 		networkDiscovery.StartAsServer ();
@@ -141,7 +143,7 @@ public class LobbyController : NetworkManager {
 	public override void OnClientDisconnect(NetworkConnection conn){
 		if (SceneManager.GetActiveScene().name == "Lobby") {
 			changeTo (LobbyPanel);
-		} else if (SceneManager.GetActiveScene().name == "LevelEditor") {
+		} else if (SceneManager.GetActiveScene().name != "Lobby") {
 			//SceneManager.LoadScene ("Lobby");
 			base.ServerChangeScene ("Lobby");
 			changeTo (LobbyPanel);
@@ -151,7 +153,7 @@ public class LobbyController : NetworkManager {
 		networkDiscovery.Initialize ();
 	}
 
-	public void OnBackToMainMenu(){
+	public void OnBackToLobbyMenu(){
 		base.ServerChangeScene ("Lobby");
 		changeTo (LobbyPanel);
 		base.StopHost();
@@ -163,7 +165,7 @@ public class LobbyController : NetworkManager {
 	}
 
 	public void OnRematch(){
-		if (SceneManager.GetActiveScene().name == "LevelEditor") {
+		if (SceneManager.GetActiveScene().name != "Lobby") {
 			foreach (GameObject go in playerChara) {
 				NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerHealth>().pn.conn, go.GetComponent<PlayerHealth>().pn.playerInfo,0);
 			}
@@ -206,7 +208,7 @@ public class LobbyController : NetworkManager {
 		readyPlayer++;
 		if (readyPlayer > 1) {
 			print ("All Ready");
-			PlayerInfo.singleton.RpcEnableLoading ();
+			PlayerInfo.singleton.RpcLevelSelect ();
 
 			readyPlayer = 0;
 		}
@@ -217,15 +219,25 @@ public class LobbyController : NetworkManager {
 	public void allLoadScreenOn(){
 		isLoadScreenOn++;
 		if (isLoadScreenOn == 2) {
-			base.ServerChangeScene ("LevelEditor");
-			//base.ServerChangeScene ("DragonBallLevel");
+			//base.ServerChangeScene ("LevelEditor");
+			base.ServerChangeScene (levelSelectString);
 			foreach (GameObject go in playerNetwork) {
 				NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerNetwork> ().conn, go, 0);
 			}
 			isLoadScreenOn = 0;
 		}
 	}
-
+	public string levelSelectString = "DragonBallLevel";
+	public void SelectLevel(int level){
+		switch (level) {
+		case 1:
+			levelSelectString = "DragonBallLevel";
+			break;
+		case 2:
+			levelSelectString = "LevelEditor";
+			break;
+		}
+	}
 
 	public void allLoadEnterReady(){
 		loadReady++;
@@ -300,7 +312,9 @@ public class LobbyController : NetworkManager {
 			player2CharaterProtrait = playerCharacter;
 			LocalPlayerInfo.singleton.player2 = playerCharacter;
 		}
-
+		if (player1Character == player2Character) {
+			player2Character = playerCharacterSelector [playerCharacter+2];
+		}
 		//RpcCharacterProtrait (playerCharacter, playerNumber);
 		return playerCharacter;
 	}

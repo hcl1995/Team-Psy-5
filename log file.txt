@@ -1,3 +1,14 @@
+Commit 36 (Apr 6, 2018)
+-----------------------
+-Chinemachine CameraShake Virtual Cam1, 2, 3 (CameraShake Script)
+-Change The Way The Bullet Destroy (Bullet Script)
+-Meteorite Now Become Attack Can Damage Prop & Player (Meteorite Script)
+-Change The Dash Offset Collider (PlayerControl)
+-Disable UnityChan Ulti RotateMouseFunction (UnityChanControlSkill)
+-UnityChan P2 Prefab Added. UnityChan Drill & Dash Image Changed & Updated
+-All Character Skill & Dash CD / NO CD Image Terbalik. (Swapped).
+
+
 Commit 35 (Apr 6, 2018)
 -----------------------
 -Fixed Pillar Fall VFX (Destructable Wall)

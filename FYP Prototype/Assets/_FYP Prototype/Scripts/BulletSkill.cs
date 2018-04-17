@@ -103,18 +103,20 @@ public class BulletSkill : NetworkBehaviour
 		{
 			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (damage,"DamageDown", impact, other.transform.position);
 			AudioSource.PlayClipAtPoint(soundEffect.selfServiceClip[0], other.transform.position);
-			//soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 
 			if (maxCharge)
 			{
 				other.gameObject.transform.root.position += (gameObject.transform.root.forward * distance);
 			}
-			// For Bounce
-			//			NetworkServer.Destroy (gameObject);
-			//			Destroy(gameObject);
+//			NetworkServer.Destroy (gameObject);
+			Destroy(gameObject);
+		}
+
+		if (other.gameObject.layer == LayerMask.NameToLayer("AboveGround")){
+			Destroy(gameObject);
 		}
 		//NetworkServer.Destroy (gameObject);
-		Destroy(gameObject);
+		//Destroy(gameObject);
 		//Bounce(other.contacts[0].normal);
 	}
 
