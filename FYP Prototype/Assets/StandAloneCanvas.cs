@@ -12,7 +12,7 @@ public class StandAloneCanvas : MonoBehaviour {
 		if (instance == null) {
 			instance = this;
 		} else {
-			DestroyObject (gameObject);
+			Destroy (gameObject);
 		}
 	}
 
@@ -22,6 +22,7 @@ public class StandAloneCanvas : MonoBehaviour {
 				Leave.SetActive (false);
 			} else if(!Leave.activeSelf){
 				Leave.SetActive (true);
+				LoadingScreenCanvas.instance.canvas.sortingOrder = 100;
 			}
 		}
 	}
@@ -29,10 +30,12 @@ public class StandAloneCanvas : MonoBehaviour {
 	public void OnLeaveButton(){
 		LobbyController.s_Singleton.OnBackToLobbyMenu ();
 		Leave.SetActive (false);
+		LobbyController.s_Singleton.LoadingCanvas.SetActive (false);
 	}
 
 	public void OnRematchButton(){
 		PlayerControl.singleton.CmdRematch ();
 		Leave.SetActive (false);
+		LobbyController.s_Singleton.LoadingCanvas.SetActive (false);
 	}
 }

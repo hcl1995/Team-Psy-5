@@ -219,11 +219,6 @@ public class HealthManager : NetworkBehaviour {
 	}
 
 	[ClientRpc]
-	void RpcPlayThis(){
-		SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
-	}
-
-	[ClientRpc]
 	void RpcEndGame(){
 		MatchController.singleton.EndMatch.SetActive (true);
 	}

@@ -9,10 +9,16 @@ public class LoadingScreenScript : MonoBehaviour {
 	static public LoadingScreenScript singleton; 
 	public Image player1Portrait;
 	public Image player2Portrait;
-	public Text tutorial;
+	//public Text tutorial;
+	public Image tutorialImage;
+	public List<Sprite> tutorialImageList = new List<Sprite>();
 	public Text Loading;
 	public PlayerInfo[] playerSelectCharacter;
 	public bool loadReady = false;
+	public Text skill1;
+	public Text skill2;
+	public Text skillUlti;
+	public Canvas canvas;
 
 	void OnEnable(){
 		Loading.text = "LOADING";
@@ -21,11 +27,16 @@ public class LoadingScreenScript : MonoBehaviour {
 			if (player.playerNumber == 1) {
 				player1Portrait.sprite = LobbyController.s_Singleton.selectedCharacterSprite [player.playerCharacter];
 			} else if (player.playerNumber == 2) {
-				player2Portrait.sprite = LobbyController.s_Singleton.selectedCharacterSprite [player.playerCharacter];
+				player2Portrait.sprite = LobbyController.s_Singleton.selectedCharacterSprite [player.playerCharacter+2];
 			}
 		}
-		tutorial.text = strTutorialText (PlayerInfo.singleton.playerCharacter);
+		//tutorial.text = strTutorialText (PlayerInfo.singleton.playerCharacter);
+		tutorialImage.sprite = tutorialImageList[PlayerInfo.singleton.playerCharacter];
 		PlayerInfo.singleton.CmdLoadScreenOn ();
+		skill1.text = ((KeyCode)PlayerPrefs.GetInt (KeyAction.Skill01.ToString())).ToString();
+		skill2.text = ((KeyCode)PlayerPrefs.GetInt (KeyAction.Skill02.ToString())).ToString();
+		skillUlti.text = ((KeyCode)PlayerPrefs.GetInt (KeyAction.Ultimate.ToString())).ToString();
+		LoadingScreenCanvas.instance.canvas.sortingOrder = 100;
 	}
 	// Use this for initialization
 	void Start () {

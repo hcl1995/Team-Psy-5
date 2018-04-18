@@ -16,7 +16,7 @@ public class LocalPlayerInfo : MonoBehaviour {
 		if (singleton == null) {
 			singleton = this;
 		} else {
-			DestroyObject (gameObject);
+			Destroy(gameObject);
 		}
 
 		//DontDestroyOnLoad(transform.gameObject);

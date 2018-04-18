@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class PlayerInfo : NetworkBehaviour {
 	static public PlayerInfo singleton; 
 	public List<Transform> infoLoction = new List<Transform>();
-	[SyncVar(hook="Ready")]
+	[SyncVar]
 	public bool ready = false;
 	public Image buttonImage;
 	public GameObject readyButton;
@@ -22,14 +22,23 @@ public class PlayerInfo : NetworkBehaviour {
 	public int selectedCharacterInt;
 	public Image characterSprite;
 	public RectTransform rt;
+
+	[SyncVar]
+	public int player1Select;
+	[SyncVar]
+	public int player2Select;
+
 	[SyncVar]
 	public int playerNumber = 0;
+	Color playerColor;
+	Color oppColor;
 	// Use this for initialization
 	void OnEnable(){
-		canvas.SetActive (true);
-		ready = false;
-		buttonImage.color = Color.red;
-		SoundManager.instance.PlayBGM (BGMAudioClipID.BGM_IMMORTALSELECTION);
+		if (isLocalPlayer) {
+			canvas.SetActive (true);
+			ready = false;
+			SoundManager.instance.PlayBGM (BGMAudioClipID.BGM_IMMORTALSELECTION);
+		}
 	}
 	void Awake(){
 		rt = (RectTransform)transform;
@@ -48,25 +57,39 @@ public class PlayerInfo : NetworkBehaviour {
 		if (!isLocalPlayer) {
 			readyIndicator.SetActive (true);
 		}
+
 	}
 	
 	// Update is called once per frame
 	void Update () {
 //		transform.position = Vector3.zero;
 //
-		transform.localPosition = Vector3.zero;
+		if (isServer) {
+			CmdGetSelect ();
+		}
 
+		int playerNumberForSprite = 0;
+		if (playerNumber == 2)
+			playerNumberForSprite = 2;
+		
+		transform.localPosition = Vector3.zero;
+		if (playerNumber == 1) {
+			playerColor = Color.blue;
+			oppColor = Color.red;
+		}else if (playerNumber == 2) {
+			oppColor = Color.blue;
+			playerColor = Color.red;
+		}
 		if (isLocalPlayer)
 			return;
 		
 		if (ready) {
-			buttonImage.color = Color.green;
-			readyIndicator.GetComponent<Image> ().color = Color.green;
+			readyIndicator.GetComponent<Image> ().color = playerColor;
 		} else if (!ready) {
-			buttonImage.color = Color.red;
-			readyIndicator.GetComponent<Image> ().color = Color.red;
+			readyIndicator.GetComponent<Image> ().color = Color.black;
 		}
-		characterSprite.sprite = LobbyController.s_Singleton.selectedCharacterSprite [selectedCharacterInt];
+
+		characterSprite.sprite = LobbyController.s_Singleton.selectedCharacterSprite [selectedCharacterInt+playerNumberForSprite];
 	}
 
 	public void OnClickPlayerReady(){
@@ -78,12 +101,11 @@ public class PlayerInfo : NetworkBehaviour {
 		if (!ready) {	
 			CmdReadyState (true);
 
-			buttonImage.color = Color.green;
+			localPlayerIndicator.GetComponent<Image> ().color = playerColor;
 
 		} else if (ready) {	
 			CmdReadyState (false);
-
-			buttonImage.color = Color.red;
+			localPlayerIndicator.GetComponent<Image> ().color = Color.black;
 		}
 	}
 
@@ -116,17 +138,19 @@ public class PlayerInfo : NetworkBehaviour {
 	public void Ready(bool r){
 		ready = r;
 		if (ready) {
-			buttonImage.color = Color.green;
-			readyIndicator.GetComponent<Image> ().color = Color.green;
+			readyIndicator.GetComponent<Image> ().color = oppColor;
 		} else if (!ready) {
-			buttonImage.color = Color.red;
-			readyIndicator.GetComponent<Image> ().color = Color.red;
+
+			readyIndicator.GetComponent<Image> ().color = Color.black;
 		}
 	}
 
 	public void SelectedCharacter(int i){
+		int playerNumberForSprite = 0;
+		if (playerNumber == 2)
+			playerNumberForSprite = 2;
 		selectedCharacterInt = i;
-		characterSprite.sprite = LobbyController.s_Singleton.selectedCharacterSprite [i];
+		characterSprite.sprite = LobbyController.s_Singleton.selectedCharacterSprite [i+playerNumberForSprite];
 	}
 	[Command]
 	public void CmdSelectLevel(int level){
@@ -176,6 +200,11 @@ public class PlayerInfo : NetworkBehaviour {
 	public void EnableCharacterSelector(){
 		canvas.SetActive (true);
 		ready = false;
-		buttonImage.color = Color.red;
+	}
+
+	[Command]
+	public void CmdGetSelect(){
+		player1Select = LobbyController.s_Singleton.player1CharaterProtrait;
+		player2Select = LobbyController.s_Singleton.player2CharaterProtrait;
 	}
 }

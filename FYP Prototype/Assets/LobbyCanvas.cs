@@ -10,7 +10,7 @@ public class LobbyCanvas : MonoBehaviour {
 		if (instance == null) {
 			instance = this;
 		} else {
-			DestroyObject (gameObject);
+			Destroy(gameObject);
 		}
 	}
 

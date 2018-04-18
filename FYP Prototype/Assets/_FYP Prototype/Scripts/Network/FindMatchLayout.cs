@@ -4,7 +4,6 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 public class FindMatchLayout : MonoBehaviour {
-	float refresh = 0;
 	[SerializeField]
 	private GameObject _matchListingPrefab;
 	public GameObject MatchListingPrefab{

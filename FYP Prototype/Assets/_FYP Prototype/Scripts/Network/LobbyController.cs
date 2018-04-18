@@ -33,6 +33,8 @@ public class LobbyController : NetworkManager {
 	public int player2CharaterProtrait;
 	int matchCount = 1;
 	public int loadReady;
+	public int allReadyEnd;
+	public string levelSelectString = "DragonBallLevel";
 
 	public List<GameObject> playerNetwork = new List<GameObject> ();
 	public List<GameObject> playerChara = new List<GameObject> ();
@@ -82,6 +84,8 @@ public class LobbyController : NetworkManager {
 
 	public void changeTo(RectTransform newPanel){
 		LevelSelector.instance.OffLevelSelect ();
+		player1CharaterProtrait = 0;
+		player2CharaterProtrait = 0;
 		if (currentPanel != null)
 		{
 			currentPanel.gameObject.SetActive(false);
@@ -118,7 +122,7 @@ public class LobbyController : NetworkManager {
 
 	public override void OnServerDisconnect(NetworkConnection conn){		
 		networkDiscovery.Initialize ();
-
+		LobbyController.s_Singleton.LoadingCanvas.SetActive (false);
 		if (SceneManager.GetActiveScene().name != "Lobby")
 		{
 			foreach (GameObject go in playerChara) {
@@ -141,6 +145,7 @@ public class LobbyController : NetworkManager {
 	}
 
 	public override void OnClientDisconnect(NetworkConnection conn){
+		LobbyController.s_Singleton.LoadingCanvas.SetActive (false);
 		if (SceneManager.GetActiveScene().name == "Lobby") {
 			changeTo (LobbyPanel);
 		} else if (SceneManager.GetActiveScene().name != "Lobby") {
@@ -227,7 +232,7 @@ public class LobbyController : NetworkManager {
 			isLoadScreenOn = 0;
 		}
 	}
-	public string levelSelectString = "DragonBallLevel";
+
 	public void SelectLevel(int level){
 		switch (level) {
 		case 1:
@@ -319,7 +324,7 @@ public class LobbyController : NetworkManager {
 		return playerCharacter;
 	}
 
-	public int allReadyEnd;
+
 	public void EndMatchAllReady(){
 		allReadyEnd++;
 		if (allReadyEnd == 2) {
