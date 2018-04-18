@@ -102,17 +102,19 @@ public class BulletSkill : NetworkBehaviour
 		if (other.gameObject.CompareTag("Player"))
 		{
 			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (damage,"DamageDown", impact, other.transform.position);
-			AudioSource.PlayClipAtPoint(soundEffect.selfServiceClip[0], other.transform.position);
+			AudioSource.PlayClipAtPoint(soundEffect.selfServiceClip[0], other.transform.position, SoundManager.instance.GetSoundVolume() * SoundManager.instance.GetMasterVolume ());
 
 			if (maxCharge)
 			{
-				other.gameObject.transform.root.position += (gameObject.transform.root.forward * distance);
+				other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flying = true;
+				other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().getOtherPos = transform.root.forward * distance;
 			}
 //			NetworkServer.Destroy (gameObject);
 			Destroy(gameObject);
 		}
 
 		if (other.gameObject.layer == LayerMask.NameToLayer("AboveGround")){
+			AudioSource.PlayClipAtPoint(soundEffect.selfServiceClip[0], other.transform.position, SoundManager.instance.GetSoundVolume() * SoundManager.instance.GetMasterVolume ());
 			Destroy(gameObject);
 		}
 		//NetworkServer.Destroy (gameObject);

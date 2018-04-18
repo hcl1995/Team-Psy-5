@@ -1,4 +1,15 @@
-Commit 36 (Apr 6, 2018)
+Commit 37 (Apr 18, 2018)
+-----------------------
+-Change guard particle from instantiate --> particle.play (PlayerHealth)
+-Character flying & death invisible (PlayerControl & Attack that will Knockback de scriptS)
+-Add GetVolumeFromSound on PlayClipOnPoint (All Attacks Scripts & Destructable Wall & Lava Pit Scripts)
+-Khai Lun Particles / OngBak Skill2 Animation / Remove Tutorial Button.
+-PlayBGM on each stage (StartTheMusic & TurnOnTheMusic script)
+-Change Bullet Skill Knockback. (BulletSkill)
+-Hope i Didn't forget anything.
+
+
+Commit 36 (Apr 17, 2018)
 -----------------------
 -Chinemachine CameraShake Virtual Cam1, 2, 3 (CameraShake Script)
 -Change The Way The Bullet Destroy (Bullet Script)

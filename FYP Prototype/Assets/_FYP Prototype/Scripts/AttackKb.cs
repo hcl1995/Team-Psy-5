@@ -46,13 +46,14 @@ public class AttackKb : MonoBehaviour
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().getOtherPos = transform.root.forward * distance;
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeKnockbackDamage (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position), other, gImpact);
 					//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
-					AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[2], other.transform.position);
+					AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[2], other.transform.position, SoundManager.instance.GetSoundVolume() * SoundManager.instance.GetMasterVolume ());
+					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().CmdInvincible(true);
 				}
 				else
 				{
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeKnockbackDamage (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position), other, gImpact);
 					//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
-					AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[2], other.transform.position);
+					AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[2], other.transform.position, SoundManager.instance.GetSoundVolume() * SoundManager.instance.GetMasterVolume ());
 				}
 				//other.transform.root.position += (transform.root.forward * distance);
 

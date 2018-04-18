@@ -22,7 +22,7 @@ public class LavaPit : DestructableWall
 	{
 		if (health <= breakHP && callOnce == false)
 		{
-			AudioSource.PlayClipAtPoint(soundEffect.selfServiceClip[1], transform.position);
+			AudioSource.PlayClipAtPoint(soundEffect.selfServiceClip[1], transform.position, SoundManager.instance.GetSoundVolume() * SoundManager.instance.GetMasterVolume ());
 
 			int repeat = Random.Range(5, 20);
 			Debug.Log("meteor number: " + repeat);

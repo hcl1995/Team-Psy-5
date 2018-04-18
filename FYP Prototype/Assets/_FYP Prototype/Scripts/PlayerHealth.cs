@@ -16,6 +16,7 @@ public class PlayerHealth : NetworkBehaviour {
 	public Animator anim;
 	GameObject impactGO;
 	public GameObject superGuard;
+	public ParticleSystem m_SuperGuard;
 	public hitIndicator hitIndicator;
 	float previousHealth = maxHealth;
 	public bool harzardDamageCD = false;
@@ -86,9 +87,11 @@ public class PlayerHealth : NetworkBehaviour {
 			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
 			playerControl.CmdPlaySFXClip(6);
 
-			impactGO =  (GameObject)Instantiate (superGuard, position, Quaternion.identity);
-			NetworkServer.Spawn (impactGO);
-			Destroy (impactGO, 1.5f);
+			CmdGuardParticle();
+			//m_SuperGuard.Play();
+			//impactGO =  (GameObject)Instantiate (superGuard, position, Quaternion.identity);
+			//NetworkServer.Spawn (impactGO);
+			//Destroy (impactGO, 1.5f);
 		}
 		else {
 			HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
@@ -185,9 +188,11 @@ public class PlayerHealth : NetworkBehaviour {
 			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
 			playerControl.CmdPlaySFXClip(6);
 
-			impactGO =  (GameObject)Instantiate (superGuard, position, Quaternion.identity);
-			NetworkServer.Spawn (impactGO);
-			Destroy (impactGO, 1.5f);
+			CmdGuardParticle();
+			//m_SuperGuard.Play();
+			//impactGO =  (GameObject)Instantiate (superGuard, position, Quaternion.identity);
+			//NetworkServer.Spawn (impactGO);
+			//Destroy (impactGO, 1.5f);
 		}
 		else {
 			HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
@@ -270,6 +275,16 @@ public class PlayerHealth : NetworkBehaviour {
 	[ClientRpc]
 	public void RpcAmintion(string animation){
 		anim.SetTrigger (animation);
+	}
+
+	[Command]
+	void CmdGuardParticle(){
+		RpcGuardParticle();
+	}
+
+	[ClientRpc]
+	void RpcGuardParticle(){
+		m_SuperGuard.Play();
 	}
 
 	//	[Command]
