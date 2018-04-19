@@ -132,6 +132,7 @@ public class LobbyController : NetworkManager {
 			}
 			base.ServerChangeScene ("Lobby");
 			SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
+			//SoundManager.instance.PlaySpecialBGM(BGMAudioClipID.TOTAL);
 		}
 		LevelSelector.instance.OffLevelSelect ();
 		PlayerInfo.singleton.EnableCharacterSelector ();
@@ -156,6 +157,7 @@ public class LobbyController : NetworkManager {
 			base.ServerChangeScene ("Lobby");
 			changeTo (LobbyPanel);
 			SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_MAINMENU);
+			//SoundManager.instance.PlaySpecialBGM(BGMAudioClipID.TOTAL);
 		}
 		base.StopClient ();
 		networkDiscovery.Initialize ();
@@ -164,12 +166,15 @@ public class LobbyController : NetworkManager {
 	public void OnBackToLobbyMenu(){
 		base.ServerChangeScene ("Lobby");
 		changeTo (LobbyPanel);
+		//SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_MAINMENU);
+		//SoundManager.instance.PlaySpecialBGM(BGMAudioClipID.TOTAL);
 		base.StopHost();
 		base.StopClient ();
 		intPlayer = 0;
 		playerNetwork.Clear ();
 		playerChara.Clear ();
 		networkDiscovery.Initialize ();
+		SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_MAINMENU);
 	}
 
 	public void OnRematch(){
@@ -178,6 +183,8 @@ public class LobbyController : NetworkManager {
 				NetworkServer.ReplacePlayerForConnection (go.GetComponent<PlayerHealth>().pn.conn, go.GetComponent<PlayerHealth>().pn.playerInfo,0);
 			}
 			base.ServerChangeScene ("Lobby");
+			SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
+			//SoundManager.instance.PlaySpecialBGM(BGMAudioClipID.TOTAL);
 			playerChara.Clear();
 		}
 	}

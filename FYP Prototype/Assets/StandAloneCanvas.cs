@@ -47,4 +47,9 @@ public class StandAloneCanvas : MonoBehaviour {
 		Leave.SetActive (false);
 		LobbyController.s_Singleton.LoadingCanvas.SetActive (false);
 	}
+
+	public void OnReturnButton()
+	{
+		Leave.SetActive (false);
+	}
 }

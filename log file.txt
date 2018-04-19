@@ -1,6 +1,13 @@
 Commit 39 (Apr 20, 2018)
 -----------------------
--Unity Chan mismerged sound.
+-Death (I just readjust trigger, timer too hard)
+-Dragon Ball level change back to diamond & 1 Pillar.
+-OngBak Charge Bar.
+-UnityChan LightSource.
+-Character Select Quit BUtton
+-Escape --> Unpause/Return Button
+-Normal, Height Map Lava Tile & Dragon Ball Lighting
+-Sound fixed, if not mistaken.
 
 
 Commit 38 (Apr 19, 2018)

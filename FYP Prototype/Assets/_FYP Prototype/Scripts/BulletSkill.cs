@@ -20,7 +20,7 @@ public class BulletSkill : NetworkBehaviour
 
 	public float projectileSpeed;
 	public float travelingThreshold;
-	public float distance;
+	public float distance = 2;
 	public float damage = 10;
 
 	bool maxCharge = false;

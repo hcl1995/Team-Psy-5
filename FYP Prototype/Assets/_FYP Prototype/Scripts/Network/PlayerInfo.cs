@@ -11,6 +11,7 @@ public class PlayerInfo : NetworkBehaviour {
 	public bool ready = false;
 	public Image buttonImage;
 	public GameObject readyButton;
+	public GameObject quitButton;
 	public GameObject playerNetwork;
 	public GameObject localPlayerIndicator;
 	public GameObject readyIndicator;
@@ -53,6 +54,7 @@ public class PlayerInfo : NetworkBehaviour {
 			localPlayerIndicator.SetActive (true);
 			CharaterSelector.SetActive (true);
 			readyButton.SetActive (true);
+			quitButton.SetActive(true);
 			CmdSetPlayerNumber (LocalPlayerInfo.singleton.playerNum);
 		}
 		if (!isLocalPlayer) {
@@ -212,5 +214,10 @@ public class PlayerInfo : NetworkBehaviour {
 	public void CmdGetSelect(){
 		player1Select = LobbyController.s_Singleton.player1CharaterProtrait;
 		player2Select = LobbyController.s_Singleton.player2CharaterProtrait;
+	}
+
+	public void BringMeBack()
+	{
+		LobbyController.s_Singleton.OnBackToLobbyMenu();
 	}
 }

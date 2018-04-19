@@ -25,7 +25,7 @@ public class PlayerHealth : NetworkBehaviour {
 	public bool falled = false;
 	public float fallElapsed = 0.0f;
 
-	bool isDead = false;
+	public bool isDead = false;
 
 	void Start(){
 		anim = GetComponent<Animator>();
@@ -48,23 +48,23 @@ public class PlayerHealth : NetworkBehaviour {
 		if (!isLocalPlayer)
 			return;
 
-		if (gameObject.transform.position.y <= -0.5)
-		{
-			//if (!falled) {
-				CmdFallToDeath ();
+//		if (gameObject.transform.position.y <= -0.5)
+//		{
+//			if (!falled) {
+//				CmdFallToDeath ();
 //				falled = true;
-//			}
+//		}
 //			fallElapsed += Time.deltaTime;
-//			if (fallElapsed >= 10.5f) {
+//			if (fallElapsed >= 5.0f) { //hmm tough 1
 //				falled = false;
 //				fallElapsed = 0.0f;
 //			}
-		}
-
-//		if (currentHealth < previousHealth) {
-//			hitIndicator.OnHit ();
-//			previousHealth = currentHealth;
 //		}
+
+		if (currentHealth < previousHealth) {
+			hitIndicator.OnHit ();
+			previousHealth = currentHealth;
+		}
 
 
 
@@ -116,7 +116,7 @@ public class PlayerHealth : NetworkBehaviour {
 		checkDeath();
 	}
 
-	public void takeDamageBullet(float damage, string animation, GameObject impact, Vector3 colliderHit){ // give another parameter, detect player from bullet skill script
+	public void takeDamageBullet(float damage, string animation, GameObject impact, Vector3 colliderHit){
 		if (!isServer)
 			return;
 		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
@@ -129,7 +129,8 @@ public class PlayerHealth : NetworkBehaviour {
 		//		}
 		//		else
 		//		{
-		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl); //(damage * playerSkillControl.fillCharge.fillAmount);
+
+		HealthManager.singleton.takeDamage (playerNumber, damage * 2.0f, playerControl); //(damage * playerSkillControl.fillCharge.fillAmount);
 		CmdAnimation (animation);
 		//		}
 		//CmdHit ();
