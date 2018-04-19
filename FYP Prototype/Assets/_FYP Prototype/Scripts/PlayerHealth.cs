@@ -25,7 +25,7 @@ public class PlayerHealth : NetworkBehaviour {
 	public bool falled = false;
 	public float fallElapsed = 0.0f;
 
-	bool isDead = false;
+	public bool isDead = false;
 
 	void Start(){
 		anim = GetComponent<Animator>();
@@ -48,24 +48,23 @@ public class PlayerHealth : NetworkBehaviour {
 		if (!isLocalPlayer)
 			return;
 
-		if (gameObject.transform.position.y <= -5)
-		{
-			if (!falled) {
-				CmdFallToDeath ();
-				falled = true;
-			}
-			fallElapsed += Time.deltaTime;
-			if (fallElapsed >= 10.5f) {
-				falled = false;
-				fallElapsed = 0.0f;
-			}
-
-		}
-
-//		if (currentHealth < previousHealth) {
-//			hitIndicator.OnHit ();
-//			previousHealth = currentHealth;
+//		if (gameObject.transform.position.y <= -0.5)
+//		{
+//			if (!falled) {
+//				CmdFallToDeath ();
+//				falled = true;
 //		}
+//			fallElapsed += Time.deltaTime;
+//			if (fallElapsed >= 5.0f) { //hmm tough 1
+//				falled = false;
+//				fallElapsed = 0.0f;
+//			}
+//		}
+
+		if (currentHealth < previousHealth) {
+			hitIndicator.OnHit ();
+			previousHealth = currentHealth;
+		}
 
 
 
@@ -109,15 +108,15 @@ public class PlayerHealth : NetworkBehaviour {
 		//CmdHit ();
 
 		// doesn't seems working here.
-		transform.root.LookAt (colliderHit);
-		Vector3 eulerFucker = euler;
-		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
-		transform.root.rotation = Quaternion.Euler (eulerFucker);
+//		transform.root.LookAt (colliderHit);
+//		Vector3 eulerFucker = euler;
+//		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
+//		transform.root.rotation = Quaternion.Euler (eulerFucker);
 
 		checkDeath();
 	}
 
-	public void takeDamageBullet(float damage, string animation, GameObject impact, Vector3 colliderHit){ // give another parameter, detect player from bullet skill script
+	public void takeDamageBullet(float damage, string animation, GameObject impact, Vector3 colliderHit){
 		if (!isServer)
 			return;
 		if (playerControl.state == PlayerControl.playerState.Death || playerControl.invincible) {
@@ -130,7 +129,8 @@ public class PlayerHealth : NetworkBehaviour {
 		//		}
 		//		else
 		//		{
-		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl); //(damage * playerSkillControl.fillCharge.fillAmount);
+
+		HealthManager.singleton.takeDamage (playerNumber, damage, playerControl); //(damage * playerSkillControl.fillCharge.fillAmount);
 		CmdAnimation (animation);
 		//		}
 		//CmdHit ();
@@ -163,6 +163,8 @@ public class PlayerHealth : NetworkBehaviour {
 		if (harzardDamageCD)
 			return;
 		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
+		gameObject.GetComponent<Animator>().SetBool("LegPainBool", true);
+		legPainAnimation("LegPain");
 		//CmdAnimation (animation);
 //		harzardDamageCD = true;
 //		StartCoroutine(hazardCoolDown());
@@ -208,10 +210,10 @@ public class PlayerHealth : NetworkBehaviour {
 			Destroy (impactGO, 1f);
 		}
 
-		transform.root.LookAt (position);
-		Vector3 eulerFucker = euler;
-		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
-		transform.root.rotation = Quaternion.Euler (eulerFucker);
+//		transform.root.LookAt (position);
+//		Vector3 eulerFucker = euler;
+//		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
+//		transform.root.rotation = Quaternion.Euler (eulerFucker);
 
 		checkDeath();
 	}
@@ -231,10 +233,11 @@ public class PlayerHealth : NetworkBehaviour {
 		impactGO =  (GameObject)Instantiate (impact,colliderHit, Quaternion.identity);
 		NetworkServer.Spawn (impactGO);
 		Destroy (impactGO, 1.5f);
-		transform.root.LookAt (position);
-		Vector3 eulerFucker = euler;
-		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
-		transform.root.rotation = Quaternion.Euler (eulerFucker);
+
+//		transform.root.LookAt (position);
+//		Vector3 eulerFucker = euler;
+//		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
+//		transform.root.rotation = Quaternion.Euler (eulerFucker);
 
 		checkDeath();
 	}

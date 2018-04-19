@@ -9,6 +9,7 @@ public class LevelSelector : MonoBehaviour {
 	public List<Sprite> levelSprites = new List<Sprite> ();
 	public GameObject comfirmButton;
 	public GameObject canvas;
+	public int selectedStage;
 	// Use this for initialization
 	void Start () {
 		instance = this;
@@ -38,6 +39,7 @@ public class LevelSelector : MonoBehaviour {
 	}
 
 	public void ChangeSelectedLevelImage(int level){
+		selectedStage = level-1;
 		selectedLevel.sprite = levelSprites [level - 1];
 	}
 }

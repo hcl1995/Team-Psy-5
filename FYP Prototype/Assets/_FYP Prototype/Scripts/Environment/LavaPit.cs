@@ -7,6 +7,7 @@ public class LavaPit : DestructableWall
 {
 	public GameObject meteorRock;
 	public GameObject wtfDoubleMeshRock;
+	public float spawnYPos;
 
 	protected override void Update()
 	{
@@ -15,7 +16,7 @@ public class LavaPit : DestructableWall
 
 	Vector3 GetMeteorPosition(int xpos, int zpos)
 	{
-		return new Vector3(xpos, 15, zpos);
+		return new Vector3(xpos, spawnYPos, zpos);
 	}
 
 	void LavaPitChuiDiao()

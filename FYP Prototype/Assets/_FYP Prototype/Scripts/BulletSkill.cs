@@ -20,7 +20,7 @@ public class BulletSkill : NetworkBehaviour
 
 	public float projectileSpeed;
 	public float travelingThreshold;
-	public float distance;
+	public float distance = 2;
 	public float damage = 10;
 
 	bool maxCharge = false;
@@ -101,14 +101,15 @@ public class BulletSkill : NetworkBehaviour
 
 		if (other.gameObject.CompareTag("Player"))
 		{
-			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (damage,"DamageDown", impact, other.transform.position);
+			
 			AudioSource.PlayClipAtPoint(soundEffect.selfServiceClip[0], other.transform.position, SoundManager.instance.GetSoundVolume() * SoundManager.instance.GetMasterVolume ());
-
+	
 			if (maxCharge)
 			{
 				other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().flying = true;
 				other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().getOtherPos = transform.root.forward * distance;
 			}
+			other.gameObject.GetComponent<PlayerHealth> ().takeDamageBullet (damage,"DamageDown", impact, other.transform.position);
 //			NetworkServer.Destroy (gameObject);
 			Destroy(gameObject);
 		}

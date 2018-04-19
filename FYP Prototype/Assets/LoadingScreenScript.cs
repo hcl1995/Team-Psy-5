@@ -11,6 +11,7 @@ public class LoadingScreenScript : MonoBehaviour {
 	public Image player2Portrait;
 	//public Text tutorial;
 	public Image tutorialImage;
+	public Image background;
 	public List<Sprite> tutorialImageList = new List<Sprite>();
 	public Text Loading;
 	public PlayerInfo[] playerSelectCharacter;
@@ -36,6 +37,7 @@ public class LoadingScreenScript : MonoBehaviour {
 		skill1.text = ((KeyCode)PlayerPrefs.GetInt (KeyAction.Skill01.ToString())).ToString();
 		skill2.text = ((KeyCode)PlayerPrefs.GetInt (KeyAction.Skill02.ToString())).ToString();
 		skillUlti.text = ((KeyCode)PlayerPrefs.GetInt (KeyAction.Ultimate.ToString())).ToString();
+		background.sprite = LevelSelector.instance.levelSprites [LevelSelector.instance.selectedStage]; 
 		LoadingScreenCanvas.instance.canvas.sortingOrder = 100;
 	}
 	// Use this for initialization

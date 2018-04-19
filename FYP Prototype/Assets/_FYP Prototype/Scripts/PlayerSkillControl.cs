@@ -50,13 +50,16 @@ public class PlayerSkillControl : PlayerControl
 
 	public void InputSkills()
 	{
+		if(lastResort == true)
+			return;
+		
 		if (state == playerState.Normal)
 		{
 			if (KeyBindingManager.GetKeyDown(KeyAction.Skill01))
 			{
 				if (skill01Cooldown <= 0)
 				{
-					maxCharge = false;
+					//maxCharge = false;
 					chargeBar.SetActive(true);
 					CmdSkill01PlayParticle();
 					CmdAnimation("Bullet");
@@ -120,7 +123,7 @@ public class PlayerSkillControl : PlayerControl
 				}
 			}
 		}
-
+			
 		if (chargeBar.activeInHierarchy)
 		{
 			fillCharge.fillAmount += Time.deltaTime * chargeRate;
@@ -129,6 +132,8 @@ public class PlayerSkillControl : PlayerControl
 			{
 				maxCharge = true;
 			}
+			else
+				maxCharge = false;
 		}
 	}
 
@@ -139,6 +144,11 @@ public class PlayerSkillControl : PlayerControl
 
 	[Command]
 	void CmdFire(int rangeSkill, Vector3 position, Quaternion rotation, bool max){
+		RpcFire(rangeSkill, position, rotation, max);
+	}
+
+	[ClientRpc]
+	void RpcFire(int rangeSkill, Vector3 position, Quaternion rotation, bool max){
 		GameObject cprojectile = projectile;
 		switch (rangeSkill) {
 		case 1:

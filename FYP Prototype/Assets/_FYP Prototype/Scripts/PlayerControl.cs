@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 
 public class PlayerControl : NetworkBehaviour
 {
+	public bool lastResort;
 	static public PlayerControl singleton;
 	Vector3 targetDirection;
 	float rotationSpeed = 30;
@@ -168,6 +169,16 @@ public class PlayerControl : NetworkBehaviour
 			}
 		} else {
 			CmdBlinkCharacter (true);
+		}
+
+		if (lastResort == true)
+		{
+			animation.ResetTrigger("Attack");
+			animation.ResetTrigger("Guard");
+			animation.ResetTrigger("ShootCasting01");
+			animation.ResetTrigger("ShootCasting02");
+			animation.ResetTrigger("Wall");
+			animation.ResetTrigger("Ultimate");
 		}
 	}
 
@@ -372,14 +383,17 @@ public class PlayerControl : NetworkBehaviour
 
 			// bloody cheat
 			transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
-//			Quaternion rotation = Quaternion.LookRotation(hit.point);
-//			transform.rotation = rotation;
+			//Quaternion rotation = Quaternion.LookRotation(hit.point);
+			//transform.rotation = rotation;
 		}
 	}
 
 	bool isNotAlwaysGuard = true;
 	void Guard()
 	{
+		if(lastResort == true)
+			return;
+		
 		if (KeyBindingManager.GetKey (KeyAction.Guard)) {
 			if (state == PlayerControl.playerState.Normal) {
 				//animation.SetBool("isMoving", false);
@@ -392,7 +406,7 @@ public class PlayerControl : NetworkBehaviour
 				toggleGuard = true;
 				animation.SetBool ("Guarding", true);
 				CmdSetPlayerState (PlayerControl.playerState.Guarding);
-				soundEffect.PlaySFXClip (soundEffect.selfServiceClip [6]);
+				//soundEffect.PlaySFXClip (soundEffect.selfServiceClip [6]);
 			}				
 		} else if (state == PlayerControl.playerState.Guarding && isNotAlwaysGuard) {
 			//			if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
@@ -442,6 +456,9 @@ public class PlayerControl : NetworkBehaviour
 
 	void Attack()
 	{
+		if(lastResort == true)
+			return;
+		
 		if (attackCount >= 3 || attackInterval > attackIntervalLimit)
 		{
 			attackCount = 0;
@@ -454,7 +471,6 @@ public class PlayerControl : NetworkBehaviour
 
 		if (KeyBindingManager.GetKeyDown(KeyAction.Attack))
 		{
-			Cursor.lockState = CursorLockMode.Confined;
 			attackCount++;
 			attackInterval = 0;
 		}
@@ -464,7 +480,14 @@ public class PlayerControl : NetworkBehaviour
 			if (attackCount == 1 && attackInterval < attackIntervalLimit)
 			{
 				RotateTowardMouseDuringAction();
-				CmdAnimation("Attack");
+				if (isServer) {
+					RpcSetAnimation("Attack");
+				}else if (!isServer) {
+					animation.SetTrigger("Attack");
+					CmdAttack("Attack");
+				}
+
+
 			}
 		}
 		else if (state == playerState.Attacking)
@@ -472,7 +495,13 @@ public class PlayerControl : NetworkBehaviour
 			if (attackCount == 2 && attackInterval < attackIntervalLimit)
 			{
 				RotateTowardMouseDuringAction();
-				CmdAnimation("Attack02");
+				if (isServer) {
+					RpcSetAnimation("Attack02");
+				}else if (!isServer) {
+					animation.SetTrigger("Attack02");
+					CmdAttack("Attack02");
+				}
+
 			}
 			else if (attackCount >= 3 && attackInterval < attackIntervalLimit)
 			{
@@ -480,7 +509,13 @@ public class PlayerControl : NetworkBehaviour
 				attackInterval = 0;
 
 				RotateTowardMouseDuringAction();
-				CmdAnimation("Attack03");
+				if (isServer) {
+					RpcSetAnimation("Attack03");
+				}else if (!isServer) {
+					animation.SetTrigger("Attack03");
+					CmdAttack("Attack03");
+				}
+
 			}
 		}
 	}
@@ -547,11 +582,13 @@ public class PlayerControl : NetworkBehaviour
 
 	void LegNotPain()
 	{
+		lastResort = false;
 		animation.SetBool("LegPainBool", false);
 	}
 		
 	void RestrictInput()
 	{
+		//if (animation.GetCurrentAnimatorStateInfo (0).length > animation.GetCurrentAnimatorStateInfo (0).normalizedTime)
 		// it's bad due to the delay
 		if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Idle") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Run") ||
 		    this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Dash") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("ShootCasting02"))
@@ -739,7 +776,10 @@ public class PlayerControl : NetworkBehaviour
 	public void CmdAnimation(string anim){
 		RpcSetAnimation (anim);
 	}
-
+	[Command]
+	public void CmdAttack(string anim){
+		animation.SetTrigger(anim);
+	}
 	[ClientRpc]
 	void RpcSetAnimation(string anim){
 		animation.SetTrigger(anim);
@@ -844,5 +884,17 @@ public class PlayerControl : NetworkBehaviour
 	[Command]
 	public void CmdRematch(){
 		LobbyController.s_Singleton.OnRematch ();
+	}
+
+	[Command]
+	public void CmdLastResort()
+	{
+		RpcLastResort();
+		//lastResort = true;
+	}
+
+	[ClientRpc]
+	void RpcLastResort(){
+		lastResort = true;
 	}
 }

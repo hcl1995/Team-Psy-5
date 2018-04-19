@@ -26,8 +26,5 @@ public class SplashScreenController : MonoBehaviour {
 			isStart = true;
 			gameObject.SetActive (false);
 		}
-		if (Input.anyKeyDown) {
-			TimeElepsed += 3.0f;
-		}
 	}
 }
