@@ -16,6 +16,10 @@ public class EndMatch : MonoBehaviour {
 	public Text text;
 	bool isReady = false;
 	public GameObject playerAgain;
+	public Image loser1;
+	public Image loser2;
+	public List<Sprite> loserSprite = new List<Sprite> ();
+	public List<Sprite> WinnerSprite = new List<Sprite> ();
 	// Use this for initialization
 	void Start () {
 		singleton = this;
@@ -24,16 +28,20 @@ public class EndMatch : MonoBehaviour {
 		if (!isAlphaMax) {
 			alphaColor += Time.deltaTime * alphaIncreaseRate;
 			endMatchBackground.color = new Color(1,1,1,alphaColor);
-			if (alphaColor >= 1) {
+			if (alphaColor >= 0.8f) {
 				isAlphaMax = true;
 				if (HealthManager.singleton.WinPlayerInt == 1) {
 					Player1.SetActive (true);
-					Player1.GetComponent<Image> ().sprite = LobbyController.s_Singleton.selectedCharacterSprite [HealthManager.singleton.player1Character];
+					Player1.GetComponent<Image> ().sprite = WinnerSprite [HealthManager.singleton.player1Character];
 					Player1Text.text = getWinnerText (HealthManager.singleton.player1Character);
+					loser1.sprite = loserSprite [HealthManager.singleton.player2Character];
+					loser1.SetNativeSize ();
 				} else if (HealthManager.singleton.WinPlayerInt == 2) {
 					Player2.SetActive (true);
-					Player2.GetComponent<Image> ().sprite = LobbyController.s_Singleton.selectedCharacterSprite [HealthManager.singleton.player2Character];
+					Player2.GetComponent<Image> ().sprite = WinnerSprite [HealthManager.singleton.player2Character];
 					Player2Text.text = getWinnerText (HealthManager.singleton.player2Character);
+					loser2.sprite = loserSprite [HealthManager.singleton.player1Character];
+					loser2.SetNativeSize ();
 				}
 				text.text = "PRESS ANY KEY TO CONTINUE";
 			}
@@ -49,7 +57,7 @@ public class EndMatch : MonoBehaviour {
 
 	string getWinnerText(int winnerTextInt){
 		if (winnerTextInt == 1) {
-			int rand = Random.Range (0, 2);
+			int rand = Random.Range (0, 3);
 			switch (rand) {
 			case 0:
 				return "Ha! Not even close";
@@ -61,7 +69,7 @@ public class EndMatch : MonoBehaviour {
 				return "Something not right";
 			}
 		} else if (winnerTextInt == 2) {
-			int rand = Random.Range (0, 1);
+			int rand = Random.Range (0, 2);
 			switch (rand) {
 			case 0:
 				return "Ha! How does the wind taste like";

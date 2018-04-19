@@ -39,14 +39,18 @@ public class UnityChanSkillControl : PlayerControl
 
 	public void InputSkills()
 	{
+		if(lastResort == true)
+			return;
+		
 		if (state == playerState.Normal)
 		{
 			if (KeyBindingManager.GetKeyDown(KeyAction.Skill01))
 			{
 				if (skill01Cooldown <= 0)
 				{
-					RotateTowardMouseDuringAction();
 					CmdAnimation("Bullet");
+					RotateTowardMouseDuringAction();
+					//CmdAnimation("Bullet");
 					CmdSkill01 (skill01SpawnPoint.position, skill01SpawnPoint.rotation);
 
 					skill01CD.fillAmount = 1;

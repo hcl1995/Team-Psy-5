@@ -4,19 +4,26 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 public class LocalPlayerInfo : MonoBehaviour {
+	private static LocalPlayerInfo _singleton = null;
+	static public LocalPlayerInfo singleton{
+		get {
+			if (_singleton == null)
+				Debug.LogError ("A script is trying to access the SoundManager which isn't present in this scene!");
 
-	static public LocalPlayerInfo singleton; 
+			return _singleton;
+		}
+	}
 	public int playerNum = 0;
 	public int player1;
 	public int player2;
 	public hitIndicator hit;
 	// Use this for initialization
-	void Start () {
-		DontDestroyOnLoad (gameObject);
-		if (singleton == null) {
-			singleton = this;
-		} else {
-			DestroyObject (gameObject);
+	void Awake () {		
+		if (_singleton == null) {
+			_singleton = this;
+			DontDestroyOnLoad (gameObject);
+		} else if(singleton!=this){
+			Destroy(this.gameObject);
 		}
 
 		//DontDestroyOnLoad(transform.gameObject);
@@ -42,6 +49,6 @@ public class LocalPlayerInfo : MonoBehaviour {
 	}
 
 	public void SelfDestroy(){
-		Destroy (gameObject);
+		Destroy (this.gameObject);
 	}
 }

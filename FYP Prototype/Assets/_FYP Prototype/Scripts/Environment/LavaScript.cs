@@ -11,8 +11,10 @@ public class LavaScript : NetworkBehaviour {
 			return;
 		if (other.gameObject.CompareTag("Player"))
 		{
-			other.gameObject.GetComponent<PlayerHealth> ().takeDamageHazard (damage); // Trigger doesn't looks that bad
+			other.gameObject.GetComponent<PlayerControl>().CmdLastResort();
 			other.gameObject.GetComponent<Animator>().SetBool("LegPainBool", true);
+
+			other.gameObject.GetComponent<PlayerHealth> ().takeDamageHazard (damage); // Trigger doesn't looks that bad
 
 			if (other.gameObject.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).IsName ("LegPain") == false)
 			{

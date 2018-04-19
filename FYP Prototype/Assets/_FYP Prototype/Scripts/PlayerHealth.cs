@@ -22,6 +22,8 @@ public class PlayerHealth : NetworkBehaviour {
 	public bool harzardDamageCD = false;
 	public float harzardDamageCDDuration = 1.0f;
 	public float harzardDamageCDElapsed = 0.0f;
+	public bool falled = false;
+	public float fallElapsed = 0.0f;
 
 	bool isDead = false;
 
@@ -38,18 +40,26 @@ public class PlayerHealth : NetworkBehaviour {
 	}
 
 	void Update(){
-//		if (isServer) {
-//			if (gameObject.transform.position.y <= -5)
-//			{
-//				
-//			}
-//		}
+
+			
+
 
 
 		if (!isLocalPlayer)
 			return;
 
-
+		if (gameObject.transform.position.y <= -0.5)
+		{
+			//if (!falled) {
+				CmdFallToDeath ();
+//				falled = true;
+//			}
+//			fallElapsed += Time.deltaTime;
+//			if (fallElapsed >= 10.5f) {
+//				falled = false;
+//				fallElapsed = 0.0f;
+//			}
+		}
 
 //		if (currentHealth < previousHealth) {
 //			hitIndicator.OnHit ();
@@ -57,13 +67,7 @@ public class PlayerHealth : NetworkBehaviour {
 //		}
 
 
-//		if (harzardDamageCD) {
-//			harzardDamageCDElapsed += Time.deltaTime;
-//			if (harzardDamageCDElapsed >= harzardDamageCDDuration) {
-//				harzardDamageCD = false;
-//				harzardDamageCDElapsed = 0.0f;
-//			}
-//		}
+
 	}
 
 	public IEnumerator hazardCoolDown(){
@@ -104,10 +108,10 @@ public class PlayerHealth : NetworkBehaviour {
 		//CmdHit ();
 
 		// doesn't seems working here.
-		transform.root.LookAt (colliderHit);
-		Vector3 eulerFucker = euler;
-		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
-		transform.root.rotation = Quaternion.Euler (eulerFucker);
+//		transform.root.LookAt (colliderHit);
+//		Vector3 eulerFucker = euler;
+//		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
+//		transform.root.rotation = Quaternion.Euler (eulerFucker);
 
 		checkDeath();
 	}
@@ -158,6 +162,8 @@ public class PlayerHealth : NetworkBehaviour {
 		if (harzardDamageCD)
 			return;
 		HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
+		gameObject.GetComponent<Animator>().SetBool("LegPainBool", true);
+		legPainAnimation("LegPain");
 		//CmdAnimation (animation);
 //		harzardDamageCD = true;
 //		StartCoroutine(hazardCoolDown());
@@ -203,10 +209,10 @@ public class PlayerHealth : NetworkBehaviour {
 			Destroy (impactGO, 1f);
 		}
 
-		transform.root.LookAt (position);
-		Vector3 eulerFucker = euler;
-		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
-		transform.root.rotation = Quaternion.Euler (eulerFucker);
+//		transform.root.LookAt (position);
+//		Vector3 eulerFucker = euler;
+//		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
+//		transform.root.rotation = Quaternion.Euler (eulerFucker);
 
 		checkDeath();
 	}
@@ -226,10 +232,11 @@ public class PlayerHealth : NetworkBehaviour {
 		impactGO =  (GameObject)Instantiate (impact,colliderHit, Quaternion.identity);
 		NetworkServer.Spawn (impactGO);
 		Destroy (impactGO, 1.5f);
-		transform.root.LookAt (position);
-		Vector3 eulerFucker = euler;
-		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
-		transform.root.rotation = Quaternion.Euler (eulerFucker);
+
+//		transform.root.LookAt (position);
+//		Vector3 eulerFucker = euler;
+//		eulerFucker = new Vector3 (0, eulerFucker.y - 180f, 0);
+//		transform.root.rotation = Quaternion.Euler (eulerFucker);
 
 		checkDeath();
 	}
@@ -285,6 +292,11 @@ public class PlayerHealth : NetworkBehaviour {
 	[ClientRpc]
 	void RpcGuardParticle(){
 		m_SuperGuard.Play();
+	}
+
+	[Command]
+	void CmdFallToDeath(){
+		HealthManager.singleton.takeDamage (playerNumber, 200.0f,playerControl);
 	}
 
 	//	[Command]

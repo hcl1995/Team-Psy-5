@@ -18,7 +18,10 @@ public class PlayerNetwork : NetworkBehaviour {
 	public GameObject playerUI;
 
 	public Text endGameText;
+	public Image endGameImage;
 	public GameObject Canvas;
+	public GameObject endGame;
+	public List<Sprite> endGameImageList = new List<Sprite>();
 
 	[SyncVar(hook = "GetEndGame")]
 	public int textInt = 0;
@@ -59,13 +62,13 @@ public class PlayerNetwork : NetworkBehaviour {
 	void OnSceneChange(Scene scene1, Scene scene2){
 		if (scene2.name == "DragonBallLevel" || scene2.name == "LevelEditor")
 		{
-			LobbyController.s_Singleton.lobbyCanvas.SetActive (false);
+			LobbyCanvas.instance.gameObject.SetActive  (false);
 
 			//CmdSpawnCharacter ();
 		
 		}
 		if (scene2.name == "Lobby") {
-			LobbyController.s_Singleton.lobbyCanvas.SetActive (true);
+			LobbyCanvas.instance.gameObject.SetActive (true);
 		}
 	}
 
@@ -73,13 +76,19 @@ public class PlayerNetwork : NetworkBehaviour {
 		//transform.localPosition = Vector3.zero;
 		switch (textInt) {
 		case 0:
-			endGameText.text = "";
+			//endGameText.text = "";
+			endGameImage.sprite = null;
+			endGame.SetActive (false);
 			break;
 		case 1:
-			endGameText.text = "You Win";
+			//endGameText.text = "You Win";
+			endGame.SetActive (true);
+			endGameImage.sprite = endGameImageList [1];
 			break;
 		case 2:
-			endGameText.text = "You Lose";
+			//endGameText.text = "You Lose";
+			endGame.SetActive (true);
+			endGameImage.sprite = endGameImageList[2];
 			break;
 		}
 	}

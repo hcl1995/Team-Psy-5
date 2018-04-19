@@ -12,6 +12,7 @@ public class LevelSelector : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		instance = this;
+		canvas.SetActive (false);
 	}
 
 	public void OnSelectLevel(int level){
@@ -25,8 +26,11 @@ public class LevelSelector : MonoBehaviour {
 	public void OnReadyLevelSelect(){
 		canvas.SetActive (true);
 		PlayerInfo.singleton.DisableCharacterSelector ();
+		LoadingScreenCanvas.instance.canvas.sortingOrder = -100;
 		if (PlayerInfo.singleton.playerNumber == 1)
 			comfirmButton.SetActive (true);
+		else
+			comfirmButton.SetActive (false);
 	}
 
 	public void OffLevelSelect(){

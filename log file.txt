@@ -1,3 +1,16 @@
+Commit 39 (Apr 20, 2018)
+-----------------------
+-Unity Chan mismerged sound.
+
+
+Commit 38 (Apr 19, 2018)
+-----------------------
+-Unity Chan mismerged sound.
+-Try & forcefully make character faster into leg burn state so they cannot use skill.
+-Refresh spelling text fixed.
+-UnityChan 2nd skill collider fixed.
+
+
 Commit 37 (Apr 18, 2018)
 -----------------------
 -Change guard particle from instantiate --> particle.play (PlayerHealth)

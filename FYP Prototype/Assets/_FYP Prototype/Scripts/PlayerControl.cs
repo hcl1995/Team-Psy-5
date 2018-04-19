@@ -6,6 +6,7 @@ using UnityEngine.Networking;
 
 public class PlayerControl : NetworkBehaviour
 {
+	public bool lastResort;
 	static public PlayerControl singleton;
 	Vector3 targetDirection;
 	float rotationSpeed = 30;
@@ -168,6 +169,16 @@ public class PlayerControl : NetworkBehaviour
 			}
 		} else {
 			CmdBlinkCharacter (true);
+		}
+
+		if (lastResort == true)
+		{
+			animation.ResetTrigger("Attack");
+			animation.ResetTrigger("Guard");
+			animation.ResetTrigger("ShootCasting01");
+			animation.ResetTrigger("ShootCasting02");
+			animation.ResetTrigger("Wall");
+			animation.ResetTrigger("Ultimate");
 		}
 	}
 
@@ -372,76 +383,82 @@ public class PlayerControl : NetworkBehaviour
 
 			// bloody cheat
 			transform.localEulerAngles = new Vector3(0, transform.localEulerAngles.y, 0);
-//			Quaternion rotation = Quaternion.LookRotation(hit.point);
-//			transform.rotation = rotation;
+			//Quaternion rotation = Quaternion.LookRotation(hit.point);
+			//transform.rotation = rotation;
 		}
 	}
 
 	bool isNotAlwaysGuard = true;
 	void Guard()
 	{
-//		if (KeyBindingManager.GetKey (KeyAction.Guard)) {
-//			if (state == PlayerControl.playerState.Normal) {
-//				//animation.SetBool("isMoving", false);
-//				RotateTowardMouseDuringAction ();
-//				//animation.SetTrigger("Guard");
-//				if (!toggleGuard) {
-//					CmdAnimation ("Guard");
-//					CmdPlaySFXClip (2);
-//				}
-//				toggleGuard = true;
-//				animation.SetBool ("Guarding", true);
-//				CmdSetPlayerState (PlayerControl.playerState.Guarding);
-//				soundEffect.PlaySFXClip (soundEffect.selfServiceClip [6]);
-//			}				
-//		} else if (state == PlayerControl.playerState.Guarding && isNotAlwaysGuard) {
-//			//			if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
-//			//			{
-//			//animation.SetBool("isMoving", false);
-//			animation.SetBool ("Guarding", false);
-//			CmdSetPlayerState (PlayerControl.playerState.Normal);
-//			toggleGuard = false;
-//			//}
-//		} else if (state == PlayerControl.playerState.Normal) {
-//			toggleGuard = false;
-//		}
-//		if (Input.GetKeyUp (KeyCode.K)) {
-//			if (isNotAlwaysGuard)
-//				isNotAlwaysGuard = false;
-//			else if (!isNotAlwaysGuard)
-//				isNotAlwaysGuard = true;
-//		}
-
-		if (state == PlayerControl.playerState.Normal)
-		{
-			if (KeyBindingManager.GetKey(KeyAction.Guard))
-			{
+		if(lastResort == true)
+			return;
+		
+		if (KeyBindingManager.GetKey (KeyAction.Guard)) {
+			if (state == PlayerControl.playerState.Normal) {
 				//animation.SetBool("isMoving", false);
-				RotateTowardMouseDuringAction();
+				RotateTowardMouseDuringAction ();
 				//animation.SetTrigger("Guard");
-				if(!toggleGuard)
-				{
+				if (!toggleGuard) {
 					CmdAnimation ("Guard");
-					CmdPlaySFXClip(2);
+					CmdPlaySFXClip (2);
 				}
 				toggleGuard = true;
-				animation.SetBool("Guarding", true);
+				animation.SetBool ("Guarding", true);
 				CmdSetPlayerState (PlayerControl.playerState.Guarding);
+				//soundEffect.PlaySFXClip (soundEffect.selfServiceClip [6]);
 			}				
-		}else if (state == PlayerControl.playerState.Guarding){
-						if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
-						{
+		} else if (state == PlayerControl.playerState.Guarding && isNotAlwaysGuard) {
+			//			if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
+			//			{
 			//animation.SetBool("isMoving", false);
-			animation.SetBool("Guarding", false);
+			animation.SetBool ("Guarding", false);
 			CmdSetPlayerState (PlayerControl.playerState.Normal);
 			toggleGuard = false;
 			//}
+		} else if (state == PlayerControl.playerState.Normal) {
+			toggleGuard = false;
 		}
+		if (Input.GetKeyUp (KeyCode.K)) {
+			if (isNotAlwaysGuard)
+				isNotAlwaysGuard = false;
+			else if (!isNotAlwaysGuard)
+				isNotAlwaysGuard = true;
 		}
+
+//		if (state == PlayerControl.playerState.Normal)
+//		{
+//			if (KeyBindingManager.GetKey(KeyAction.Guard))
+//			{
+//				//animation.SetBool("isMoving", false);
+//				RotateTowardMouseDuringAction();
+//				//animation.SetTrigger("Guard");
+//				if(!toggleGuard)
+//				{
+//					CmdAnimation ("Guard");
+//					CmdPlaySFXClip(2);
+//				}
+//				toggleGuard = true;
+//				animation.SetBool("Guarding", true);
+//				CmdSetPlayerState (PlayerControl.playerState.Guarding);
+//			}				
+//		}else if (state == PlayerControl.playerState.Guarding){
+//						if (KeyBindingManager.GetKeyUp(KeyAction.Guard))
+//						{
+//			//animation.SetBool("isMoving", false);
+//			animation.SetBool("Guarding", false);
+//			CmdSetPlayerState (PlayerControl.playerState.Normal);
+//			toggleGuard = false;
+//			//}
+//		}
+//		}
 	}
 
 	void Attack()
 	{
+		if(lastResort == true)
+			return;
+		
 		if (attackCount >= 3 || attackInterval > attackIntervalLimit)
 		{
 			attackCount = 0;
@@ -547,11 +564,13 @@ public class PlayerControl : NetworkBehaviour
 
 	void LegNotPain()
 	{
+		lastResort = false;
 		animation.SetBool("LegPainBool", false);
 	}
 		
 	void RestrictInput()
 	{
+		//if (animation.GetCurrentAnimatorStateInfo (0).length > animation.GetCurrentAnimatorStateInfo (0).normalizedTime)
 		// it's bad due to the delay
 		if (this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Idle") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Run") ||
 		    this.animation.GetCurrentAnimatorStateInfo (0).IsName ("Dash") || this.animation.GetCurrentAnimatorStateInfo (0).IsName ("ShootCasting02"))
@@ -844,5 +863,17 @@ public class PlayerControl : NetworkBehaviour
 	[Command]
 	public void CmdRematch(){
 		LobbyController.s_Singleton.OnRematch ();
+	}
+
+	[Command]
+	public void CmdLastResort()
+	{
+		RpcLastResort();
+		//lastResort = true;
+	}
+
+	[ClientRpc]
+	void RpcLastResort(){
+		lastResort = true;
 	}
 }

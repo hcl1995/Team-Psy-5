@@ -20,6 +20,12 @@ public class DestructableWall : NetworkBehaviour
 	public ParticleSystem FallParticle;
 	public ParticleSystem breakParticle;
 
+	public GameObject m_HitParticle;
+	public GameObject m_FallParticle;
+	public GameObject m_BreakParticle;
+
+	//public GameObject spawnPoint;
+
 	void Awake()
 	{
 		animation = GetComponent<Animator>();
@@ -58,7 +64,8 @@ public class DestructableWall : NetworkBehaviour
 		{
 			c.enabled = !c.enabled;
 		}
-		breakParticle.Play();
+		CmdHitParticles(3, new Vector3(transform.position.x, transform.position.y +1.5f, transform.position.z), transform.rotation);
+		//breakParticle.Play();
 	}
 
 	//	[ClientRpc]
@@ -81,12 +88,36 @@ public class DestructableWall : NetworkBehaviour
 	[ClientRpc]
 	void RpcHitParticlePLUSSound()
 	{
-		hitParticle.Play();
+		//hitParticle.Play();
+		CmdHitParticles(1, new Vector3(transform.position.x, transform.position.y +1.5f, transform.position.z), transform.rotation);
 		soundEffect.PlaySFXClip(soundEffect.selfServiceClip[0]);
 	}
 
 	void AnimEventPlayParticle()
 	{
-		FallParticle.Play();
+		CmdHitParticles(2, new Vector3(transform.position.x, transform.position.y +0.5f, transform.position.z), transform.rotation);
+		//FallParticle.Play();
 	}
+
+	[Command]
+	void CmdHitParticles(int destroyType, Vector3 position, Quaternion rotation){
+		GameObject particleType = m_HitParticle;
+		switch (destroyType) {
+		case 1:
+			particleType = m_HitParticle;
+			break;
+		case 2:
+			particleType = m_FallParticle;
+			break;
+		case 3:
+			particleType = m_BreakParticle;
+			break;
+		}
+
+		var particleHit = Instantiate(particleType, position, rotation);
+		NetworkServer.Spawn (particleHit);
+		Destroy(particleHit, 1.5f);
+	}
+
+	// use back old aren't that bad also
 }

@@ -50,6 +50,9 @@ public class PlayerSkillControl : PlayerControl
 
 	public void InputSkills()
 	{
+		if(lastResort == true)
+			return;
+		
 		if (state == playerState.Normal)
 		{
 			if (KeyBindingManager.GetKeyDown(KeyAction.Skill01))
