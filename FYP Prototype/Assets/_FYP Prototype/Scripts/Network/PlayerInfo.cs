@@ -72,7 +72,9 @@ public class PlayerInfo : NetworkBehaviour {
 		int playerNumberForSprite = 0;
 		if (playerNumber == 2&&selectedCharacterInt>0)
 			playerNumberForSprite = 2;
-		
+		if (playerNumber == 2 && selectedCharacterInt == 0) {
+			playerNumberForSprite = 5;
+		}
 		transform.localPosition = Vector3.zero;
 		if (playerNumber == 1) {
 			playerColor = Color.blue;
@@ -147,8 +149,12 @@ public class PlayerInfo : NetworkBehaviour {
 
 	public void SelectedCharacter(int i){
 		int playerNumberForSprite = 0;
-		if (playerNumber == 2 && i>0)
+		if (playerNumber == 2 && i > 0) {
 			playerNumberForSprite = 2;
+		} 
+		if (playerNumber == 2 && i == 0) {
+			playerNumberForSprite = 5;
+		}
 		selectedCharacterInt = i;
 		characterSprite.sprite = LobbyController.s_Singleton.selectedCharacterSprite [i+playerNumberForSprite];
 	}

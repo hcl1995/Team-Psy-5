@@ -29,6 +29,8 @@ public class LevelSelector : MonoBehaviour {
 		LoadingScreenCanvas.instance.canvas.sortingOrder = -100;
 		if (PlayerInfo.singleton.playerNumber == 1)
 			comfirmButton.SetActive (true);
+		else
+			comfirmButton.SetActive (false);
 	}
 
 	public void OffLevelSelect(){

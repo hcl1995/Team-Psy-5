@@ -62,6 +62,8 @@ public class LobbyController : NetworkManager {
 	}
 
 	public void OnBackToMainMenu(){
+		base.StopHost();
+		base.StopClient ();
 		SceneManager.LoadScene(1);
 		LocalPlayerInfo.singleton.SelfDestroy ();
 		LoadingScreenCanvas.instance.SelfDestroy ();
@@ -215,6 +217,9 @@ public class LobbyController : NetworkManager {
 		if (readyPlayer > 1) {
 			print ("All Ready");
 			PlayerInfo.singleton.RpcLevelSelect ();
+			allReadyEnd = 0;
+			isLoadScreenOn = 0;
+			loadReady = 0;
 		}
 	}
 	public void PlayerUnready(){
