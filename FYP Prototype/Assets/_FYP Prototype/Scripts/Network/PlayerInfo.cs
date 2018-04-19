@@ -33,10 +33,11 @@ public class PlayerInfo : NetworkBehaviour {
 	Color playerColor;
 	Color oppColor;
 	// Use this for initialization
-	void OnEnable(){
+	public void OnEnable(){
 		if (isLocalPlayer) {
 			canvas.SetActive (true);
-			ready = false;
+			CmdReadyState (false);
+			localPlayerIndicator.GetComponent<Image> ().color = Color.black;
 			SoundManager.instance.PlayBGM (BGMAudioClipID.BGM_IMMORTALSELECTION);
 		}
 	}
@@ -69,7 +70,7 @@ public class PlayerInfo : NetworkBehaviour {
 		}
 
 		int playerNumberForSprite = 0;
-		if (playerNumber == 2)
+		if (playerNumber == 2&&selectedCharacterInt>0)
 			playerNumberForSprite = 2;
 		
 		transform.localPosition = Vector3.zero;
@@ -100,7 +101,6 @@ public class PlayerInfo : NetworkBehaviour {
 
 		if (!ready) {	
 			CmdReadyState (true);
-
 			localPlayerIndicator.GetComponent<Image> ().color = playerColor;
 
 		} else if (ready) {	
@@ -147,7 +147,7 @@ public class PlayerInfo : NetworkBehaviour {
 
 	public void SelectedCharacter(int i){
 		int playerNumberForSprite = 0;
-		if (playerNumber == 2)
+		if (playerNumber == 2 && i>0)
 			playerNumberForSprite = 2;
 		selectedCharacterInt = i;
 		characterSprite.sprite = LobbyController.s_Singleton.selectedCharacterSprite [i+playerNumberForSprite];

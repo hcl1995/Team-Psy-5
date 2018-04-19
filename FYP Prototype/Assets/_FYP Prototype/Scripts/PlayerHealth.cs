@@ -16,11 +16,14 @@ public class PlayerHealth : NetworkBehaviour {
 	public Animator anim;
 	GameObject impactGO;
 	public GameObject superGuard;
+	public ParticleSystem m_SuperGuard;
 	public hitIndicator hitIndicator;
 	float previousHealth = maxHealth;
 	public bool harzardDamageCD = false;
 	public float harzardDamageCDDuration = 1.0f;
 	public float harzardDamageCDElapsed = 0.0f;
+	public bool falled = false;
+	public float fallElapsed = 0.0f;
 
 	bool isDead = false;
 
@@ -37,18 +40,27 @@ public class PlayerHealth : NetworkBehaviour {
 	}
 
 	void Update(){
-//		if (isServer) {
-//			if (gameObject.transform.position.y <= -5)
-//			{
-//				
-//			}
-//		}
+
+			
+
 
 
 		if (!isLocalPlayer)
 			return;
 
+		if (gameObject.transform.position.y <= -5)
+		{
+			if (!falled) {
+				CmdFallToDeath ();
+				falled = true;
+			}
+			fallElapsed += Time.deltaTime;
+			if (fallElapsed >= 10.5f) {
+				falled = false;
+				fallElapsed = 0.0f;
+			}
 
+		}
 
 //		if (currentHealth < previousHealth) {
 //			hitIndicator.OnHit ();
@@ -56,13 +68,7 @@ public class PlayerHealth : NetworkBehaviour {
 //		}
 
 
-//		if (harzardDamageCD) {
-//			harzardDamageCDElapsed += Time.deltaTime;
-//			if (harzardDamageCDElapsed >= harzardDamageCDDuration) {
-//				harzardDamageCD = false;
-//				harzardDamageCDElapsed = 0.0f;
-//			}
-//		}
+
 	}
 
 	public IEnumerator hazardCoolDown(){
@@ -86,9 +92,11 @@ public class PlayerHealth : NetworkBehaviour {
 			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
 			playerControl.CmdPlaySFXClip(6);
 
-			impactGO =  (GameObject)Instantiate (superGuard, position, Quaternion.identity);
-			NetworkServer.Spawn (impactGO);
-			Destroy (impactGO, 1.5f);
+			CmdGuardParticle();
+			//m_SuperGuard.Play();
+			//impactGO =  (GameObject)Instantiate (superGuard, position, Quaternion.identity);
+			//NetworkServer.Spawn (impactGO);
+			//Destroy (impactGO, 1.5f);
 		}
 		else {
 			HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
@@ -185,9 +193,11 @@ public class PlayerHealth : NetworkBehaviour {
 			HealthManager.singleton.takeDamage (playerNumber, 1.0f,playerControl);
 			playerControl.CmdPlaySFXClip(6);
 
-			impactGO =  (GameObject)Instantiate (superGuard, position, Quaternion.identity);
-			NetworkServer.Spawn (impactGO);
-			Destroy (impactGO, 1.5f);
+			CmdGuardParticle();
+			//m_SuperGuard.Play();
+			//impactGO =  (GameObject)Instantiate (superGuard, position, Quaternion.identity);
+			//NetworkServer.Spawn (impactGO);
+			//Destroy (impactGO, 1.5f);
 		}
 		else {
 			HealthManager.singleton.takeDamage (playerNumber, damage,playerControl);
@@ -270,6 +280,21 @@ public class PlayerHealth : NetworkBehaviour {
 	[ClientRpc]
 	public void RpcAmintion(string animation){
 		anim.SetTrigger (animation);
+	}
+
+	[Command]
+	void CmdGuardParticle(){
+		RpcGuardParticle();
+	}
+
+	[ClientRpc]
+	void RpcGuardParticle(){
+		m_SuperGuard.Play();
+	}
+
+	[Command]
+	void CmdFallToDeath(){
+		HealthManager.singleton.takeDamage (playerNumber, 200.0f,playerControl);
 	}
 
 	//	[Command]

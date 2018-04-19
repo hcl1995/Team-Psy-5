@@ -72,7 +72,8 @@ public class UnityChanUltimate : MonoBehaviour
 
 					}
 				}
-				AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[11], other.transform.position);
+				AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[11], other.transform.position, SoundManager.instance.GetSoundVolume() * SoundManager.instance.GetMasterVolume ());
+				other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().CmdInvincible(true);
 				isHit = true;
 			}
 		}

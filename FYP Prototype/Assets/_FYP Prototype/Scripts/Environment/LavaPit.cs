@@ -22,13 +22,14 @@ public class LavaPit : DestructableWall
 	{
 		if (health <= breakHP && callOnce == false)
 		{
-			AudioSource.PlayClipAtPoint(soundEffect.selfServiceClip[1], transform.position);
+			AudioSource.PlayClipAtPoint(soundEffect.selfServiceClip[1], transform.position, SoundManager.instance.GetSoundVolume() * SoundManager.instance.GetMasterVolume ());
 
 			int repeat = Random.Range(5, 20);
+			Debug.Log("meteor number: " + repeat);
 			for (int i = 0; i < repeat; i++)
 			{
-				int randomX = Random.Range(1, 23);
-				int randomZ = Random.Range(1, 23);
+				int randomX = Random.Range(2, 22);
+				int randomZ = Random.Range(2, 22);
 				CmdSpawnMe (meteorRock, GetMeteorPosition(randomX, randomZ), Quaternion.identity);
 			}
 

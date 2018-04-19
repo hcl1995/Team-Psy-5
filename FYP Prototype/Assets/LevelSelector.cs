@@ -12,6 +12,7 @@ public class LevelSelector : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		instance = this;
+		canvas.SetActive (false);
 	}
 
 	public void OnSelectLevel(int level){

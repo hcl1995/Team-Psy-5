@@ -46,7 +46,7 @@ public class DestructableWall : NetworkBehaviour
 		}
 		if (health <= 0)
 		{
-			AudioSource.PlayClipAtPoint(soundEffect.selfServiceClip[1], transform.position);
+			AudioSource.PlayClipAtPoint(soundEffect.selfServiceClip[1], transform.position, SoundManager.instance.GetSoundVolume() * SoundManager.instance.GetMasterVolume ());
 			Destroy(gameObject);
 		}
 	}

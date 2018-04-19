@@ -47,7 +47,8 @@ public class AttackUlti : MonoBehaviour
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().getOtherPos = transform.root.forward * distance;
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position),other);
 					//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
-					AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[11], other.transform.position);
+					AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[11], other.transform.position, SoundManager.instance.GetSoundVolume() * SoundManager.instance.GetMasterVolume ());
+					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().CmdInvincible(true);
 				}
 				else if (selfPlayerSkill.skill02Buffed == true)
 				{
@@ -55,7 +56,8 @@ public class AttackUlti : MonoBehaviour
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().getOtherPos = transform.root.forward * distance;
 					other.gameObject.transform.root.gameObject.GetComponent<PlayerHealth> ().takeMuaiThaiUlt (damage * 2,"DamageDown03",impact,transform.position,other.transform.rotation.eulerAngles,other.gameObject.GetComponent<Collider> ().ClosestPointOnBounds (transform.position),other);
 					//AudioSource.PlayClipAtPoint(SoundManager.instance.onHitClip, other.transform.position);
-					AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[11], other.transform.position);
+					AudioSource.PlayClipAtPoint(selfControl.soundEffect.selfServiceClip[11], other.transform.position, SoundManager.instance.GetSoundVolume() * SoundManager.instance.GetMasterVolume ());
+					other.gameObject.transform.root.gameObject.GetComponent<PlayerControl>().CmdInvincible(true);
 					selfPlayerSkill.skill02Buffed = false;
 				}
 				isHit = true;

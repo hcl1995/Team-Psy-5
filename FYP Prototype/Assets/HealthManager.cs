@@ -7,8 +7,8 @@ using Cinemachine;
 
 public class HealthManager : NetworkBehaviour {
 
-	float player1HealthMax = 200;
-	float player2HealthMax = 200;
+	public float player1HealthMax = 200;
+	public float player2HealthMax = 200;
 	[SyncVar(hook = "OnChangeHealth1")]
 	float player1HealthCurrent;
 	[SyncVar(hook = "OnChangeHealth2")]
@@ -52,9 +52,6 @@ public class HealthManager : NetworkBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_INGAME);
-		SoundManager.instance.PlaySpecialBGM(BGMAudioClipID.BGM_AMBIENCE);
-
 		player1HealthCurrent = player1HealthMax;
 		player2HealthCurrent = player2HealthMax;
 		singleton = this;
@@ -65,7 +62,7 @@ public class HealthManager : NetworkBehaviour {
 	void Update(){
 		player1Protrait.sprite = CharacterProtrait [player1Character];
 		Player1Name.sprite = CharacterName [player1Character];
-		player2Protrait.sprite = CharacterProtrait [player2Character];
+		player2Protrait.sprite = CharacterProtrait [player2Character+2];
 		Player2Name.sprite = CharacterName [player2Character+2];
 	}
 
@@ -216,6 +213,11 @@ public class HealthManager : NetworkBehaviour {
 		} else if (playerNumber == 2) {
 			player2LifeNode [Life].GetComponent<Image>().sprite = lifeGone2;
 		}
+	}
+
+	[ClientRpc]
+	void RpcPlayThis(){
+		SoundManager.instance.PlayBGM(BGMAudioClipID.BGM_IMMORTALSELECTION);
 	}
 
 	[ClientRpc]

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 
 public class FindMatchLayout : MonoBehaviour {
+	float refresh = 0;
 	[SerializeField]
 	private GameObject _matchListingPrefab;
 	public GameObject MatchListingPrefab{
@@ -20,9 +21,12 @@ public class FindMatchLayout : MonoBehaviour {
 	public Dictionary<string,NetworkBroadcastResult> nbr;
 
 	void OnEnable(){
+		networkDiscovery = LobbyController.s_Singleton.networkDiscovery;
 		StartSearch ();
 	}
-
+	void Start(){
+		
+	}
 	public void StartSearch(){
 		nbr = networkDiscovery.broadcastsReceived;
 		StartCoroutine (SearchGame());

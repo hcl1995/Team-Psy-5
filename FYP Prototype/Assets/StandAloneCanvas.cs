@@ -3,16 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class StandAloneCanvas : MonoBehaviour {
-	private static StandAloneCanvas instance;
+	private static StandAloneCanvas _instance = null;
+	public static StandAloneCanvas instance{
+		get {
+			if (_instance == null)
+				Debug.LogError ("A script is trying to access the SoundManager which isn't present in this scene!");
+
+			return _instance;
+		}
+	}
 	public GameObject Leave;
 	public GameObject GameManager;
 	// Use this for initialization
-	void Start () {
-		DontDestroyOnLoad (gameObject);
-		if (instance == null) {
-			instance = this;
-		} else {
-			Destroy (gameObject);
+	void Awake () {
+		
+		if (_instance == null) {
+			_instance = this;
+			DontDestroyOnLoad (gameObject);
+		} else if(instance!=this){
+			Destroy (this.gameObject);
 		}
 	}
 

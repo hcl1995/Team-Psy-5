@@ -141,6 +141,7 @@ public class LobbyController : NetworkManager {
 		foreach (GameObject go in playerNetwork) {
 			go.GetComponent<PlayerNetwork> ().textInt = 0;
 		}
+		PlayerInfo.singleton.OnEnable ();
 		intPlayer--;
 	}
 
@@ -214,12 +215,11 @@ public class LobbyController : NetworkManager {
 		if (readyPlayer > 1) {
 			print ("All Ready");
 			PlayerInfo.singleton.RpcLevelSelect ();
-
-			readyPlayer = 0;
 		}
 	}
 	public void PlayerUnready(){
-		readyPlayer--;
+		if(readyPlayer>0)
+			readyPlayer--;
 	}
 	public void allLoadScreenOn(){
 		isLoadScreenOn++;

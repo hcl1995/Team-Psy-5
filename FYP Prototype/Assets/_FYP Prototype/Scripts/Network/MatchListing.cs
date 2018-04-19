@@ -17,7 +17,7 @@ public class MatchListing : MonoBehaviour {
 	public bool Updated{ get; set; }
 
 	private void Start(){
-		GameObject gameListPanelObj = LobbyController.s_Singleton.FindMatchPanel.gameObject;
+		GameObject gameListPanelObj = LobbyController.s_Singleton.FindMatchPanel.gameObject;//transform.parent.GetComponent<GameListPanel> ().gameObject;
 		if (gameListPanelObj == null)
 			return;
 

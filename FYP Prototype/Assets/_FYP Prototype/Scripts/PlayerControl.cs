@@ -10,6 +10,8 @@ public class PlayerControl : NetworkBehaviour
 	Vector3 targetDirection;
 	float rotationSpeed = 30;
 
+	Vector3 colYOffset;
+	BoxCollider colCollider;
 	public Animator animation;
 	public Vector3 startSpawnPosition;
 
@@ -119,6 +121,7 @@ public class PlayerControl : NetworkBehaviour
 
 	protected void Awake()
 	{
+		colCollider = GetComponent<BoxCollider>();
 		soundEffect = GetComponent<SoundEffect>();
 		animation = GetComponent<Animator>();
 		trailRendererObject.transform.parent = null;
@@ -127,6 +130,7 @@ public class PlayerControl : NetworkBehaviour
 
 	protected void Start()
 	{
+		colYOffset = colCollider.center;
 		dashCharge = maxDashChargeCount;
 		if (isLocalPlayer){
 			playerCanvas.SetActive (true);
@@ -195,9 +199,14 @@ public class PlayerControl : NetworkBehaviour
 
 		if (seriouslyFlying)
 		{
+			//CmdOffsetCollider(1.4f);
 			completeFlyTime += flyLerpSpeed * Time.deltaTime;
 			transform.position = Vector3.Lerp (flyStartPos, flyTargetPos, completeFlyTime);
 		}
+//		else
+//		{
+//			CmdOffsetCollider(0.9f);
+//		}
 
 		if (completeFlyTime >= 1)
 		{
@@ -281,10 +290,15 @@ public class PlayerControl : NetworkBehaviour
 
 		if (isDash)
 		{
+			CmdOffsetCollider(1.4f);
 			completeDashTime += dashLerpSpeed * Time.deltaTime;
 			transform.position = Vector3.Lerp (dashStartPos, dashEndPos, completeDashTime);
 			//trailRendererObject.transform.position = gameObject.transform.position;
 			CmdDashTrail();
+		}
+		else
+		{
+			CmdOffsetCollider(0.9f);
 		}
 
 		if (completeDashTime >= 1)
@@ -397,6 +411,7 @@ public class PlayerControl : NetworkBehaviour
 			else if (!isNotAlwaysGuard)
 				isNotAlwaysGuard = true;
 		}
+
 //		if (state == PlayerControl.playerState.Normal)
 //		{
 //			if (KeyBindingManager.GetKey(KeyAction.Guard))
@@ -599,11 +614,19 @@ public class PlayerControl : NetworkBehaviour
 
 	public void playDeathAnim(){
 		CmdAnimation ("Death");
+		CmdInvincible(true);
 
 		if (isFalling == false)
 		{
 			CmdPlaySFXClip(0);
 		}
+	}
+
+	[Command]
+	public void CmdOffsetCollider(float yOffset)
+	{
+		colYOffset.y = yOffset;
+		colCollider.center = colYOffset;
 	}
 
 	[Command]
@@ -802,7 +825,7 @@ public class PlayerControl : NetworkBehaviour
 	}
 
 	[Command]
-	void CmdInvincible(bool invinc){
+	public void CmdInvincible(bool invinc){
 		invincible = invinc;
 
 		RpcBlinkCharacter (true);
